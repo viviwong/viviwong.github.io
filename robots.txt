@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /Blog/
+Allow: /archives/
+Allow: /categories/
+Allow: /files/
+Allow: /tags/
+
+
+# Disallow: /css/
+# Disallow: /images/
+# Disallow: /js/
+# Disallow: /vendors/
+
+
+Sitemap: https://maxchendt.github.io/sitemap.xml
