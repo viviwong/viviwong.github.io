@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="我是测试分类123 我是正文123">
+<meta name="description" content="基本语法简介python是什么 编程语言 丰富的基础模块和第三方模块  这些模块包含数据库,web开发,文件操作;避免重复造轮子 python版本,目前有python2和python3,相互不兼容,大部分库已经支持python3">
 <meta property="og:type" content="article">
 <meta property="og:title" content="123">
 <meta property="og:url" content="http://viviwong.github.io/Blog/20171114123.html">
 <meta property="og:site_name" content="viviwong&#39;s Blog">
-<meta property="og:description" content="我是测试分类123 我是正文123">
+<meta property="og:description" content="基本语法简介python是什么 编程语言 丰富的基础模块和第三方模块  这些模块包含数据库,web开发,文件操作;避免重复造轮子 python版本,目前有python2和python3,相互不兼容,大部分库已经支持python3">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2017-11-14T15:59:10.000Z">
+<meta property="og:updated_time" content="2017-11-14T16:31:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="123">
-<meta name="twitter:description" content="我是测试分类123 我是正文123">
+<meta name="twitter:description" content="基本语法简介python是什么 编程语言 丰富的基础模块和第三方模块  这些模块包含数据库,web开发,文件操作;避免重复造轮子 python版本,目前有python2和python3,相互不兼容,大部分库已经支持python3">
 
 
 
@@ -360,9 +360,147 @@
       
 
       
-        <h1 id="我是测试分类123"><a href="#我是测试分类123" class="headerlink" title="我是测试分类123"></a>我是测试分类123</h1><ul>
-<li>我是正文123</li>
+        <h1 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="python是什么"><a href="#python是什么" class="headerlink" title="python是什么"></a>python是什么</h3><ul>
+<li>编程语言</li>
+<li>丰富的基础模块和第三方模块 </li>
+<li>这些模块包含<code>数据库</code>,<code>web开发</code>,<code>文件操作</code>;避免重复造轮子</li>
+<li>python版本,目前有python2和python3,相互不兼容,大部分库已经支持python3</li>
 </ul>
+<a id="more"></a>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><ul>
+<li>优点: 简单,<code>少量的代码实现复杂的功能</code></li>
+<li>缺点: 解释型的编程语言,每次执行的时候会一行一行的解释执行,执行的性能比不上编译型的语言,Python 程序的源代码完全开放。因为Python程序是脚本，不是编译成二进制分发的，通常很难进行代码保护。</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>Python 最主要的应用场景包括网络爬虫，Web 开发，自动化运维，数据分析等领域</p>
+<h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><ul>
+<li>Ubuntu</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">使用 apt-get 安装</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install python3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Mac</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install python3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Windows</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Python 官网下载后通过图形界面一步步点击下一步进行安装</span><br></pre></td></tr></table></figure>
+<h3 id="交互"><a href="#交互" class="headerlink" title="交互"></a>交互</h3><ul>
+<li>终端中输入<code>python3</code>进入交互环境</li>
+</ul>
+<h3 id="执行脚本"><a href="#执行脚本" class="headerlink" title="执行脚本"></a>执行脚本</h3><ul>
+<li>直接使用python3解释器执行脚本</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"print('hello world')"</span> &gt; /Users/wangsheng/hello world.py</span><br><span class="line">python3 /Users/wangsheng/hello world.py</span><br></pre></td></tr></table></figure>
+<h2 id="初次尝试"><a href="#初次尝试" class="headerlink" title="初次尝试"></a>初次尝试</h2><ul>
+<li>初次接触Python的<code>脚本编写与执行</code>、<code>模块引入和使用</code></li>
+</ul>
+<h3 id="第一行"><a href="#第一行" class="headerlink" title="第一行"></a>第一行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>#!</code> Shebang</li>
+<li>目的是告诉 shell 使用 Python 3 解释器执行其下面的代码</li>
+</ul>
+<h3 id="模块与引入"><a href="#模块与引入" class="headerlink" title="模块与引入"></a>模块与引入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> math <span class="keyword">import</span> pi</span><br></pre></td></tr></table></figure>
+<ul>
+<li>从math库中引入 pi，让当前的文件中可以使用 pi</li>
+</ul>
+<h3 id="执行代码"><a href="#执行代码" class="headerlink" title="执行代码"></a>执行代码</h3><ul>
+<li>用python3 命令指定脚本 python3 执行</li>
+<li>直接执行脚本</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">要运行脚本文件 circle.py，还要为文件添加可执行权限</span><br><span class="line">chmod +x circle.py</span><br><span class="line">执行脚本</span><br><span class="line">执行脚本的时候前面需要输入 ./ 表示在当前目录下的脚本</span><br><span class="line">./circle.py</span><br></pre></td></tr></table></figure>
+<h2 id="变量与数据类型"><a href="#变量与数据类型" class="headerlink" title="变量与数据类型"></a>变量与数据类型</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><ul>
+<li>变量,编程语言中为了更好的处理数据</li>
+<li>变量可以是不同的数据类型</li>
+<li>python中变量不需要声明可以直接使用</li>
+</ul>
+<h3 id="变量名"><a href="#变量名" class="headerlink" title="变量名"></a>变量名</h3><ul>
+<li>字母数字下划线</li>
+<li>不能以数字开头</li>
+<li>不能是关键词</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> keyword </span><br><span class="line">keyword.kwlist</span><br></pre></td></tr></table></figure>
+<h3 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h3><ul>
+<li>整型 </li>
+<li>布尔 <code>True False</code></li>
+<li>浮点 </li>
+<li>None 代表未定义</li>
+</ul>
+<h3 id="使用变量及打印"><a href="#使用变量及打印" class="headerlink" title="使用变量及打印"></a>使用变量及打印</h3><ul>
+<li><code>print()</code> 打印输出</li>
+<li><code>type</code>显示变量数据类型</li>
+</ul>
+<h3 id="运算"><a href="#运算" class="headerlink" title="运算"></a>运算</h3><ul>
+<li>整型和浮点型混合运算中,整型会被转化为浮点型</li>
+</ul>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><ul>
+<li><code>+</code> 字符串连接</li>
+<li><code>\</code> 字符串转义</li>
+<li><code>:</code> 字符串切片 <code>字符串[起始位置:结束位置]</code></li>
+<li><code>len()</code> 字符串中字符数量</li>
+</ul>
+<h3 id="流程控制"><a href="#流程控制" class="headerlink" title="流程控制"></a>流程控制</h3><h4 id="顺序结构"><a href="#顺序结构" class="headerlink" title="顺序结构"></a>顺序结构</h4><h4 id="分支结构"><a href="#分支结构" class="headerlink" title="分支结构"></a>分支结构</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> 条件语句<span class="number">1</span>:</span><br><span class="line">    输出<span class="number">1</span></span><br><span class="line"><span class="keyword">elif</span> 条件语句<span class="number">2</span>:</span><br><span class="line">    输出<span class="number">2</span></span><br><span class="line"><span class="keyword">else</span> :</span><br><span class="line">    输出<span class="number">3</span></span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">* input</span><br><span class="line">* input获取用户输入</span><br><span class="line">* input中的参数将输出到屏幕上</span><br><span class="line">* 用户输入的内容会被函数返回,返回的值为字符串</span><br><span class="line">* 如果不输入，程序将始终阻塞等待</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">input(<span class="string">"Please enter: "</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="循环结构"><a href="#循环结构" class="headerlink" title="循环结构"></a>循环结构</h4><ul>
+<li>for 循环主要用在依次取出一个列表中的项，对列表进行遍历处理</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">    print(a)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>while</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">w = <span class="number">100</span></span><br><span class="line"><span class="keyword">while</span> w &gt; <span class="number">10</span>:</span><br><span class="line">    print(w)</span><br><span class="line">    w -= <span class="number">10</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>循环控制语句</li>
+<li>break表示停止当前循环</li>
+<li>continue表示跳过本轮循环</li>
+</ul>
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><h3 id="什么是异常"><a href="#什么是异常" class="headerlink" title="什么是异常"></a>什么是异常</h3><ul>
+<li>异常处理 <code>编程中必须要完成的内容</code></li>
+<li>不符合预期的<code>用户操作和数据输入</code>都会产生异常</li>
+<li>处理异常是<code>保证程序稳定</code>的关键</li>
+<li><p>异常出现原因很多,逻辑错误,用户输入错误都会造成异常</p>
+</li>
+<li><p>以下演示出现异常</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">filename = input(<span class="string">"Enter file path:"</span>)</span><br><span class="line">f = open(filename)</span><br><span class="line">print(f.read())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>会出现文件不存在的异常，并且会发现 Traceback，这就是系统抛出的异常，异常的类型是 FileNotFoundError</p>
+</blockquote>
+<ul>
+<li>最常见的异常类</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">NameError 			访问一个未定义的变量</span><br><span class="line">SyntaxError 		语法错误，这个严格讲算是程序的错误</span><br><span class="line">IndeError 			对于一个序列，访问的索引超过了序列的范围（序列的概念会在后续讲到），可以理解为我的序列里只有三个元素，但要访问第<span class="number">4</span>个</span><br><span class="line">KeyError 			访问一个不存在的字典 Key，字典也会在后面详细讲到，Key 如果不存在字典就会抛出这个异常</span><br><span class="line">ValueError 			传入无效的参数</span><br><span class="line">AttributeError 		访问类对象中不存在的属性</span><br></pre></td></tr></table></figure>
+<h3 id="异常处理-1"><a href="#异常处理-1" class="headerlink" title="异常处理"></a>异常处理</h3><ul>
+<li>出现异常不可以直接抛给用户</li>
+<li>应该使用python提供的<code>异常处理方法捕获</code>并且<code>处理异常</code></li>
+<li>处理方法 <code>try</code> <code>except</code> <code>finally</code></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    有可能抛出异常的代码</span><br><span class="line"><span class="keyword">except</span> 异常类型名称：</span><br><span class="line">    处理代码</span><br><span class="line"><span class="keyword">except</span> 异常类型名称：</span><br><span class="line">    处理代码</span><br><span class="line"></span><br><span class="line"><span class="keyword">except</span>可以有多个，每个处理不同类型的异常，也可以不写任何异常类型名称，则会处理所有捕获的异常</span><br></pre></td></tr></table></figure>
+<ul>
+<li>改进文件读取程序</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">filename = input(<span class="string">"Enter file path:"</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    f = open(filename)</span><br><span class="line">    print(f.read())</span><br><span class="line">    f.close()</span><br><span class="line"><span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">    print(<span class="string">"File not found"</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>finally关键字</li>
+<li>进行清理工作,经常和 except 一起使用</li>
+<li>正常还是异常,这段代码都会执行</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">filename = <span class="string">'/etc/protocols'</span></span><br><span class="line">f = open(filename)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    f.write(<span class="string">'shiyanlou'</span>)</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    print(<span class="string">"File write error"</span>)</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    print(<span class="string">"finally"</span>)</span><br><span class="line">    f.close()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>以只读的模式打开了一个文件,尝试向文件中写入内容,会抛出异常,虽然异常，但仍然执行到了 finally 代码块</p>
+</blockquote>
+<h3 id="抛出异常"><a href="#抛出异常" class="headerlink" title="抛出异常"></a>抛出异常</h3><ul>
+<li><code>raise</code>希望在程序中抛出异常的时候使用</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">格式 </span><br><span class="line"><span class="keyword">raise</span> 异常名称</span><br><span class="line">抛出一个ValueError</span><br><span class="line"><span class="keyword">raise</span> ValueError()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>外部可以使用 except ValueError: 捕获和处理异常 </p>
+</blockquote>
+<h3 id="异常处理逻辑"><a href="#异常处理逻辑" class="headerlink" title="异常处理逻辑"></a>异常处理逻辑</h3><ul>
+<li>程序执行出现异常 or 自定义抛出异常 raise 异常</li>
+<li>捕获异常</li>
+</ul>
+<p>### </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>: </span><br><span class="line">    可能出现异常的代码 </span><br><span class="line"><span class="keyword">except</span> 异常名:</span><br><span class="line">    处理异常</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -420,6 +558,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Blog/2017111502-deep-learning.html" rel="prev" title="02-deep-learning">
+                02-deep-learning <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -500,7 +642,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -522,7 +664,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -557,7 +699,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#我是测试分类123"><span class="nav-number">1.</span> <span class="nav-text">我是测试分类123</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本语法"><span class="nav-number">1.</span> <span class="nav-text">基本语法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#python是什么"><span class="nav-number">1.1.1.</span> <span class="nav-text">python是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点"><span class="nav-number">1.1.2.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用场景"><span class="nav-number">1.1.3.</span> <span class="nav-text">应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发环境"><span class="nav-number">1.2.</span> <span class="nav-text">开发环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#交互"><span class="nav-number">1.2.2.</span> <span class="nav-text">交互</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行脚本"><span class="nav-number">1.2.3.</span> <span class="nav-text">执行脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初次尝试"><span class="nav-number">1.3.</span> <span class="nav-text">初次尝试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一行"><span class="nav-number">1.3.1.</span> <span class="nav-text">第一行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模块与引入"><span class="nav-number">1.3.2.</span> <span class="nav-text">模块与引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行代码"><span class="nav-number">1.3.3.</span> <span class="nav-text">执行代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量与数据类型"><span class="nav-number">1.4.</span> <span class="nav-text">变量与数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">1.4.1.</span> <span class="nav-text">变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量名"><span class="nav-number">1.4.2.</span> <span class="nav-text">变量名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本数据类型"><span class="nav-number">1.4.3.</span> <span class="nav-text">基本数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用变量及打印"><span class="nav-number">1.4.4.</span> <span class="nav-text">使用变量及打印</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算"><span class="nav-number">1.4.5.</span> <span class="nav-text">运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串"><span class="nav-number">1.4.6.</span> <span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流程控制"><span class="nav-number">1.4.7.</span> <span class="nav-text">流程控制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#顺序结构"><span class="nav-number">1.4.7.1.</span> <span class="nav-text">顺序结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分支结构"><span class="nav-number">1.4.7.2.</span> <span class="nav-text">分支结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#循环结构"><span class="nav-number">1.4.7.3.</span> <span class="nav-text">循环结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常处理"><span class="nav-number">1.5.</span> <span class="nav-text">异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是异常"><span class="nav-number">1.5.1.</span> <span class="nav-text">什么是异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异常处理-1"><span class="nav-number">1.5.2.</span> <span class="nav-text">异常处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抛出异常"><span class="nav-number">1.5.3.</span> <span class="nav-text">抛出异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异常处理逻辑"><span class="nav-number">1.5.4.</span> <span class="nav-text">异常处理逻辑</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
