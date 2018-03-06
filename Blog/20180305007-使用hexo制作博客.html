@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="item,软件使用," />
+  <meta name="keywords" content="Hexo," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="item2使用快捷键 垂直切屏 command+D   水平切屏 command+shift+D 关闭窗口 command+W">
-<meta name="keywords" content="item,软件使用">
+<meta name="description" content="关于博客 使用Hexo搭建自己的博客">
+<meta name="keywords" content="Hexo">
 <meta property="og:type" content="article">
-<meta property="og:title" content="001-item2使用快捷键">
-<meta property="og:url" content="http://viviwong.github.io/Blog/20171110001-item2使用快捷键.html">
+<meta property="og:title" content="007-使用hexo制作博客">
+<meta property="og:url" content="http://viviwong.github.io/Blog/20180305007-使用hexo制作博客.html">
 <meta property="og:site_name" content="viviwong&#39;s Blog">
-<meta property="og:description" content="item2使用快捷键 垂直切屏 command+D   水平切屏 command+shift+D 关闭窗口 command+W">
+<meta property="og:description" content="关于博客 使用Hexo搭建自己的博客">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-03-05T16:23:16.000Z">
+<meta property="og:updated_time" content="2018-03-05T16:06:17.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="001-item2使用快捷键">
-<meta name="twitter:description" content="item2使用快捷键 垂直切屏 command+D   水平切屏 command+shift+D 关闭窗口 command+W">
+<meta name="twitter:title" content="007-使用hexo制作博客">
+<meta name="twitter:description" content="关于博客 使用Hexo搭建自己的博客">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://viviwong.github.io/Blog/20171110001-item2使用快捷键.html"/>
+  <link rel="canonical" href="http://viviwong.github.io/Blog/20180305007-使用hexo制作博客.html"/>
 
 
 
 
 
-  <title>001-item2使用快捷键 | viviwong's Blog</title>
+  <title>007-使用hexo制作博客 | viviwong's Blog</title>
   
 
 
@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://viviwong.github.io/Blog/20171110001-item2使用快捷键.html">
+    <link itemprop="mainEntityOfPage" href="http://viviwong.github.io/Blog/20180305007-使用hexo制作博客.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="viviwong">
@@ -289,7 +289,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">001-item2使用快捷键</h1>
+          <h1 class="post-title" itemprop="name headline">007-使用hexo制作博客</h1>
         
 
         <div class="post-meta">
@@ -301,8 +301,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-10T17:21:53+08:00">
-                2017-11-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-05T23:27:04+08:00">
+                2018-03-05
               </time>
             
 
@@ -324,8 +324,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具/" itemprop="url" rel="index">
-                    <span itemprop="name">工具</span>
+                  <a href="/categories/教程/" itemprop="url" rel="index">
+                    <span itemprop="name">教程</span>
                   </a>
                 </span>
 
@@ -361,11 +361,65 @@
       
 
       
-        <h1 id="item2使用快捷键"><a href="#item2使用快捷键" class="headerlink" title="item2使用快捷键"></a>item2使用快捷键</h1><ul>
-<li>垂直切屏 <code>command+D</code>  </li>
-<li>水平切屏 <code>command+shift+D</code></li>
-<li>关闭窗口 <code>command+W</code></li>
+        <h1 id="关于博客"><a href="#关于博客" class="headerlink" title="关于博客"></a>关于博客</h1><ul>
+<li>使用Hexo搭建自己的博客</li>
 </ul>
+<a id="more"></a>
+<ul>
+<li>首先你必须要有github账号(因为我们使用了免费的gitpage服务)</li>
+<li>环境安装   <ul>
+<li>安装homebrew</li>
+<li>安装git</li>
+<li>安装node.js</li>
+<li>安装Hexo</li>
+<li>当然以上你都可以通过homebrew安装</li>
+</ul>
+</li>
+<li>安装<ul>
+<li><a href="https://brew.sh/" target="_blank" rel="external">安装homebrew</a>  </li>
+<li>安装nodejs  <code>brew install node</code></li>
+<li>安装hexo <code>npm install -g hexo-cli</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-启动博客"><a href="#1-启动博客" class="headerlink" title="1 启动博客"></a>1 启动博客</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo server -p 4400</span><br></pre></td></tr></table></figure>
+<ul>
+<li>浏览 <a href="http://localhost:4400/" target="_blank" rel="external">http://localhost:4400/</a> 就看到了！这里我使用端口 4400 (-p 4400)，因为端口 4000 被其他程序占用</li>
+</ul>
+<h2 id="2-准备写博客"><a href="#2-准备写博客" class="headerlink" title="2 准备写博客"></a>2 准备写博客</h2><ul>
+<li>1 参考 <a href="https://hexo.io/zh-cn/docs/configuration.html" target="_blank" rel="external">https://hexo.io/zh-cn/docs/configuration.html</a> 进行配置。我只修改了 <code>/hexo/_config.yml</code> 里面很少的配置 (title description author url permalink 等, 其中的 language: default 临时解决不设置language导致缺省语言错误)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># Site</span><br><span class="line">title: viviwong&apos;s Blog</span><br><span class="line">subtitle:</span><br><span class="line">description: viviwong&apos;s Blog collection TECH</span><br><span class="line">author: viviwong</span><br><span class="line">language: en</span><br><span class="line">timezone:</span><br><span class="line"></span><br><span class="line"># URL</span><br><span class="line">## If your site is put in a subdirectory, set url as &apos;http://yoursite.com/child&apos; and root as &apos;/child/&apos;</span><br><span class="line">url: http://viviwong.github.io</span><br><span class="line">root: /</span><br><span class="line">permalink: Blog/:year:month:day:title.html</span><br><span class="line">permalink_defaults:</span><br></pre></td></tr></table></figure>
+<ul>
+<li>2 开始写博文:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new 001-item2使用快捷键</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Hexo会在<code>/hexo-dir/source/_posts</code> 目录下创建 <code>001-item2使用快捷键.md</code></p>
+</blockquote>
+<ul>
+<li>3 本地查看博客效果</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo g; hexo s -p 4400</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>浏览 <a href="http://localhost:4400/" target="_blank" rel="external">http://localhost:4400/</a></p>
+</blockquote>
+<h2 id="3-分类和标签"><a href="#3-分类和标签" class="headerlink" title="3 分类和标签"></a>3 分类和标签</h2><ul>
+<li><p>分类和标签</p>
+<ul>
+<li><a href="http://theme-next.iissnan.com/theme-settings.html#categories-page" target="_blank" rel="external">NexT中主题配置中有说</a></li>
+<li><a href="https://hexo.io/zh-cn/docs/front-matter.html#%E5%88%86%E7%B1%BB%E5%92%8C%E6%A0%87%E7%AD%BE" target="_blank" rel="external">Hexo关于分类和标签</a></li>
+</ul>
+</li>
+<li><p>规划分类和标签</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">配置分类</span><br><span class="line">---</span><br><span class="line">title: categories</span><br><span class="line">date: 2017-11-14 22:14:11</span><br><span class="line">type: categories</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">配置标签</span><br><span class="line">---</span><br><span class="line">title: TagCloud</span><br><span class="line">date: 2017-11-14 21:44:33</span><br><span class="line">type: tags</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<ul>
+<li>博文中直接添加</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: 005-第一性原理--黄晓杰</span><br><span class="line">date: 2018-03-05 21:30:03</span><br><span class="line">tags: 学习</span><br><span class="line">categories: 得到</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -407,9 +461,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/item/" rel="tag"> <i class="fa fa-tag"></i> item</a>
-          
-            <a href="/tags/软件使用/" rel="tag"> <i class="fa fa-tag"></i> 软件使用</a>
+            <a href="/tags/Hexo/" rel="tag"> <i class="fa fa-tag"></i> Hexo</a>
           
         </div>
       
@@ -422,14 +474,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/Blog/20180305006-第一性原理-练习.html" rel="next" title="006-第一性原理--练习">
+                <i class="fa fa-chevron-left"></i> 006-第一性原理--练习
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/Blog/20171115002-deep-learning.html" rel="prev" title="002-deep-learning">
-                002-deep-learning <i class="fa fa-chevron-right"></i>
+              <a href="/Blog/20180306008-如何成为有效学习的高手.html" rel="prev" title="008-如何成为有效学习的高手">
+                008-如何成为有效学习的高手 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -568,7 +624,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#item2使用快捷键"><span class="nav-text">item2使用快捷键</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于博客"><span class="nav-text">关于博客</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-启动博客"><span class="nav-text">1 启动博客</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-准备写博客"><span class="nav-text">2 准备写博客</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-分类和标签"><span class="nav-text">3 分类和标签</span></a></li></ol></li></ol></div>
             
 
           </div>
