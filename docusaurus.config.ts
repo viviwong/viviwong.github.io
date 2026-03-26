@@ -3,35 +3,31 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  // 1. 站点基础信息
-  title: '嵌入式AI', 
-  tagline: '让嵌入式开发更简单', 
+  // 【关键：基础配置】
+  title: '嵌入式AI',
+  tagline: '让嵌入式开发更简单',
   favicon: 'img/favicon.ico',
 
-  // 2. GitHub Pages 发布配置 (严禁重复定义)
+  // 【关键：GitHub Pages 路径，只准出现这一次】
   url: 'https://viviwong.github.io',
   baseUrl: '/',
   organizationName: 'viviwong',
   projectName: 'viviwong.github.io',
-  deploymentBranch: 'gh-pages',
-  trailingSlash: false,
 
-  // 3. 外部样式库 (确保图标正常显示)
+  // 【核心重点：外部样式表注入】
+  // 如果这里还是加载不到，请检查你的开发服务器是否需要重启
   stylesheets: [
     {
-      href: 'https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.min.css',
-      type: 'text/css',
+      'https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css',
+      // 加入这个 Inter 字体，它是目前最顶级的 UI 字体
+      'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap',
+      
     },
   ],
 
-  // 4. 报错处理与实验性功能
   onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
-  future: {
-    v4: true, 
-  },
 
-  // 5. 语言设置
   i18n: {
     defaultLocale: 'zh-Hans',
     locales: ['zh-Hans'],
@@ -55,41 +51,22 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       defaultMode: 'dark',
-      respectPrefersColorScheme: true,
     },
-    // 导航栏
     navbar: {
       title: '嵌入式AI',
       logo: {
         alt: 'Logo',
-        src: 'img/logo.png', 
+        src: 'img/logo.png',
       },
       items: [
         {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: '讲义'},
         {to: '/blog', label: '博客', position: 'left'},
       ],
     },
-    // 页脚
     footer: {
       style: 'dark',
-      links: [
-        {
-          title: 'Docs',
-          items: [
-            { label: '讲义', to: '/docs/intro' },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            { label: 'Blog', to: '/blog' },
-            { label: 'GitHub', href: 'https://github.com/viviwong' },
-          ],
-        },
-      ],
       copyright: `Copyright © ${new Date().getFullYear()} KDL, Inc. 叩丁狼嵌入式AI讲义.`,
     },
     prism: {

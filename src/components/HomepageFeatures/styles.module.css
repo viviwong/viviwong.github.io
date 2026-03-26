@@ -1,140 +1,284 @@
-/* 全局暗色背景 */
+/* --- 基础容器 --- */
 .featuresSection {
-  background-color: #0b0e14; /* 深黑色背景 */
-  padding: 4rem 0;
-  color: #fff;
+ 
+  padding: 6rem 0; /* 增加上下间距，显得大气 */
+  font-family: 'Inter', -apple-system, sans-serif;
 }
 
-/* 卡片基础样式：参考图 7 的大圆角和间距 */
 .featureCard {
   margin-bottom: 2rem;
   display: flex;
+  padding: 0 15px; /* 增加卡片之间的间距 */
 }
 
+/* --- 卡片主体 --- */
 .cardOuter {
-  background-color: #161a23; /* 卡片深灰色背景 */
-  border-radius: 24px; /* 大圆角 */
+  background: #111318; /* Readdy 的卡片不是透明的，是深灰黑 */
+  border-radius: 24px; /* 更大的圆角 */
+  
+  transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
   overflow: hidden;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  transition: all 0.3s ease; /* 添加悬停动画 */
-  border: 1px solid rgba(255, 255, 255, 0.05); /* 淡淡的边框 */
 }
 
-/* --- 霓虹发光核心逻辑 --- */
-/* 这里利用 box-shadow 实现外发光 */
+/* 三大主题色变量定义 (使用原版高饱和度颜色) */
+.blue { --accent: #00d4ff; }
+.green { --accent: #4ade80; }
+.purple { --accent: #B537F2; }
 
-/* 蓝色主题 (Python) */
-.blue .cardOuter {
-  box-shadow: 0 0 15px rgba(37, 99, 235, 0.1), 0 0 30px rgba(37, 99, 235, 0.05);
-}
-.blue .cardOuter:hover {
-  box-shadow: 0 0 25px rgba(37, 99, 235, 0.3), 0 0 50px rgba(37, 99, 235, 0.15);
-  transform: translateY(-5px);
-}
-.blue .neonTag {
-  background: rgba(37, 99, 235, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(37, 99, 235, 0.5);
-  text-shadow: 0 0 5px #60a5fa;
+/* 悬停效果：边框变色 + 阴影 */
+.cardOuter:hover {
+  transform: translateY(-10px);
+  
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(var(--accent), 0.1);
 }
 
-/* 绿色主题 (STM32) */
-.green .cardOuter {
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.1), 0 0 30px rgba(34, 197, 94, 0.05);
-}
-.green .cardOuter:hover {
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.3), 0 0 50px rgba(34, 197, 94, 0.15);
-  transform: translateY(-5px);
-}
-.green .neonTag {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.5);
-  text-shadow: 0 0 5px #4ade80;
-}
-
-/* 紫色主题 (LVGL) */
-.purple .cardOuter {
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.1), 0 0 30px rgba(168, 85, 247, 0.05);
-}
-.purple .cardOuter:hover {
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.3), 0 0 50px rgba(168, 85, 247, 0.15);
-  transform: translateY(-5px);
-}
-.purple .neonTag {
-  background: rgba(168, 85, 247, 0.15);
-  color: #a78bfa;
-  border: 1px solid rgba(168, 85, 247, 0.5);
-  text-shadow: 0 0 5px #a78bfa;
-}
-
-/* --- 子组件样式 --- */
-
-/* 图片区域 */
+/* --- 顶部图片区 --- */
 .cardImageWrapper {
   position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 比例锁定 */
+  aspect-ratio: 1.8 / 1; /* 稍微压扁一点，显得更秀气 */
+  overflow: hidden;
 }
 
 .mainImage {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 确保图片不变形地充满 */
+  object-fit: cover;
+  transition: transform 0.8s ease;
 }
 
-/* 右上角霓虹标签 */
+.cardOuter:hover .mainImage {
+  transform: scale(1.1);
+}
+
+/* 右上角选项卡 (Python/AI等) - 实心高亮 */
 .neonTag {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 1px;
+  top: 15px;
+  right: 15px;
+  color: var(--accent); /* 背景色随主题变 */
+  
+  padding: 5px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* 文字内容区域 */
+/* --- 内容区 --- */
 .cardContent {
-  padding: 24px;
+  padding: 2rem; /* 增加内边距是高级感的秘诀 */
+  flex-grow: 1;
 }
 
-/* 标题行：图标 + 标题文字 */
 .titleRow {
   display: flex;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  align-items: center; /* 必须是 center，确保左右两块的中轴线在一条线上 */
+  margin-bottom: 1.5rem;
 }
 
-.bottomIcon {
-  width: 40px;
-  height: 40px;
-  margin-right: 16px;
-  margin-top: 4px; /* 微调对齐 */
+.iconContainer {
+  width: 42px;         /* 稍微缩小一点，更精致 */
+  height: 42px;
+  border-radius: 12px;
+  margin-right: 12px;  /* 调整与文字的间距 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;      /* 防止图标被挤压变形 */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.featureIcon { font-size: 24px; }
+
+/* 标题字体：亮白色，悬停变色 */
+.titleText {
+  margin-top: 2px; /* 微调这个像素值，直到标题第一行和图标视觉对齐 */
 }
 
 .titleText h3 {
-  margin: 0;
-  font-size: 20px;
-  color: #fff;
+  margin: 0 !important; /* 强制清空所有外边距 */
+  padding: 0;
+  line-height: 1.2;     /* 设置固定行高，方便精准计算位置 */
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .subTitle {
-  margin: 2px 0 0 0;
-  font-size: 14px;
-  color: #94a3b8; /* 灰色小字 */
+  margin: 2px 0 0 0;    /* 只给副标题加一点点顶部间距 */
+  font-size: 0.75rem;
+  color: #64748b;
 }
 
-/* 详细描述文字 */
+.subTitle {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+
+
 .description {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #cbd5e1; /* 稍亮的灰色 */
+  /* 1. 字体：必须确保引入了 Inter 或类似的无衬线字体 */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* 2. 字号：Readdy 的正文其实很小，但行距很大 */
+  font-size: 0.92rem; 
+  
+  /* 3. 行高：这是“高级感”的关键，1.7 到 1.8 之间最舒适 */
+  line-height: 1.75; 
+  
+  /* 4. 颜色：不能是纯白，也不能太暗。用这种带有蓝灰调的浅色 */
+  color: #94a3b8; 
+  
+  /* 5. 字间距：现代 UI 喜欢稍微缩紧一点点 */
+  letter-spacing: -0.01em; 
+  
+  /* 6. 边距：给文字上下留出足够的呼吸空间 */
+  margin: 1.2rem 0 2rem 0;
+  
+  /* 7. 渲染优化：让字体在暗色下更细更锐利 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- 底部标签栏 --- */
+.tagBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.contentTag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 8px;
+  
+  /* --- 关键修改：背景色随主题走，但只给 0.1 的透明度 --- */
+  /* 如果你的变量是 Hex，用 rgba(var(--accent-rgb), 0.1) 效果最好 */
+  /* 这里我们直接使用一个带颜色的半透明背景 */
+  background: rgba(var(--theme-color-rgb), 0.1); 
+  
+  /* 或者更简单直接的方法：直接在特定类里定义 */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* 边框不需要太亮，保持低调 */
+  color: var(--accent); /* 文字颜色保持高亮 */
+  
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px); /* 加一点点模糊，增加玻璃质感 */
+}
+
+/* 蓝色板块 (Python) */
+.blue .contentTag {
+  background: rgba(0, 212, 255, 0.12); /* 淡淡的深蓝色背景 */
+  border: 1px solid rgba(0, 212, 255, 0.2); /* 带颜色的极细边框 */
+}
+
+/* 绿色板块 (STM32) */
+.green .contentTag {
+  background: rgba(34, 197, 94, 0.12); /* 淡淡的深绿色背景 */
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* 紫色板块 (LVGL) */
+.purple .contentTag {
+  background: rgba(168, 85, 247, 0.12); /* 淡淡的深紫色背景 */
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+/* 悬停时 Tag 变亮 */
+/* .cardOuter:hover .contentTag {
+  
+  border-color: rgba(var(--accent), 0.3);
+  background: rgba(var(--accent), 0.05);
+} */
+
+
+/* --- 1. 定义主题色变量 (确保 Hex 颜色正确) --- */
+.blue { 
+  --accent: #00d4ff; 
+  --accent-rgb: 0, 212, 255; 
+}
+.green { 
+  --accent: #4ade80; 
+  --accent-rgb: 74, 222, 128; 
+}
+.purple { 
+  --accent: #B537F2; 
+  --accent-rgb: 167, 139, 250; 
+}
+
+/* --- 2. 卡片主体阴影强化 --- */
+.cardOuter {
+  /* 1. 【核心修改】双重背景叠加：淡白打底 + 主题色 */
+  background: 
+    /* 上层：高饱和度主题色，透明度设为 0.1 */
+    linear-gradient(rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.1)),
+    /* 下层：极淡的纯白，增加整体亮度，透明度设为 0.03 */
+    linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08));
+  
+  /* 备用背景色，设为卡片的基础深灰黑 */
+  background-color: #111318;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border-color: var(--accent);
+  /* 默认一个极其微弱的投影 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* 核心：悬停时的复合阴影效果 */
+.cardOuter:hover {
+  transform: translateY(-8px);
+
+   box-shadow: 
+    0 16px 45px rgba(0, 0, 0, 0.75),
+    0 24px 60px rgba(0, 0, 0, 0.4),
+    0 0 35px rgba(var(--accent-rgb), 0.6),
+    0 0 70px 5px rgba(var(--accent-rgb), 0.3);
+}
+/* --- 3. 背景色随主题变化的标签 --- */
+.contentTag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 8px;
+  
+  /* 重点：背景色取自变量的 0.1 透明度 */
+  background: rgba(var(--accent-rgb), 0.1); 
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
+  color: var(--accent);
+  
+  transition: all 0.3s;
+  background: rgba(var(--accent-rgb), 0.2);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.2);
+}
+
+/* 悬停时标签亮度提升 */
+/* .cardOuter:hover .contentTag {
+  background: rgba(var(--accent-rgb), 0.2);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.2);
+} */
+
+/* --- 4. 描述文字（针对你的“系统学习...”文字微调） --- */
+.description {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: #94a3b8; /* 稍微暗一点的蓝灰色，显得高级 */
+  margin: 1.2rem 0;
+  /* 确保长文本换行好看 */
+  text-align: justify;
 }

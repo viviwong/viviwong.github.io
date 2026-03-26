@@ -3,6 +3,8 @@ import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css'; // 稍后我们要重点修改这个 CSS
 
+
+
 // 定义新的数据结构
 type FeatureItem = {
   title: string;
@@ -30,13 +32,14 @@ const FeatureList: FeatureItem[] = [
         打造可落地的工业视觉应用。
       </>
     ),
+    tags: ['OpenCV 图像处理', 'YOLOv8 目标检测', '模型量化与部署', '实时视频分析', '工业缺陷检测']
   },
   {
     theme: 'green',
     tag: 'STM32 / HAL',
     imgSrc: 'img/2stm32.jpg',
-    iconClass: 'ri-eye-2-line', // 对应图 7 的眼睛
-    iconColor: 'rgb(0, 212, 255)',
+    iconClass: 'ri-cpu-line', // 对应芯片图标
+    iconColor: 'rgb(34, 197, 94)',
     title: 'STM32 HAL 库实战',
     subTitle: '从寄存器到高级外设驱动',
     description: (
@@ -46,13 +49,14 @@ const FeatureList: FeatureItem[] = [
         快速具备工业级嵌入式开发能力。
       </>
     ),
+    tags: ['HAL 库架构精讲', 'SPI/I2C/UART 驱动', 'DMA 高效传输', 'FreeRTOS 多任务', '低功耗优化']
   },
   {
     theme: 'purple',
     tag: 'LVGL / GUI',
     imgSrc: 'img/3lvgl.jpg',
-    iconClass: 'ri-eye-2-line', // 对应图 7 的眼睛
-    iconColor: 'rgb(0, 212, 255)',
+    iconClass: 'ri-layout-masonry-line', // 对应布局图标
+    iconColor: 'rgb(168, 85, 247)',
     title: 'LVGL 高级 UI',
     subTitle: '嵌入式图形界面全栈开发',
     description: (
@@ -62,36 +66,50 @@ const FeatureList: FeatureItem[] = [
         项目开发，UI 效果媲美手机应用。
       </>
     ),
+    tags: ['LVGL 组件体系', '自定义样式主题', '动画与过渡效果', '触摸屏驱动集成', '复杂 HMI 项目']
   },
 ];
 
 // 重构 Feature 组件以匹配图 7 的层次
-function Feature({theme, tag, imgSrc, iconClass, iconColor, title, subTitle, description}: FeatureItem) {
-  // 自动计算背景颜色 (将 rgb 转为 rgba 并设为 0.15 透明度)
-  const iconBackground = iconColor.replace('rgb', 'rgba').replace(')', ', 0.15)');
+function Feature({theme, tag, imgSrc, iconClass, iconColor, title, subTitle, description, tags}: FeatureItem) {
+  // 优化透明度计算，12% 的透明度在暗色模式下最显高级
+  const iconBackground = iconColor.replace('rgb', 'rgba').replace(')', ', 0.12)');
 
   return (
-    <div className={clsx('col col--4', styles.featureCard, styles[theme])}>
-      <div className={styles.cardOuter}>
+    <div className={clsx('col col--4', styles.featureCard)}>
+      {/* 确保 styles[theme] 作用在最外层，方便控制悬停发光 */}
+      <div className={clsx(styles.cardOuter, styles[theme])}>
+        
+        {/* 1. 顶部视觉区：图片 + 霓虹标签 */}
         <div className={styles.cardImageWrapper}>
           <img src={imgSrc} className={styles.mainImage} alt={title} />
-          <span className={styles.neonTag}>{tag}</span>
+          <div className={styles.neonTag}>{tag}</div>
         </div>
         
+        {/* 2. 内容核心区 */}
         <div className={styles.cardContent}>
+          {/* 标题行：图标方块 + 文字组合 */}
           <div className={styles.titleRow}>
-            {/* 这里的 div 负责霓虹背景方块 */}
             <div className={styles.iconContainer} style={{ background: iconBackground }}>
-              {/* 这里的 i 负责显示 Remix Icon 字体图标 */}
               <i className={clsx(iconClass, styles.featureIcon)} style={{ color: iconColor }}></i>
             </div>
-
             <div className={styles.titleText}>
               <Heading as="h3">{title}</Heading>
               <p className={styles.subTitle}>{subTitle}</p>
             </div>
           </div>
+
+          {/* 描述文本 */}
           <p className={styles.description}>{description}</p>
+          
+          {/* 3. 底部细分标签栏 (复刻 Readdy 的精髓) */}
+          {tags && tags.length > 0 && (
+            <div className={styles.tagBar}>
+              {tags.map((t, idx) => (
+                <span key={idx} className={styles.contentTag}>{t}</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
