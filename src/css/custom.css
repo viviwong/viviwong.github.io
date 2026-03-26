@@ -1,42 +1,44 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-/* You can override the default Infima variables here. */
+/* --- 1. 浅色模式下的蓝色体系 --- */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #2575fc;          /* 您的主色蓝色 */
+  --ifm-color-primary-dark: #2169e2;
+  --ifm-color-primary-darker: #1f63d6;
+  --ifm-color-primary-darkest: #1a52b0;
+  --ifm-color-primary-light: #3b83fd;
+  --ifm-color-primary-lighter: #468afd;
+  --ifm-color-primary-lightest: #669ffd;
+  
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* 新增：强制修改链接悬停颜色 */
+  --ifm-link-color-hover: var(--ifm-color-primary-light);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* --- 2. 深色模式下的蓝色体系（建议稍微亮一点） --- */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #00d4ff;          /* 对应您 Python 板块的亮蓝色 */
+  --ifm-color-primary-dark: #00bef6;
+  --ifm-color-primary-darker: #00b3e6;
+  --ifm-color-primary-darkest: #0094bd;
+  --ifm-color-primary-light: #1ad9ff;
+  --ifm-color-primary-lighter: #26dcff;
+  --ifm-color-primary-lightest: #4de3ff;
+  
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  /* 深色模式下的链接悬停 */
+  --ifm-link-color-hover: var(--ifm-color-primary-light);
 }
-/* 让首页的大背景变成蓝色 */
+
+/* --- 3. 首页 Hero 背景（已按您的要求保持蓝色） --- */
 .hero--primary {
-  background-color: #2575fc !important; /* 你喜欢的蓝色 */
+  background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%) !important; 
+  /* 建议加个渐变，会比纯蓝更有 Readdy 的质感 */
 }
 
-
-/* 按钮样式微调 */
-/* .button--secondary {
-  background-color: #ffffff;
-  color: #2563eb;
-  border: none;
-} */
+/* --- 4. 强制覆盖导航栏悬停颜色 --- */
+.navbar__link:hover,
+.navbar__item:hover {
+  color: var(--ifm-color-primary) !important;
+}

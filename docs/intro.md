@@ -2,46 +2,41 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# 课程安排行业介绍
 
-Let's discover **Docusaurus in less than 5 minutes**.
 
-## Getting Started
 
-Get started by **creating a new site**.
+## 课程安排
+1. Python  
+2. 机器学习（OpenCV、MediaPipe）  
+3. 深度学习（YOLO、LLM）  
+4. 数据分析（NumPy、Pandas、Matplotlib）  
+5. 上位机  
+  • C++ ⇒ QT  
+  • Python+QT ⇒ PySide  
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+### 学习知识万能格式
+2W1H 分析
 
-### What you'll need
+1. What：Python 编程语言
+2. Why：应用广泛（胶水语言）
+3. How: 怎么用
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+### python的应用
+1. Web 开发  
+2. 服务器运维（Ops / DevOps：Shell + Python）  
+3. AI 开发（机器学习、深度学习）  
+4. 桌面应用开发  
 
-## Generate a new site
 
-Generate a new Docusaurus site using the **classic template**.
 
-The classic template will automatically be added to your project after you run the command:
+• Python 基本语法  
+• 机器学习（OpenCV、MediaPipe）  
+• 深度学习（YOLO、LLM）  
+• 数据分析（NumPy、Pandas、Matplotlib）  
+• 上位机（C++ ⇒ QT / Python+QT ⇒ PySide）  
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+## 行业情况
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+• 图示：互联网的发展（2000—2025年）  
+• 关键词：BAT
