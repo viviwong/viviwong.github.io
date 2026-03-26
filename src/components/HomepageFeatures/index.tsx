@@ -54,7 +54,7 @@ const FeatureList: FeatureItem[] = [
   {
     theme: 'purple',
     tag: 'LVGL / GUI',
-    imgSrc: 'img/3lvgl.jpg',
+    imgSrc: 'img/3LVGL.jpg',
     iconClass: 'ri-layout-masonry-line', // 对应布局图标
     iconColor: 'rgb(168, 85, 247)',
     title: 'LVGL 高级 UI',
