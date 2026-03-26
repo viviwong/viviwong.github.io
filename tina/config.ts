@@ -35,14 +35,16 @@ export default defineConfig({
   schema: {
     collections: [
       {
-        name: "ai_tutorial",
-        label: "AI 嵌入式教程",
-        path: "docs", // 确保这里指向 Docusaurus 的文档目录
+        name: "embedded",
+        label: "嵌入式知识",
+        path: "embedded", // 对应您根目录的文件夹
+        format: "md",
         fields: [
           { type: "string", name: "title", label: "标题", isTitle: true, required: true },
-          { type: "rich-text", name: "body", label: "内容", isBody: true },
+          { type: "rich-text", name: "body", label: "正文", isBody: true },
         ],
       },
+      // 保持原有的 docs 和 blog 不变
     ],
   },
 });
