@@ -28,3 +28,15 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+/* 让首页的大背景变成蓝色 */
+.hero--primary {
+  background-color: #2575fc !important; /* 你喜欢的蓝色 */
+}
+
+
+/* 按钮样式微调 */
+/* .button--secondary {
+  background-color: #ffffff;
+  color: #2563eb;
+  border: none;
+} */

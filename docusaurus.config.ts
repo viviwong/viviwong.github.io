@@ -5,9 +5,10 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
-  favicon: 'img/favicon.ico',
+  title: '嵌入式AI', // 对应图 16 中间的标题
+  tagline: '让嵌入式开发更简单', 
+  url: 'https://viviwong.github.io',
+  baseUrl: '/',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -75,24 +76,15 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'My Site',
+      title: '嵌入式AI', // 对应左上角文字
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        alt: '叩丁狼 Logo',
+        src: 'img/logo.png', // 请确保 static/img/ 目录下有 logo.svg
       },
       items: [
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Tutorial',
-        },
-        {to: '/blog', label: 'Blog', position: 'left'},
-        {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
-          position: 'right',
-        },
+        {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: '讲义'}, // “讲义”按钮
+        {to: '/blog', label: '大图', position: 'left'},
+        // 删除了多余的链接
       ],
     },
     footer: {
@@ -110,18 +102,15 @@ const config: Config = {
         {
           title: 'Community',
           items: [
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
-            },
+            
+            // {
+            //   label: 'Discord',
+            //   href: 'https://discordapp.com/invite/docusaurus',
+            // },
+            // {
+            //   label: 'X',
+            //   href: 'https://x.com/docusaurus',
+            // },
           ],
         },
         {
@@ -133,12 +122,12 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/viviwong',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} KDL, Inc. 叩丁狼嵌入式AI讲义.`,
     },
     prism: {
       theme: prismThemes.github,

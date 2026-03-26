@@ -11,32 +11,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Python + AI 视觉',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        掌握 YOLO 目标检测与 OpenCV 图像处理，
+        让你的嵌入式设备拥有“智慧之眼”。
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'STM32 HAL库实战',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        深入底层硬件，掌握高效的 HAL 库开发模式、
+        FreeRTOS 以及复杂传感器融合项目。
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'LVGL 高级 UI 打造',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        告别简陋界面，为嵌入式产品打造媲美智能手机的
+        丝滑交互体验与专业上位机系统。
       </>
     ),
   },
