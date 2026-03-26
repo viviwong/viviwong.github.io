@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1600, initial-scale=1.0">
+    <title>嵌入式行业全景架构图 (类云计算视角)</title>
+    <style>
+        :root {
+            --bg-dark: #1a1c2c;
+            --text-light: #f1f2f6;
+            --saas-color: #ff6b81; /* 红粉色系 */
+            --paas-color: #7bed9f; /* 绿色系 -> 这里的PaaS对应中间件/OS */
+            --iaas-color: #5352ed; /* 蓝色系 -> 硬件 */
+            
+            --cortex-a: #3742fa; /* 高性能 */
+            --cortex-r: #ffa502; /* 实时 */
+            --cortex-m: #2ed573; /* 低功耗 */
+            --riscv: #ff4757;    /* 开源 */
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 布局容器 */
+        .container {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 20px;
+            max-width: 1600px;
+            width: 100%;
+        }
+
+        /* 左侧：云架构类比栏 */
+        .cloud-sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px 0;
+            border-right: 2px dashed rgba(255,255,255,0.1);
+        }
+
+        .cloud-label {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .cloud-label h2 { margin: 0; font-size: 24px; }
+        .cloud-label p { margin: 5px 0 0; font-size: 14px; opacity: 0.7; }
+        .cloud-label::after {
+            content: ''; position: absolute; right: -22px; top: 50%; width: 20px; height: 2px; background: rgba(255,255,255,0.3);
+        }
+
+        .label-saas { color: var(--saas-color); border: 1px solid var(--saas-color); }
+        .label-paas { color: var(--paas-color); border: 1px solid var(--paas-color); }
+        .label-iaas { color: var(--iaas-color); border: 1px solid var(--iaas-color); }
+
+        /* 右侧：嵌入式实体内容 */
+        .embedded-main {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        /* ----- 第一层：SaaS (行业应用) ----- */
+        .layer-title {
+            font-size: 1.5em; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
+        }
+        .layer-apps {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .app-card {
+            background: linear-gradient(145deg, #2f3542, #242836);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-top: 4px solid transparent;
+            opacity: 1;
+        }
+
+        .app-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        
+        .app-consumer { border-color: #ff6b81; }
+        .app-auto { border-color: #70a1ff; }
+        .app-medical { border-color: #2ed573; }
+        .app-iot { border-color: #eccc68; }
+
+        .app-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+
+        /* ----- 第二层：PaaS (OS & Middleware) ----- */
+        /* 模拟云朵形状的容器 */
+        .cloud-platform-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 60px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        
+        .cloud-bg-decoration {
+            position: absolute; top: -20px; left: 20%; width: 60%; height: 100%;
+            background: radial-gradient(circle, rgba(123, 237, 159, 0.05) 0%, rgba(0,0,0,0) 70%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .platform-box {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(123, 237, 159, 0.3);
+        }
+        .platform-box h3 { margin: 0 0 10px 0; color: var(--paas-color); font-size: 16px; text-align: center; }
+        
+        .tech-tag-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .tech-tag {
+            font-size: 12px; padding: 4px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; color: #dfe4ea;
+        }
+
+        /* ----- 第三层：IaaS (硬件/芯片) ----- */
+        .hardware-layer {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* A, R, M, RISC-V */
+            gap: 20px;
+        }
+
+        .arch-column {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        /* 交互高亮类 */
+        .arch-column.active-highlight {
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .arch-title {
+            font-size: 18px; font-weight: bold; margin-bottom: 5px;
+            padding: 5px 15px; border-radius: 20px; color: #fff;
+        }
+
+        .arch-desc { font-size: 12px; color: #a4b0be; text-align: center; margin-bottom: 15px; min-height: 35px;}
+
+        /* 核心颜色定义 */
+        .col-a .arch-title { background-color: var(--cortex-a); }
+        .col-r .arch-title { background-color: var(--cortex-r); }
+        .col-m .arch-title { background-color: var(--cortex-m); }
+        .col-v .arch-title { background-color: var(--riscv); }
+
+        /* 芯片厂商 Grid */
+        .vendor-grid {
+            display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; width: 100%;
+        }
+        .vendor-chip {
+            font-size: 11px; padding: 4px 8px; background: #2f3542; border-radius: 4px; color: #fff;
+            border: 1px solid #57606f; cursor: pointer; transition: 0.2s;
+        }
+        .vendor-chip:hover { background: #fff; color: #000; }
+
+        /* 连线 Canvas (可选，这里用 CSS 边框模拟简单连接，保持代码纯净) */
+        
+        /* 交互状态样式 */
+        .dimmed { opacity: 0.2; filter: grayscale(100%); }
+        
+        /* 提示框 */
+        .instruction-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px;
+            border-left: 4px solid var(--iaas-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            max-width: 300px;
+            z-index: 100;
+        }
+        .reset-btn {
+            background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="cloud-sidebar">
+        <div class="cloud-label label-saas">
+            <h2>SaaS</h2>
+            <p>软件/服务<br>Software as a Service</p>
+        </div>
+        <div class="cloud-label label-paas">
+            <h2>PaaS</h2>
+            <p>平台/系统<br>Platform as a Service</p>
+        </div>
+        <div class="cloud-label label-iaas">
+            <h2>IaaS</h2>
+            <p>基础设施/硬件<br>Infrastructure as a Service</p>
+        </div>
+    </div>
+
+    <div class="embedded-main">
+
+        <div>
+            <div class="layer-title" style="color: var(--saas-color)">
+                <span class="icon">📱</span> 行业应用与服务 (SaaS Layer)
+            </div>
+            <div class="layer-apps" id="appLayer">
+                <div class="app-card app-consumer" data-type="high-perf">
+                    <span class="app-icon">⌚</span>
+                    <strong>消费电子</strong>
+                    <div style="font-size:12px; color:#aaa; margin-top:5px;">手机, 平板, 穿戴</div>
+                </div>
+                <div class="app-card app-auto" data-type="auto-cockpit">
+                    <span class="app-icon">🚗</span>
+                    <strong>智能座舱</strong>
+                    <div style="font-size:12px; color:#aaa; margin-top:5px;">中控, 娱乐, 导航</div>
+                </div>
+                <div class="app-card app-auto" data-type="auto-drive">
+                    <span class="app-icon">🤖</span>
+                    <strong>自动驾驶</strong>
+                    <div style="font-size:12px; color:#aaa; margin-top:5px;">视觉, 雷达, 决策</div>
+                </div>
+                <div class="app-card app-auto" data-type="real-time">
+                    <span class="app-icon">🔋</span>
+                    <strong>汽车电控</strong>
+                    <div style="font-size:12px; color:#aaa; margin-top:5px;">BMS, 电机, 动力</div>
+                </div>
+                <div class="app-card app-medical" data-type="control">
+                    <span class="app-icon">🏥</span>
+                    <strong>医疗/工控</strong>
+                    <div style="font-size:12px; color:#aaa; margin-top:5px;">CT机, 机械臂</div>
+                </div>
+                <!--<div class="app-card app-iot" data-type="low-power">-->
+				<div class="app-card app-iot" data-type="iot">
+                    <span class="app-icon">🏠</span>
+                    <strong>IoT 物联网</strong>
+                    <div style="font-size:12px; color:#aaa; margin-top:5px;">智能家居, 传感器</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="layer-title" style="color: var(--paas-color)">
+                <span class="icon">☁️</span> 操作系统与中间件 (PaaS Layer)
+            </div>
+            <div class="cloud-platform-container">
+                <div class="cloud-bg-decoration"></div>
+                <div class="platform-grid" id="paasLayer">
+                    <div class="platform-box" data-cat="high-perf">
+                        <h3>通用操作系统 (GPOS)</h3>
+                        <div class="tech-tag-group">
+                            <span class="tech-tag" style="background:#a4c639; color:#000">Android</span>
+                            <span class="tech-tag" style="background:#f1c40f; color:#000">HarmonyOS</span>
+                            <span class="tech-tag">Linux (Yocto)</span>
+                            <span class="tech-tag">QNX (Hypervisor)</span>
+                        </div>
+                        <div style="text-align:center; font-size:11px; margin-top:8px; color:#aaa">多任务, 富生态, 图形交互</div>
+                    </div>
+
+                    <div class="platform-box" data-cat="ai-compute">
+                        <h3>AI 计算 & 域控制器</h3>
+                        <div class="tech-tag-group">
+                            <span class="tech-tag">CUDA/TensorRT</span>
+                            <span class="tech-tag">AutoWare</span>
+                            <span class="tech-tag">Apollo</span>
+                            <span class="tech-tag">ROS 2</span>
+                        </div>
+                        <div style="text-align:center; font-size:11px; margin-top:8px; color:#aaa">大算力, 视觉感知, 路径规划</div>
+                    </div>
+
+                    <div class="platform-box" data-cat="real-time">
+                        <h3>实时系统 (RTOS/BareMetal)</h3>
+                        <div class="tech-tag-group">
+                            <span class="tech-tag">FreeRTOS</span>
+                            <span class="tech-tag">RT-Thread</span>
+                            <span class="tech-tag">Classic AUTOSAR</span>
+                            <span class="tech-tag">uC/OS</span>
+                        </div>
+                        <div style="text-align:center; font-size:11px; margin-top:8px; color:#aaa">高可靠, 低延迟, 安全关键</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="layer-title" style="color: var(--iaas-color)">
+                <span class="icon">⚙️</span> 芯片与硬件架构 (IaaS Layer)
+            </div>
+            <div class="hardware-layer">
+                <div class="arch-container">
+                    
+                    <div class="arch-column col-a" onclick="filterSystem('high-perf')">
+                        <div class="arch-title">Cortex-A</div>
+                        <div class="arch-desc">高性能应用处理器<br>多核, MMU, 跑 Linux/Android</div>
+                        <div style="font-size:12px; color:#fff; margin-bottom:5px;">代表厂商</div>
+                        <div class="vendor-grid">
+                            <div class="vendor-chip">Qualcomm 高通</div>
+                            <div class="vendor-chip">HiSilicon 海思</div>
+                            <div class="vendor-chip">MTK 联发科</div>
+                            <div class="vendor-chip">Rockchip 瑞芯微</div>
+                            <div class="vendor-chip">Allwinner 全志</div>
+                            <div class="vendor-chip">NVIDIA</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-column col-r" onclick="filterSystem('real-time')">
+                        <div class="arch-title">Cortex-R</div>
+                        <div class="arch-desc">实时处理器<br>高可靠, 中断响应快, 汽车安全</div>
+                        <div style="font-size:12px; color:#fff; margin-bottom:5px;">代表厂商</div>
+                        <div class="vendor-grid">
+                            <div class="vendor-chip">TI 德州仪器</div>
+                            <div class="vendor-chip">NXP 恩智浦</div>
+                            <div class="vendor-chip">Infineon 英飞凌</div>
+                            <div class="vendor-chip">Renesas 瑞萨</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-column col-m" onclick="filterSystem('low-power')">
+                        <div class="arch-title">Cortex-M</div>
+                        <div class="arch-desc">微控制器 (MCU)<br>低功耗, 控制为主, 跑 RTOS</div>
+                        <div style="font-size:12px; color:#fff; margin-bottom:5px;">代表厂商</div>
+                        <div class="vendor-grid">
+                            <div class="vendor-chip">ST 意法半导体</div>
+                            <div class="vendor-chip">GigaDevice 兆易</div>
+                            <div class="vendor-chip">NXP 恩智浦</div>
+                            <div class="vendor-chip">Microchip</div>
+                            <div class="vendor-chip">Espressif 乐鑫</div>
+                        </div>
+                    </div>
+
+                    <div class="arch-column col-v" onclick="filterSystem('riscv')">
+                        <div class="arch-title">RISC-V</div>
+                        <div class="arch-desc">开源指令集<br>模块化, 定制化, 未来之星</div>
+                        <div style="font-size:12px; color:#fff; margin-bottom:5px;">代表厂商</div>
+                        <div class="vendor-grid">
+                            <div class="vendor-chip">T-Head 平头哥</div>
+                            <div class="vendor-chip">SiFive</div>
+                            <div class="vendor-chip">Espressif (C3)</div>
+                            <div class="vendor-chip">StarFive</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="instruction-box">
+    <strong>💡 交互提示</strong>
+    <p style="font-size:13px; color:#ddd; margin:5px 0;">点击底部的 <b>Cortex-A/R/M</b> 或 <b>RISC-V</b> 列，查看其对应的上层应用和软件平台。</p>
+    <button class="reset-btn" onclick="resetFilter()">重置视图</button>
+</div>
+
+<script>
+    // 定义关联关系
+    // 格式: 架构ID : [关联的App类型, 关联的PaaS类型]
+    const relations = {
+        'high-perf': {
+            apps: ['high-perf', 'auto-cockpit', 'auto-drive'],
+            paas: ['high-perf', 'ai-compute']
+        },
+        'real-time': {
+            apps: ['auto-drive', 'real-time', 'control'], // 自动驾驶底层控制也需要R核
+            paas: ['real-time']
+        },
+        'low-power': {
+            apps: ['iot', 'control', 'medical'],
+            paas: ['real-time'] // MCU主要跑RTOS
+        },
+        'riscv': {
+            apps: ['iot', 'control', 'high-perf'], // RISC-V现在覆盖面很广
+            paas: ['real-time', 'high-perf']
+        }
+    };
+
+    function filterSystem(type) {
+        const targetApps = relations[type].apps;
+        const targetPaas = relations[type].paas;
+
+        // 1. 处理 App 层
+        document.querySelectorAll('.app-card').forEach(card => {
+            const cardType = card.getAttribute('data-type');
+            if (targetApps.includes(cardType)) {
+                card.classList.remove('dimmed');
+                card.style.transform = 'scale(1.05)';
+            } else {
+                card.classList.add('dimmed');
+                card.style.transform = 'scale(1)';
+            }
+        });
+
+        // 2. 处理 PaaS 层
+        document.querySelectorAll('.platform-box').forEach(box => {
+            const boxCat = box.getAttribute('data-cat');
+            // 简单的逻辑匹配：如果是ai-compute，通常属于high-perf架构(GPU/NPU)
+            let isMatch = false;
+            
+            if (type === 'high-perf' && (boxCat === 'high-perf' || boxCat === 'ai-compute')) isMatch = true;
+            if (type === 'real-time' && boxCat === 'real-time') isMatch = true;
+            if (type === 'low-power' && boxCat === 'real-time') isMatch = true;
+            if (type === 'riscv' && (boxCat === 'real-time' || boxCat === 'high-perf')) isMatch = true;
+
+            if (isMatch) {
+                box.classList.remove('dimmed');
+            } else {
+                box.classList.add('dimmed');
+            }
+        });
+
+        // 3. 处理自身高亮
+        document.querySelectorAll('.arch-column').forEach(col => {
+            col.classList.remove('active-highlight');
+            col.classList.add('dimmed');
+        });
+        // 找到当前点击的列 (这里需要简单的DOM查找)
+        let activeCol;
+        if(type === 'high-perf') activeCol = document.querySelector('.col-a');
+        if(type === 'real-time') activeCol = document.querySelector('.col-r');
+        if(type === 'low-power') activeCol = document.querySelector('.col-m');
+        if(type === 'riscv') activeCol = document.querySelector('.col-v');
+        
+        if(activeCol) {
+            activeCol.classList.remove('dimmed');
+            activeCol.classList.add('active-highlight');
+        }
+    }
+
+    function resetFilter() {
+        document.querySelectorAll('.dimmed').forEach(el => el.classList.remove('dimmed'));
+        document.querySelectorAll('.app-card').forEach(el => el.style.transform = 'scale(1)');
+        document.querySelectorAll('.active-highlight').forEach(el => el.classList.remove('active-highlight'));
+    }
+</script>
+
+</body>
+</html>
