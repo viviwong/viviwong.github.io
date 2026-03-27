@@ -90,12 +90,17 @@ const config: Config = {
           position: 'right',
           items: [
             {
-              label: 'Web 串口调试助手',
-              to: '/tools/serial/index.html', // 指向 static 目录下的路径
+              label: '🔌 Web 串口调试助手',
+              // ✨ 关键修改：使用 href 强制跳转，不走 Docusaurus 内部路由
+              href: '/tools/serial/index.html',
+              // 💡 建议添加：在新窗口打开，方便学生对照教程操作
+              target: '_blank', 
             },
             {
-              label: 'LED 矩阵配置器',
-              to: '/tools/led/index.html',
+              label: '💡 LED 矩阵配置器',
+              // ✨ 关键修改：同上
+              href: '/tools/led/index.html',
+              target: '_blank',
             },
           ],
         },
