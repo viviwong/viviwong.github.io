@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 课程安排与行业概览
+title: AI课程安排与行业概览
 ---
 
 import Admonition from '@theme/Admonition';
