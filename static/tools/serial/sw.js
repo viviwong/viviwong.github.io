@@ -1,10 +1,8 @@
 const cacheName = 'v20250314'
-
 async function addResourcesToCache(resources) {
   const cache = await caches.open(cacheName)
   await cache.addAll(resources)
 }
-
 async function putInCache(request, response) {
   const cache = await caches.open(cacheName)
   const protocol = new URL(request.url).protocol
@@ -14,7 +12,6 @@ async function putInCache(request, response) {
     await cache.put(request, response)
   }
 }
-
 // Strategy: Stale-while-revalidate
 async function staleWhileRevalidate({ request, preloadResponsePromise, fallbackUrl }) {
   // First try to get the resource from the cache
@@ -27,7 +24,6 @@ async function staleWhileRevalidate({ request, preloadResponsePromise, fallbackU
         putInCache(request, preloadResponse.clone())
         resolve(preloadResponse)
       }
-
       // Next try to get the resource from the network
       try {
         const responseFromNetwork = await fetch(request)
@@ -51,11 +47,9 @@ async function staleWhileRevalidate({ request, preloadResponsePromise, fallbackU
         }))
       }
     }).then((networkResponse) => { return networkResponse })
-
     return cachedResponse || fetchedResponse
   })
 }
-
 // Strategy: Cache first, falling back to network (not using for now)
 async function cacheFirst({ request, preloadResponsePromise, fallbackUrl }) {
   // First try to get the resource from the cache
@@ -63,7 +57,6 @@ async function cacheFirst({ request, preloadResponsePromise, fallbackUrl }) {
   if (responseFromCache) {
     return responseFromCache
   }
-
   // Next try to use (and cache) the preloaded response, if it's there
   const preloadResponse = await preloadResponsePromise
   if (preloadResponse) {
@@ -71,7 +64,6 @@ async function cacheFirst({ request, preloadResponsePromise, fallbackUrl }) {
     putInCache(request, preloadResponse.clone())
     return preloadResponse
   }
-
   // Next try to get the resource from the network
   try {
     const responseFromNetwork = await fetch(request)
@@ -95,18 +87,15 @@ async function cacheFirst({ request, preloadResponsePromise, fallbackUrl }) {
     })
   }
 }
-
 // Enable navigation preload
 async function enableNavigationPreload() {
   if (self.registration.navigationPreload) {
     await self.registration.navigationPreload.enable()
   }
 }
-
 self.addEventListener('activate', (event) => {
   event.waitUntil(enableNavigationPreload())
 })
-
 self.addEventListener('install', (event) => {
   event.waitUntil(
     addResourcesToCache([
@@ -119,7 +108,6 @@ self.addEventListener('install', (event) => {
     ]),
   )
 })
-
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     staleWhileRevalidate({

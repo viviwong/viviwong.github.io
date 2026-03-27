@@ -1,5 +1,5 @@
 {
-  "name": "波特律动 串口助手",
+  "name": "叩丁狼串口助手",
   "short_name": "串口助手",
   "lang": "zh-CN",
   "start_url": "/",
@@ -41,15 +41,12 @@
   "related_applications": [
     {
       "platform": "Webpage",
-      "url": "https://serial.keysking.com/"
+      "url": "
     },
     {
       "platform": "Github",
-      "url": "https://github.com/BaudDance/SerialAssistant/"
     },
     {
-      "platform": "Bilibili",
-      "url": "https://space.bilibili.com/6100925/"
     }
   ]
 }
