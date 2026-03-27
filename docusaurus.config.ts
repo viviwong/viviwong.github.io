@@ -84,6 +84,21 @@ const config: Config = {
         
         // 【修正点 2：对于多实例 Docs，建议使用 to 链接到文件夹下的首页】
         {to: '/embedded/', label: '嵌入式知识', position: 'left'},
+        {
+          type: 'dropdown',
+          label: '🛠️ 实训工具箱',
+          position: 'right',
+          items: [
+            {
+              label: 'Web 串口调试助手',
+              to: '/tools/serial/index.html', // 指向 static 目录下的路径
+            },
+            {
+              label: 'LED 矩阵配置器',
+              to: '/tools/led/index.html',
+            },
+          ],
+        },
       ],
     },
     footer: {
