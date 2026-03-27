@@ -97,7 +97,7 @@ const config: Config = {
               target: '_blank', 
             },
             {
-              label: '💡 LED 矩阵配置器',
+              label: '💡 LED 字模生成器',
               // ✨ 关键修改：同上
               href: '/tools/led/index.html',
               target: '_blank',
