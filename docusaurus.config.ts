@@ -67,7 +67,24 @@ const config: Config = {
       },
     ],
   ],
-
+  // 【关键修改点：headTags 应该放在这里，和 themeConfig 平级】
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: {
+        name: 'google-adsense-account',
+        content: 'ca-pub-2327671493922485',
+      },
+    },
+    {
+      tagName: 'script',
+      attributes: {
+        async: 'true',
+        src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2327671493922485',
+        crossorigin: 'anonymous',
+      },
+    },
+  ],
   themeConfig: {
     colorMode: {
       defaultMode: 'dark',
@@ -122,26 +139,7 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
-    // 插入 Google AdSense 脚本
-    headTags: [
-      // 1. 刚才添加的广告脚本 (Auto Ads)
-      {
-        tagName: 'script',
-        attributes: {
-          async: 'true',
-          src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2327671493922485',
-          crossorigin: 'anonymous',
-        },
-      },
-      // 2. 现在需要添加的验证标签 (Ownership Verification)
-      {
-        tagName: 'meta',
-        attributes: {
-          name: 'google-adsense-account',
-          content: 'ca-pub-2327671493922485',
-        },
-      },
-    ],
+    
   } satisfies Preset.ThemeConfig,
 };
 
