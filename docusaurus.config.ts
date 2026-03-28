@@ -122,6 +122,17 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
+    // 插入 Google AdSense 脚本
+    headTags: [
+      {
+        tagName: 'script',
+        attributes: {
+          async: 'true',
+          src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2327671493922485',
+          crossorigin: 'anonymous',
+        },
+      },
+    ],
   } satisfies Preset.ThemeConfig,
 };
 
