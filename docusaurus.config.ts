@@ -124,12 +124,21 @@ const config: Config = {
     },
     // 插入 Google AdSense 脚本
     headTags: [
+      // 1. 刚才添加的广告脚本 (Auto Ads)
       {
         tagName: 'script',
         attributes: {
           async: 'true',
           src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2327671493922485',
           crossorigin: 'anonymous',
+        },
+      },
+      // 2. 现在需要添加的验证标签 (Ownership Verification)
+      {
+        tagName: 'meta',
+        attributes: {
+          name: 'google-adsense-account',
+          content: 'ca-pub-2327671493922485',
         },
       },
     ],
