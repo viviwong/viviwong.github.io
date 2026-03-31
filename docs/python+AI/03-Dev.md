@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: 🎨 03-python 环境配置
+title: 🎨 03-Python 环境配置
 ---
 
 ## 🌟 传送门：官方资源站
