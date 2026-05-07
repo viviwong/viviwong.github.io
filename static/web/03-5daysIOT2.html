@@ -855,8 +855,8 @@ AA + 05 + 11 + FF = 0xAA+0x05+0x11+0xFF
       <div style="background:#f5f7fa;padding:16px;border-radius:8px">
         <p style="font-size:13px;margin-bottom:8px">输入HEX字节（空格分隔，不含最后校验和）：</p>
         <input id="hexInput" type="text" value="AA 05 11 FF" placeholder="AA 05 11 FF" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:monospace;font-size:14px">
-        <button onclick="calcChecksum()" style="margin-top:8px;width:100%;padding:8px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">计算校验和</button>
-        <div id="checksumResult" style="margin-top:10px;font-size:14px;color:var(--blue);font-weight:600"></div>
+        <button onclick="calcChecksum('hexInput','checksumResult')" style="margin-top:8px;width:100%;padding:8px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">计算校验和</button>
+        <div id="checksumResult" style="margin-top:10px;font-family:monospace;font-size:14px;line-height:2"></div>
       </div>
 
       <h3 style="margin-top:16px">JSON上报格式</h3>
@@ -1695,9 +1695,11 @@ function copyCode(btn){
     setTimeout(()=>btn.textContent='复制',2000);
   }).catch(()=>{btn.textContent='失败';setTimeout(()=>btn.textContent='复制',2000);});
 }
-function calcChecksum(){
-  const input=document.getElementById('calcInput');
-  const resultEl=document.getElementById('calcResult');
+function calcChecksum(inputId,resultId){
+  inputId=inputId||'calcInput';
+  resultId=resultId||'calcResult';
+  const input=document.getElementById(inputId);
+  const resultEl=document.getElementById(resultId);
   if(!input||!resultEl)return;
   const parts=input.value.trim().replace(/\s+/g,' ').split(' ').filter(p=>p);
   if(!parts.length){resultEl.innerHTML='<span style="color:red">请输入HEX字节</span>';return;}
@@ -1719,6 +1721,8 @@ function calcChecksum(){
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('calcInput');
   if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')calcChecksum();});
+  const el2=document.getElementById('hexInput');
+  if(el2)el2.addEventListener('keydown',e=>{if(e.key==='Enter')calcChecksum('hexInput','checksumResult');});
 });
 </script>
 </body>
