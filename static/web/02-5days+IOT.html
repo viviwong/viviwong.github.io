@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5天IoT课程 · 知识导图 & 交互原型</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --blue: #3B82F6; --green: #10B981; --purple: #8B5CF6;
+    --orange: #F59E0B; --red: #EF4444; --gray: #6B7280;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0F172A; color: #E2E8F0; }
+
+  /* ── Tab 导航 ── */
+  .tab-btn { transition: all .2s; border-bottom: 3px solid transparent; }
+  .tab-btn.active { border-bottom-color: #3B82F6; color: #60A5FA; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── 知识导图卡片 ── */
+  .day-card { background: #1E293B; border: 1px solid #334155; border-radius: 12px; transition: all .3s; cursor: pointer; }
+  .day-card:hover { border-color: #3B82F6; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,.2); }
+  .day-card.expanded .card-body { display: block; }
+  .card-body { display: none; }
+  .knowledge-tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; margin: 3px; }
+  .tag-core { background: rgba(59,130,246,.2); color: #93C5FD; border: 1px solid rgba(59,130,246,.4); }
+  .tag-tool { background: rgba(16,185,129,.2); color: #6EE7B7; border: 1px solid rgba(16,185,129,.4); }
+  .tag-trap { background: rgba(239,68,68,.2); color: #FCA5A5; border: 1px solid rgba(239,68,68,.4); }
+  .tag-output { background: rgba(139,92,246,.2); color: #C4B5FD; border: 1px solid rgba(139,92,246,.4); }
+
+  /* ── 进度条 ── */
+  .progress-bar { height: 6px; background: #334155; border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+
+  /* ── 任务清单 ── */
+  .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; transition: background .15s; }
+  .task-item:hover { background: #1E293B; }
+  .task-item input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; accent-color: #3B82F6; cursor: pointer; flex-shrink: 0; }
+  .task-item.done label { text-decoration: line-through; color: #475569; }
+  .task-label { cursor: pointer; font-size: 14px; line-height: 1.5; }
+  .task-meta { font-size: 11px; color: #64748B; margin-top: 2px; }
+
+  /* ── 手机外框 ── */
+  .phone-shell {
+    width: 360px; min-height: 720px; background: #111827;
+    border-radius: 40px; border: 3px solid #334155;
+    box-shadow: 0 0 0 6px #1E293B, 0 32px 64px rgba(0,0,0,.6);
+    overflow: hidden; position: relative; margin: 0 auto;
+  }
+  .phone-status { background: #111827; padding: 12px 24px 4px; display: flex; justify-content: space-between; font-size: 11px; color: #9CA3AF; }
+  .phone-screen { background: #F0F4F8; color: #1F2937; min-height: 660px; overflow-y: auto; }
+
+  /* ── 小程序内部样式（亮色主题）── */
+  .mp-header { background: linear-gradient(135deg, #1a56db, #7e3af2); color: white; padding: 16px; }
+  .mp-section { background: white; margin: 8px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .mp-section-title { padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 6px; }
+  .mp-row { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #F9FAFB; }
+  .mp-btn { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: all .2s; }
+  .mp-btn-primary { background: #1a56db; color: white; }
+  .mp-btn-primary:hover { background: #1648c0; transform: scale(.97); }
+  .mp-btn-primary:disabled { background: #93C5FD; cursor: not-allowed; transform: none; }
+  .mp-btn-danger { background: #EF4444; color: white; }
+  .mp-btn-sm { padding: 5px 12px; font-size: 12px; }
+  .mp-input { border: 1px solid #D1D5DB; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; color: #1F2937; background: white; }
+  .mp-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+  .badge-online { background: #D1FAE5; color: #065F46; }
+  .badge-offline { background: #FEE2E2; color: #991B1B; }
+  .badge-connecting { background: #FEF3C7; color: #92400E; }
+  .gauge-ring { position: relative; display: flex; align-items: center; justify-content: center; }
+  .toggle-sw { position: relative; width: 48px; height: 26px; background: #D1D5DB; border-radius: 13px; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+  .toggle-sw.on { background: #1a56db; }
+  .toggle-sw::after { content:''; position:absolute; left:3px; top:3px; width:20px; height:20px; background:white; border-radius:50%; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .toggle-sw.on::after { left: 25px; }
+  .device-item { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: background .15s; }
+  .device-item:hover { background: #F9FAFB; }
+  .rssi-bar { display: flex; gap: 2px; align-items: flex-end; }
+  .rssi-seg { width: 4px; background: #D1D5DB; border-radius: 1px; }
+  .rssi-seg.active { background: #1a56db; }
+
+  /* ── 帧协议可视化 ── */
+  .frame-viz { display: flex; gap: 2px; align-items: stretch; font-family: monospace; font-size: 13px; }
+  .frame-field { padding: 8px 10px; text-align: center; border-radius: 6px; display: flex; flex-direction: column; gap: 2px; min-width: 60px; }
+  .frame-field .field-val { font-size: 15px; font-weight: 700; }
+  .frame-field .field-name { font-size: 10px; opacity: .7; }
+
+  /* ── FSM 状态图 ── */
+  .fsm-state { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 13px; text-align: center; min-width: 120px; }
+  .fsm-arrow { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94A3B8; }
+  .fsm-arrow::before, .fsm-arrow::after { content:''; flex: 1; height: 1px; background: #475569; }
+
+  /* ── 日志终端 ── */
+  .terminal { background: #0D1117; border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.7; height: 160px; overflow-y: auto; }
+  .log-ok { color: #3FB950; }
+  .log-err { color: #F85149; }
+  .log-info { color: #58A6FF; }
+  .log-warn { color: #D29922; }
+
+  /* ── Prompt 卡片 ── */
+  .prompt-card { background: #1E293B; border: 1px solid #334155; border-radius: 10px; padding: 16px; position: relative; }
+  .prompt-card pre { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; color: #A5F3FC; line-height: 1.6; }
+  .copy-btn { position: absolute; top: 10px; right: 10px; background: #334155; border: none; color: #94A3B8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: all .2s; }
+  .copy-btn:hover { background: #3B82F6; color: white; }
+
+  /* ── 滚动条 ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+  /* ── 动画 ── */
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .pulse { animation: pulse-dot 1.5s infinite; }
+  .spin { animation: spin 1s linear infinite; }
+  .slide-in { animation: slideIn .3s ease; }
+  @keyframes blink-border { 0%,100%{border-color:#334155} 50%{border-color:#3B82F6} }
+  .active-module { animation: blink-border 2s infinite; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ 顶部 Tab ══════════════════════ -->
+<div class="sticky top-0 z-50 bg-gray-950 border-b border-gray-800 px-6 py-3 flex items-center gap-8">
+  <div class="text-blue-400 font-bold text-sm tracking-wider">📡 IoT · 5天课程</div>
+  <div class="flex gap-1 ml-4">
+    <button class="tab-btn active px-4 py-2 text-sm text-gray-400 hover:text-white" onclick="switchTab('map')">🗺 知识导图</button>
+    <button class="tab-btn px-4 py-2 text-sm text-gray-400 hover:text-white" onclick="switchTab('tasks')">✅ 任务清单</button>
+    <button class="tab-btn px-4 py-2 text-sm text-gray-400 hover:text-white" onclick="switchTab('proto')">📱 HMI 原型</button>
+    <button class="tab-btn px-4 py-2 text-sm text-gray-400 hover:text-white" onclick="switchTab('frames')">📦 数据帧</button>
+    <button class="tab-btn px-4 py-2 text-sm text-gray-400 hover:text-white" onclick="switchTab('prompts')">🤖 Vibe Prompts</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ TAB 1：知识导图 ══════════════════════ -->
+<div id="tab-map" class="tab-panel active p-6 max-w-6xl mx-auto">
+  <h2 class="text-xl font-bold text-white mb-1">课程知识导图 <span class="text-sm font-normal text-gray-500">· 点击展开详情</span></h2>
+  <p class="text-xs text-gray-500 mb-6">技术栈：STM32F407 标准库 · DX-BT24 BLE · ESP8266 AT · 华为云 IoTDA · 微信小程序 Vibe Coding（WorkBuddy / QClaw · GLM-4）</p>
+
+  <!-- 整体架构图 -->
+  <div class="bg-gray-900 border border-gray-700 rounded-xl p-5 mb-6">
+    <div class="text-xs text-gray-400 mb-4 font-semibold uppercase tracking-wider">系统数据流向</div>
+    <div class="flex items-center gap-2 flex-wrap text-sm">
+      <div class="bg-purple-900 border border-purple-600 rounded-lg px-3 py-2 text-center">
+        <div class="text-xs text-purple-300">手机</div>
+        <div class="font-bold text-purple-100">微信小程序</div>
+        <div class="text-xs text-purple-400 mt-1">Vibe Coding<br>WorkBuddy/QClaw</div>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-xs text-blue-400 font-mono bg-blue-900/30 px-2 py-0.5 rounded">① BLE 配网</div>
+        <div class="text-gray-500">⟷</div>
+        <div class="text-xs text-gray-500">配置阶段</div>
+      </div>
+      <div class="bg-blue-900 border border-blue-600 rounded-lg px-3 py-2 text-center">
+        <div class="text-xs text-blue-300">BLE 模块</div>
+        <div class="font-bold text-blue-100">DX-BT24</div>
+        <div class="text-xs text-blue-400 mt-1">串口透传<br>UART1</div>
+      </div>
+      <div class="text-gray-500">→</div>
+      <div class="bg-green-900 border border-green-600 rounded-lg px-3 py-2 text-center">
+        <div class="text-xs text-green-300">主控</div>
+        <div class="font-bold text-green-100">STM32F407</div>
+        <div class="text-xs text-green-400 mt-1">双状态机 FSM<br>标准库裸机</div>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-xs text-orange-400 font-mono bg-orange-900/30 px-2 py-0.5 rounded">② AT 指令</div>
+        <div class="text-gray-500">→</div>
+        <div class="text-xs text-gray-500">UART2</div>
+      </div>
+      <div class="bg-orange-900 border border-orange-600 rounded-lg px-3 py-2 text-center">
+        <div class="text-xs text-orange-300">WiFi 模块</div>
+        <div class="font-bold text-orange-100">ESP8266</div>
+        <div class="text-xs text-orange-400 mt-1">AT 固件<br>TCP/MQTT</div>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-xs text-red-400 font-mono bg-red-900/30 px-2 py-0.5 rounded">③ MQTT</div>
+        <div class="text-gray-500">→</div>
+        <div class="text-xs text-gray-500">运行阶段</div>
+      </div>
+      <div class="bg-red-900 border border-red-600 rounded-lg px-3 py-2 text-center">
+        <div class="text-xs text-red-300">云平台</div>
+        <div class="font-bold text-red-100">华为云 IoTDA</div>
+        <div class="text-xs text-red-400 mt-1">MQTT Broker<br>规则引擎</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5天知识卡片 -->
+  <div class="space-y-3" id="dayCards">
+
+    <!-- Day1 -->
+    <div class="day-card" onclick="toggleCard(this)">
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">D1</div>
+          <div>
+            <div class="font-semibold text-white">项目全貌 · Vibe Coding 破冰 · 小程序脚手架</div>
+            <div class="text-xs text-gray-500 mt-0.5">建立终态心智模型，跑通第一个真机预览</div>
+          </div>
+        </div>
+        <div class="text-gray-500 text-xs">▼ 展开</div>
+      </div>
+      <div class="card-body px-4 pb-4 border-t border-gray-700 pt-4 space-y-4">
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">📚 核心知识点</div>
+          <div>
+            <span class="knowledge-tag tag-core">小程序目录结构</span>
+            <span class="knowledge-tag tag-core">app.js 全局状态</span>
+            <span class="knowledge-tag tag-core">页面生命周期</span>
+            <span class="knowledge-tag tag-core">WXML 数据绑定</span>
+            <span class="knowledge-tag tag-tool">WorkBuddy 使用</span>
+            <span class="knowledge-tag tag-tool">QClaw 编辑器</span>
+            <span class="knowledge-tag tag-tool">GLM-4 Prompt 技巧</span>
+            <span class="knowledge-tag tag-tool">微信开发者工具</span>
+            <span class="knowledge-tag tag-output">第一个真机预览</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">⚠️ 易踩坑</div>
+          <div>
+            <span class="knowledge-tag tag-trap">AppID 未配置导致真机预览失败</span>
+            <span class="knowledge-tag tag-trap">GLM 生成代码省略关键回调</span>
+            <span class="knowledge-tag tag-trap">不验证 AI 输出直接运行</span>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-xs text-green-400 font-semibold mb-2">🎮 课堂互动：Prompt 竞速赛</div>
+          <div class="text-xs text-gray-300">目标：用 QClaw + GLM-4 生成"温湿度卡片" UI，最少改动次数跑通者分享思路。评判标准：① 能真机预览 ② 数据绑定正确 ③ 样式美观</div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+          <div class="bg-gray-800 rounded p-2"><div class="text-blue-400 font-bold">45min</div><div class="text-gray-500">架构讲解</div></div>
+          <div class="bg-gray-800 rounded p-2"><div class="text-green-400 font-bold">30min</div><div class="text-gray-500">环境配置</div></div>
+          <div class="bg-gray-800 rounded p-2"><div class="text-purple-400 font-bold">60min</div><div class="text-gray-500">Vibe Coding</div></div>
+          <div class="bg-gray-800 rounded p-2"><div class="text-orange-400 font-bold">45min</div><div class="text-gray-500">脚手架</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day2 -->
+    <div class="day-card" onclick="toggleCard(this)">
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">D2</div>
+          <div>
+            <div class="font-semibold text-white">自定义数据帧设计 · DX-BT24 BLE 驱动</div>
+            <div class="text-xs text-gray-500 mt-0.5">设计配网帧和数据帧，STM32 串口中断正确拆包</div>
+          </div>
+        </div>
+        <div class="text-gray-500 text-xs">▼ 展开</div>
+      </div>
+      <div class="card-body px-4 pb-4 border-t border-gray-700 pt-4 space-y-4">
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">📚 核心知识点</div>
+          <div>
+            <span class="knowledge-tag tag-core">帧头/帧尾/分隔符设计</span>
+            <span class="knowledge-tag tag-core">异或校验</span>
+            <span class="knowledge-tag tag-core">STM32 USART 中断接收</span>
+            <span class="knowledge-tag tag-core">strstr / strchr 字符串解析</span>
+            <span class="knowledge-tag tag-core">DX-BT24 AT 配置</span>
+            <span class="knowledge-tag tag-core">BLE 广播名设置</span>
+            <span class="knowledge-tag tag-tool">SSCOM 串口助手</span>
+            <span class="knowledge-tag tag-output">手机蓝牙可搜到设备</span>
+            <span class="knowledge-tag tag-output">STM32 正确拆出 SSID+密码</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">📋 上下行帧规范</div>
+          <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+            <div class="bg-gray-800 rounded p-3">
+              <div class="text-green-400 mb-1">↑ 配网帧（小程序→STM32）</div>
+              <div class="text-gray-300">$WIFI:SSID,PASSWORD#</div>
+            </div>
+            <div class="bg-gray-800 rounded p-3">
+              <div class="text-blue-400 mb-1">↑ 数据帧（STM32→云端）</div>
+              <div class="text-gray-300">$DATA:T=25.3,H=61,R=1#</div>
+            </div>
+            <div class="bg-gray-800 rounded p-3">
+              <div class="text-purple-400 mb-1">↓ 控制帧（云端→STM32）</div>
+              <div class="text-gray-300">$CMD:RELAY=1#</div>
+            </div>
+            <div class="bg-gray-800 rounded p-3">
+              <div class="text-orange-400 mb-1">↑ ACK 帧（STM32→小程序）</div>
+              <div class="text-gray-300">$ACK:OK#</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">⚠️ 易踩坑</div>
+          <div>
+            <span class="knowledge-tag tag-trap">蓝牙 MTU 限制导致长帧分包</span>
+            <span class="knowledge-tag tag-trap">中断中使用 printf 导致卡死</span>
+            <span class="knowledge-tag tag-trap">DX-BT24 需先退出 AT 模式才能透传</span>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-xs text-green-400 font-semibold mb-2">🎮 课堂互动：帧设计擂台</div>
+          <div class="text-xs text-gray-300">全班分组各设计一套帧格式，白板展示，投票选出最优方案。评判维度：① 解析难度 ② 抗粘包能力 ③ 可扩展性</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day3 -->
+    <div class="day-card" onclick="toggleCard(this)">
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">D3</div>
+          <div>
+            <div class="font-semibold text-white">蓝牙配网（Vibe Coding 主战场）</div>
+            <div class="text-xs text-gray-500 mt-0.5">三步法 Vibe Coding，小程序发配网包，STM32 LED 闪烁确认</div>
+          </div>
+        </div>
+        <div class="text-gray-500 text-xs">▼ 展开</div>
+      </div>
+      <div class="card-body px-4 pb-4 border-t border-gray-700 pt-4 space-y-4">
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">📚 核心知识点</div>
+          <div>
+            <span class="knowledge-tag tag-core">wx.openBluetoothAdapter</span>
+            <span class="knowledge-tag tag-core">startBluetoothDevicesDiscovery</span>
+            <span class="knowledge-tag tag-core">createBLEConnection</span>
+            <span class="knowledge-tag tag-core">getBLEDeviceCharacteristics</span>
+            <span class="knowledge-tag tag-core">writeBLECharacteristicValue</span>
+            <span class="knowledge-tag tag-core">ArrayBuffer / TextEncoder</span>
+            <span class="knowledge-tag tag-core">Promise 链式调用</span>
+            <span class="knowledge-tag tag-tool">QClaw 分步生成</span>
+            <span class="knowledge-tag tag-tool">GLM-4 上下文传递技巧</span>
+            <span class="knowledge-tag tag-output">配网成功 LED 闪烁</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">🪜 三步 Vibe Coding 节奏</div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 bg-gray-800 rounded p-2 text-xs">
+              <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+              <div><span class="text-blue-300 font-semibold">搜索+列表</span> — 扫描附近 BLE 设备，列表展示设备名和信号强度</div>
+            </div>
+            <div class="flex items-center gap-3 bg-gray-800 rounded p-2 text-xs">
+              <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">2</div>
+              <div><span class="text-green-300 font-semibold">连接+测试发送</span> — 连接 DX-BT24，发送 [0x41,0x42,0x43]，串口助手验收</div>
+            </div>
+            <div class="flex items-center gap-3 bg-gray-800 rounded p-2 text-xs">
+              <div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">3</div>
+              <div><span class="text-purple-300 font-semibold">配网 UI+协议发送</span> — 输入 SSID/密码，按帧格式发送，等待 $ACK:OK#</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">⚠️ 易踩坑</div>
+          <div>
+            <span class="knowledge-tag tag-trap">writeBLECharacteristicValue 需 ArrayBuffer 非 string</span>
+            <span class="knowledge-tag tag-trap">蓝牙 API 必须真机测试（模拟器无效）</span>
+            <span class="knowledge-tag tag-trap">GLM 易生成竞态条件代码（未等 connect 完成就 getServices）</span>
+            <span class="knowledge-tag tag-trap">特征值必须有 WRITE 属性</span>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-xs text-green-400 font-semibold mb-2">🎮 课堂互动：配网接力赛</div>
+          <div class="text-xs text-gray-300">A 同学的小程序配网 → B 同学的 STM32 接收。成功后交换角色。公开验证增强成就感，同时暴露跨设备兼容性问题。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day4 -->
+    <div class="day-card" onclick="toggleCard(this)">
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">D4</div>
+          <div>
+            <div class="font-semibold text-white">ESP8266 AT 双状态机 · MQTT 上云</div>
+            <div class="text-xs text-gray-500 mt-0.5">非阻塞 FSM，配网完成自动切换工作模式，数据上华为云</div>
+          </div>
+        </div>
+        <div class="text-gray-500 text-xs">▼ 展开</div>
+      </div>
+      <div class="card-body px-4 pb-4 border-t border-gray-700 pt-4 space-y-4">
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">📚 核心知识点</div>
+          <div>
+            <span class="knowledge-tag tag-core">SysTick 时间戳非阻塞</span>
+            <span class="knowledge-tag tag-core">FSM 状态枚举设计</span>
+            <span class="knowledge-tag tag-core">AT+CWJAP 联网</span>
+            <span class="knowledge-tag tag-core">AT+CIPSTART MQTT</span>
+            <span class="knowledge-tag tag-core">AT+CIPSEND 发帧</span>
+            <span class="knowledge-tag tag-core">华为云三元组</span>
+            <span class="knowledge-tag tag-core">MQTT Topic 规范</span>
+            <span class="knowledge-tag tag-tool">MQTTX 客户端验证</span>
+            <span class="knowledge-tag tag-output">云端实时收到传感器数据</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">🔄 双状态机结构</div>
+          <div class="space-y-2 text-xs">
+            <div class="bg-blue-900/30 border border-blue-800 rounded p-3">
+              <div class="text-blue-300 font-semibold mb-1">配网状态机 (BT_FSM)</div>
+              <div class="text-gray-400 font-mono">IDLE → WAIT_WIFI_INFO → PARSING → CONFIG_ESP → DONE</div>
+            </div>
+            <div class="bg-green-900/30 border border-green-800 rounded p-3">
+              <div class="text-green-300 font-semibold mb-1">工作状态机 (WORK_FSM)</div>
+              <div class="text-gray-400 font-mono">IDLE → MQTT_CONNECT → PUBLISHING → SUBSCRIBING → RUNNING</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">⚠️ 易踩坑</div>
+          <div>
+            <span class="knowledge-tag tag-trap">delay_ms 等 AT 响应导致蓝牙丢包</span>
+            <span class="knowledge-tag tag-trap">AT 响应含 \r\n 需处理</span>
+            <span class="knowledge-tag tag-trap">华为云 MQTT 端口 1883 非 8883</span>
+            <span class="knowledge-tag tag-trap">MQTT ClientId 格式错误连不上</span>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-xs text-green-400 font-semibold mb-2">🎮 课堂互动：故障对比实验</div>
+          <div class="text-xs text-gray-300">先演示用 delay_ms(3000) 等 AT 响应时蓝牙数据丢失的现象（串口助手抓包），再切换到状态机版本对比，形成强烈记忆。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day5 -->
+    <div class="day-card" onclick="toggleCard(this)">
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">D5</div>
+          <div>
+            <div class="font-semibold text-white">全链路联调 · 防御性设计 · 项目演示</div>
+            <div class="text-xs text-gray-500 mt-0.5">分层 Debug，加入重连机制，手机控制继电器</div>
+          </div>
+        </div>
+        <div class="text-gray-500 text-xs">▼ 展开</div>
+      </div>
+      <div class="card-body px-4 pb-4 border-t border-gray-700 pt-4 space-y-4">
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">📚 核心知识点</div>
+          <div>
+            <span class="knowledge-tag tag-core">分层 Debug 方法论</span>
+            <span class="knowledge-tag tag-core">BLE 超时重连</span>
+            <span class="knowledge-tag tag-core">AT 指令重试机制</span>
+            <span class="knowledge-tag tag-core">MQTT 断线重连</span>
+            <span class="knowledge-tag tag-core">MQTT Subscribe 下行控制</span>
+            <span class="knowledge-tag tag-core">继电器/LED 控制逻辑</span>
+            <span class="knowledge-tag tag-tool">MQTTX 模拟下发</span>
+            <span class="knowledge-tag tag-output">手机点按钮，板子 LED 响应</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider">🐛 分层排查路线</div>
+          <div class="flex items-center gap-2 text-xs flex-wrap">
+            <div class="bg-blue-900/40 border border-blue-700 rounded px-2 py-1">BLE 层<br><span class="text-blue-400">SSCOM 抓包</span></div>
+            <div class="text-gray-500">→</div>
+            <div class="bg-green-900/40 border border-green-700 rounded px-2 py-1">串口层<br><span class="text-green-400">旁路 USB-TTL</span></div>
+            <div class="text-gray-500">→</div>
+            <div class="bg-orange-900/40 border border-orange-700 rounded px-2 py-1">AT层<br><span class="text-orange-400">串口助手手发</span></div>
+            <div class="text-gray-500">→</div>
+            <div class="bg-red-900/40 border border-red-700 rounded px-2 py-1">MQTT层<br><span class="text-red-400">MQTTX 订阅</span></div>
+          </div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-xs text-green-400 font-semibold mb-2">🎮 课堂互动：故障注入演练</div>
+          <div class="text-xs text-gray-300">老师随机：① 断 WiFi ② 拔串口 ③ 强制关 MQTT。学生现场用分层排查定位故障层级并修复。</div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-xs text-center">
+          <div class="bg-gray-800 rounded p-2"><div class="text-red-400 font-bold">60min</div><div class="text-gray-500">联调 Debug</div></div>
+          <div class="bg-gray-800 rounded p-2"><div class="text-orange-400 font-bold">45min</div><div class="text-gray-500">防御性设计</div></div>
+          <div class="bg-gray-800 rounded p-2"><div class="text-green-400 font-bold">45min</div><div class="text-gray-500">Demo 路演</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dayCards -->
+</div>
+
+<!-- ══════════════════════ TAB 2：任务清单 ══════════════════════ -->
+<div id="tab-tasks" class="tab-panel p-6 max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-bold text-white">交互任务清单</h2>
+    <button onclick="resetTasks()" class="text-xs text-gray-500 hover:text-red-400 border border-gray-700 px-3 py-1 rounded-lg transition-colors">重置</button>
+  </div>
+  <!-- 总进度 -->
+  <div class="bg-gray-900 border border-gray-700 rounded-xl p-4 mb-6">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm text-gray-400">总体完成度</span>
+      <span class="text-sm font-bold text-blue-400" id="totalPct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill bg-gradient-to-r from-blue-500 to-purple-500" id="totalBar" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="space-y-4" id="taskList">
+    <!-- tasks injected by JS -->
+  </div>
+</div>
+
+<!-- ══════════════════════ TAB 3：HMI 原型 ══════════════════════ -->
+<div id="tab-proto" class="tab-panel p-6">
+  <h2 class="text-xl font-bold text-white mb-1 text-center">微信小程序 HMI 高保真原型</h2>
+  <p class="text-xs text-gray-500 text-center mb-6">模拟配网流程 · 环境监控 · 远程控制 · 可交互操作</p>
+  <div class="flex gap-8 justify-center items-start flex-wrap">
+
+    <!-- 手机外框 -->
+    <div class="phone-shell">
+      <div class="phone-status">
+        <span>9:41</span>
+        <span>📶 🔋</span>
+      </div>
+      <!-- 小程序内容区 -->
+      <div class="phone-screen" id="mpScreen">
+        <!-- 顶部 Header -->
+        <div class="mp-header">
+          <div class="text-xs opacity-70 mb-1">IoT 控制台</div>
+          <div class="font-bold text-lg">智能环境监控</div>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-xs opacity-70">设备状态：</span>
+            <span class="mp-badge" id="devStatus" style="background:rgba(254,243,199,.9);color:#92400E">● 未配网</span>
+          </div>
+        </div>
+
+        <!-- ① 蓝牙配网面板 -->
+        <div class="mp-section" id="bleSection">
+          <div class="mp-section-title">
+            <span>📡</span> 蓝牙配网
+            <span class="ml-auto mp-badge" id="bleStatus" style="background:#F3F4F6;color:#6B7280">未连接</span>
+          </div>
+
+          <!-- 搜索控制 -->
+          <div class="mp-row">
+            <div>
+              <div class="text-sm font-medium text-gray-800">搜索 BLE 设备</div>
+              <div class="text-xs text-gray-500" id="scanHint">点击开始扫描附近设备</div>
+            </div>
+            <button class="mp-btn mp-btn-primary mp-btn-sm" id="scanBtn" onclick="startScan()">搜索</button>
+          </div>
+
+          <!-- 设备列表 -->
+          <div id="deviceList" style="display:none">
+            <div style="padding:8px 16px;font-size:11px;color:#9CA3AF;background:#F9FAFB;">发现的设备</div>
+          </div>
+
+          <!-- WiFi 配网表单 -->
+          <div id="wifiForm" style="display:none;padding:12px 16px;border-top:1px solid #F3F4F6;">
+            <div class="text-xs font-semibold text-gray-600 mb-3">已连接：<span id="connectedName" class="text-blue-600"></span></div>
+            <div class="space-y-2 mb-3">
+              <input class="mp-input" id="ssidInput" placeholder="WiFi 名称 (SSID)" />
+              <div class="relative">
+                <input class="mp-input" id="pwdInput" type="password" placeholder="WiFi 密码" style="padding-right:60px"/>
+                <button onclick="togglePwd()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:11px;color:#6B7280;cursor:pointer">显示</button>
+              </div>
+            </div>
+            <button class="mp-btn mp-btn-primary" style="width:100%" id="sendWifiBtn" onclick="sendWifiConfig()">发送配网指令</button>
+            <div id="sendResult" style="display:none;margin-top:8px;text-align:center;font-size:12px;"></div>
+          </div>
+        </div>
+
+        <!-- ② 环境监控仪表盘 -->
+        <div class="mp-section" id="dashSection">
+          <div class="mp-section-title"><span>🌡️</span> 环境监控</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#F3F4F6">
+            <div style="background:white;padding:16px;text-align:center">
+              <div style="font-size:11px;color:#9CA3AF;margin-bottom:4px">温度</div>
+              <div style="font-size:32px;font-weight:700;color:#EF4444" id="tempVal">--</div>
+              <div style="font-size:11px;color:#9CA3AF">°C</div>
+              <div style="height:4px;background:#FEE2E2;border-radius:2px;margin-top:8px">
+                <div style="height:100%;background:#EF4444;border-radius:2px;transition:width .5s" id="tempBar" style="width:0%"></div>
+              </div>
+            </div>
+            <div style="background:white;padding:16px;text-align:center">
+              <div style="font-size:11px;color:#9CA3AF;margin-bottom:4px">湿度</div>
+              <div style="font-size:32px;font-weight:700;color:#3B82F6" id="humVal">--</div>
+              <div style="font-size:11px;color:#9CA3AF">%RH</div>
+              <div style="height:4px;background:#DBEAFE;border-radius:2px;margin-top:8px">
+                <div style="height:100%;background:#3B82F6;border-radius:2px;transition:width .5s" id="humBar" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mp-row" style="padding:10px 16px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:8px;height:8px;background:#10B981;border-radius:50%" class="pulse" id="mqttDot" style="background:#D1D5DB"></div>
+              <span style="font-size:12px;color:#6B7280">MQTT 连接</span>
+            </div>
+            <span class="mp-badge badge-offline" id="mqttBadge">离线</span>
+          </div>
+          <div style="padding:8px 16px;font-size:11px;color:#9CA3AF;border-top:1px solid #F9FAFB">
+            最近上报：<span id="lastReport">--</span>
+          </div>
+        </div>
+
+        <!-- ③ 远程控制 -->
+        <div class="mp-section" style="margin-bottom:16px">
+          <div class="mp-section-title"><span>🔌</span> 远程控制</div>
+          <div class="mp-row">
+            <div>
+              <div style="font-size:14px;font-weight:500;color:#1F2937">继电器 1（LED）</div>
+              <div style="font-size:11px;color:#9CA3AF" id="relay1Status">当前状态：关闭</div>
+            </div>
+            <div class="toggle-sw" id="relay1" onclick="toggleRelay(1)"></div>
+          </div>
+          <div class="mp-row" style="border-bottom:none">
+            <div>
+              <div style="font-size:14px;font-weight:500;color:#1F2937">继电器 2（风扇）</div>
+              <div style="font-size:11px;color:#9CA3AF" id="relay2Status">当前状态：关闭</div>
+            </div>
+            <div class="toggle-sw" id="relay2" onclick="toggleRelay(2)"></div>
+          </div>
+        </div>
+
+        <!-- 串口日志 -->
+        <div style="margin:0 8px 16px;background:#0D1117;border-radius:12px;padding:12px;">
+          <div style="font-size:11px;color:#58A6FF;margin-bottom:6px;font-family:monospace">▶ 串口日志</div>
+          <div class="terminal" id="serialLog">
+            <div class="log-info">[SYS] STM32F407 启动中...</div>
+            <div class="log-ok">[SYS] 系统初始化完成</div>
+            <div class="log-warn">[BLE] 等待配网指令...</div>
+          </div>
+        </div>
+
+      </div><!-- /phone-screen -->
+    </div><!-- /phone-shell -->
+
+    <!-- 右侧说明 -->
+    <div style="max-width:280px;flex:1;min-width:220px">
+      <div class="space-y-4">
+        <div class="bg-gray-900 border border-gray-700 rounded-xl p-4">
+          <div class="text-xs text-gray-400 uppercase tracking-wider mb-3">🎮 操作步骤</div>
+          <ol class="space-y-2 text-xs text-gray-300 list-decimal list-inside">
+            <li>点击"搜索"扫描 BLE 设备</li>
+            <li>点击列表中的 <span class="text-blue-400">DX-BT24</span> 连接</li>
+            <li>输入 WiFi SSID 和密码</li>
+            <li>点击"发送配网指令"</li>
+            <li>观察配网成功后数据刷新</li>
+            <li>拨动开关控制继电器</li>
+          </ol>
+        </div>
+        <div class="bg-gray-900 border border-gray-700 rounded-xl p-4">
+          <div class="text-xs text-gray-400 uppercase tracking-wider mb-3">📦 模拟帧记录</div>
+          <div class="terminal" id="frameLog" style="height:120px">
+            <div class="log-info">[待操作] 暂无帧数据</div>
+          </div>
+        </div>
+        <div class="bg-gray-900 border border-gray-700 rounded-xl p-4">
+          <div class="text-xs text-gray-400 uppercase tracking-wider mb-3">⚡ 快捷操作</div>
+          <div class="space-y-2">
+            <button onclick="simulateOnline()" class="w-full text-xs bg-green-900 hover:bg-green-800 border border-green-700 text-green-300 py-2 rounded-lg transition-colors">模拟 MQTT 上线 + 数据刷新</button>
+            <button onclick="simulateCmd()" class="w-full text-xs bg-purple-900 hover:bg-purple-800 border border-purple-700 text-purple-300 py-2 rounded-lg transition-colors">模拟云端下发控制指令</button>
+            <button onclick="resetProto()" class="w-full text-xs bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-400 py-2 rounded-lg transition-colors">重置原型状态</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flex -->
+</div>
+
+<!-- ══════════════════════ TAB 4：数据帧可视化 ══════════════════════ -->
+<div id="tab-frames" class="tab-panel p-6 max-w-5xl mx-auto">
+  <h2 class="text-xl font-bold text-white mb-6">自定义数据帧 · 可视化解析</h2>
+  <div class="grid grid-cols-1 gap-6">
+
+    <!-- 配网帧 -->
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-5">
+      <div class="text-sm font-semibold text-green-400 mb-4">① 配网帧 $WIFI:SSID,PASSWORD#</div>
+      <div class="frame-viz mb-4 flex-wrap gap-2">
+        <div class="frame-field" style="background:#064E3B;border:1px solid #065F46">
+          <div class="field-val text-green-400">$</div>
+          <div class="field-name text-green-600">帧头</div>
+          <div class="text-xs text-gray-500 mt-1">0x24</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:100px">
+          <div class="field-val text-blue-400">WIFI</div>
+          <div class="field-name text-blue-600">命令类型</div>
+          <div class="text-xs text-gray-500 mt-1">固定4字节</div>
+        </div>
+        <div class="frame-field" style="background:#312E81;border:1px solid #4338CA">
+          <div class="field-val text-purple-400">:</div>
+          <div class="field-name text-purple-600">分隔符</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:80px">
+          <div class="field-val text-blue-300">SSID</div>
+          <div class="field-name text-blue-600">WiFi名称</div>
+          <div class="text-xs text-gray-500 mt-1">可变长度</div>
+        </div>
+        <div class="frame-field" style="background:#312E81;border:1px solid #4338CA">
+          <div class="field-val text-purple-400">,</div>
+          <div class="field-name text-purple-600">分隔符</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:80px">
+          <div class="field-val text-blue-300">PWD</div>
+          <div class="field-name text-blue-600">密码</div>
+          <div class="text-xs text-gray-500 mt-1">可变长度</div>
+        </div>
+        <div class="frame-field" style="background:#7F1D1D;border:1px solid #DC2626">
+          <div class="field-val text-red-400">#</div>
+          <div class="field-name text-red-600">帧尾</div>
+          <div class="text-xs text-gray-500 mt-1">0x23</div>
+        </div>
+      </div>
+      <div class="bg-gray-800 rounded-lg p-3">
+        <div class="text-xs text-gray-400 mb-2">示例：</div>
+        <div class="font-mono text-sm text-yellow-300">$WIFI:MyHome_5G,password123#</div>
+      </div>
+      <!-- 交互解析 -->
+      <div class="mt-4">
+        <div class="text-xs text-gray-400 mb-2">🔍 交互解析器（输入帧字符串）</div>
+        <div class="flex gap-2">
+          <input id="wifiFrameInput" class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-200 font-mono" placeholder="$WIFI:SSID,PWD#" value="$WIFI:MyHome_5G,password123#"/>
+          <button onclick="parseWifiFrame()" class="mp-btn mp-btn-primary mp-btn-sm">解析</button>
+        </div>
+        <div id="wifiParseResult" class="mt-3 text-xs font-mono space-y-1"></div>
+      </div>
+    </div>
+
+    <!-- 数据帧 -->
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-5">
+      <div class="text-sm font-semibold text-blue-400 mb-4">② 上行数据帧 $DATA:T=xx.x,H=xx,R=x#</div>
+      <div class="frame-viz mb-4 flex-wrap gap-2">
+        <div class="frame-field" style="background:#064E3B;border:1px solid #065F46">
+          <div class="field-val text-green-400">$</div><div class="field-name text-green-600">帧头</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:80px">
+          <div class="field-val text-blue-400">DATA</div><div class="field-name text-blue-600">命令类型</div>
+        </div>
+        <div class="frame-field" style="background:#312E81;border:1px solid #4338CA">
+          <div class="field-val text-purple-400">:</div><div class="field-name text-purple-600">分隔</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:60px">
+          <div class="field-val text-orange-300">T=xx</div><div class="field-name text-blue-600">温度</div>
+        </div>
+        <div class="frame-field" style="background:#312E81;border:1px solid #4338CA">
+          <div class="field-val text-purple-400">,</div><div class="field-name text-purple-600">分隔</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:60px">
+          <div class="field-val text-blue-300">H=xx</div><div class="field-name text-blue-600">湿度</div>
+        </div>
+        <div class="frame-field" style="background:#312E81;border:1px solid #4338CA">
+          <div class="field-val text-purple-400">,</div><div class="field-name text-purple-600">分隔</div>
+        </div>
+        <div class="frame-field" style="background:#1E3A5F;border:1px solid #1D4ED8;min-width:60px">
+          <div class="field-val text-green-300">R=x</div><div class="field-name text-blue-600">继电器</div>
+        </div>
+        <div class="frame-field" style="background:#7F1D1D;border:1px solid #DC2626">
+          <div class="field-val text-red-400">#</div><div class="field-name text-red-600">帧尾</div>
+        </div>
+      </div>
+      <!-- 数据帧生成器 -->
+      <div class="mt-4 bg-gray-800 rounded-lg p-4">
+        <div class="text-xs text-gray-400 mb-3">🔧 数据帧生成器</div>
+        <div class="grid grid-cols-3 gap-3 mb-3">
+          <div>
+            <label class="text-xs text-gray-500">温度 (°C)</label>
+            <input id="genTemp" type="number" value="25.3" step="0.1" class="mp-input mt-1 text-sm" style="background:#1E293B;border-color:#475569;color:#E2E8F0"/>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500">湿度 (%RH)</label>
+            <input id="genHum" type="number" value="61" class="mp-input mt-1 text-sm" style="background:#1E293B;border-color:#475569;color:#E2E8F0"/>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500">继电器</label>
+            <select id="genRelay" class="mp-input mt-1 text-sm" style="background:#1E293B;border-color:#475569;color:#E2E8F0">
+              <option value="0">关闭 (0)</option>
+              <option value="1">开启 (1)</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="generateDataFrame()" class="mp-btn mp-btn-primary mp-btn-sm mb-3">生成帧</button>
+        <div id="dataFrameOutput" class="font-mono text-yellow-300 text-sm bg-gray-900 rounded p-3 min-h-8"></div>
+      </div>
+    </div>
+
+    <!-- 控制帧 -->
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-5">
+      <div class="text-sm font-semibold text-purple-400 mb-4">③ 下行控制帧 $CMD:RELAY=x# 及 ACK</div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <div class="text-xs text-gray-400 mb-2">云端 → STM32</div>
+          <div class="font-mono text-sm bg-gray-800 rounded p-3">
+            <div class="text-purple-300">$CMD:RELAY=1#</div>
+            <div class="text-gray-500 text-xs mt-1">→ 打开继电器1</div>
+            <div class="text-purple-300 mt-2">$CMD:RELAY=0#</div>
+            <div class="text-gray-500 text-xs mt-1">→ 关闭继电器1</div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-gray-400 mb-2">STM32 → 云端 (ACK)</div>
+          <div class="font-mono text-sm bg-gray-800 rounded p-3">
+            <div class="text-green-300">$ACK:OK#</div>
+            <div class="text-gray-500 text-xs mt-1">→ 执行成功</div>
+            <div class="text-red-300 mt-2">$ACK:ERR#</div>
+            <div class="text-gray-500 text-xs mt-1">→ 执行失败</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FSM 状态机图 -->
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-5">
+      <div class="text-sm font-semibold text-orange-400 mb-4">④ 双状态机 FSM 设计（非阻塞）</div>
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div>
+          <div class="text-xs text-blue-400 mb-3 font-semibold">配网状态机 BT_FSM</div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#1E3A5F;border:1px solid #3B82F6;color:#93C5FD">BT_IDLE</div>
+              <div class="text-gray-500">→ 蓝牙连接</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="w-6"></div>
+              <div class="text-gray-600">↓</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#1E3A5F;border:1px solid #3B82F6;color:#93C5FD">WAIT_WIFI_INFO</div>
+              <div class="text-gray-500">→ 等待帧数据</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs"><div class="w-6"></div><div class="text-gray-600">↓</div></div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#1E3A5F;border:1px solid #3B82F6;color:#93C5FD">PARSING</div>
+              <div class="text-gray-500">→ strstr 解析帧</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs"><div class="w-6"></div><div class="text-gray-600">↓</div></div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#1E3A5F;border:1px solid #3B82F6;color:#93C5FD">CONFIG_ESP</div>
+              <div class="text-gray-500">→ AT+CWJAP</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs"><div class="w-6"></div><div class="text-gray-600">↓</div></div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#064E3B;border:1px solid #10B981;color:#6EE7B7">BT_DONE</div>
+              <div class="text-gray-500">→ 切换工作模式</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-green-400 mb-3 font-semibold">工作状态机 WORK_FSM</div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#064E3B;border:1px solid #10B981;color:#6EE7B7">WORK_IDLE</div>
+              <div class="text-gray-500">→ WiFi 已联网</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs"><div class="w-6"></div><div class="text-gray-600">↓</div></div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#064E3B;border:1px solid #10B981;color:#6EE7B7">MQTT_CONNECT</div>
+              <div class="text-gray-500">→ AT+CIPSTART</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs"><div class="w-6"></div><div class="text-gray-600">↓</div></div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#064E3B;border:1px solid #10B981;color:#6EE7B7">SUBSCRIBING</div>
+              <div class="text-gray-500">→ 订阅控制 Topic</div>
+            </div>
+            <div class="flex items-center gap-2 text-xs"><div class="w-6"></div><div class="text-gray-600">↓</div></div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="fsm-state" style="background:#064E3B;border:1px solid #10B981;color:#6EE7B7">RUNNING</div>
+              <div class="text-gray-500">→ 周期上报 + 响应下行</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- C代码骨架 -->
+      <div class="mt-4 bg-gray-800 rounded-lg p-4">
+        <div class="text-xs text-gray-400 mb-2">C 语言状态机骨架</div>
+        <pre class="text-xs text-green-300 font-mono overflow-x-auto"><code>typedef enum { BT_IDLE, WAIT_WIFI_INFO, PARSING, CONFIG_ESP, BT_DONE } BT_State;
+typedef enum { WORK_IDLE, MQTT_CONNECT, SUBSCRIBING, RUNNING } Work_State;
+
+BT_State   bt_state   = BT_IDLE;
+Work_State work_state = WORK_IDLE;
+
+void Main_FSM_Tick(void) {          // 在 while(1) 中每 10ms 调用一次
+    uint32_t now = SysTick_GetMs();
+
+    /* ── 配网状态机 ── */
+    switch (bt_state) {
+        case WAIT_WIFI_INFO:
+            if (UART1_HasNewFrame()) { bt_state = PARSING; }
+            break;
+        case PARSING:
+            if (Parse_WifiFrame(rx_buf, ssid, pwd)) {
+                bt_state = CONFIG_ESP;
+            }
+            break;
+        case CONFIG_ESP:
+            if (ESP_SendAT("AT+CWJAP", ssid, pwd, now)) {
+                bt_state = BT_DONE;
+                work_state = WORK_IDLE;  // 触发工作状态机
+            }
+            break;
+        default: break;
+    }
+
+    /* ── 工作状态机 ── */
+    if (bt_state == BT_DONE) {
+        switch (work_state) {
+            case WORK_IDLE:   work_state = MQTT_CONNECT; break;
+            case MQTT_CONNECT:
+                if (MQTT_Connect(now)) { work_state = SUBSCRIBING; }
+                break;
+            case RUNNING:
+                if (now - last_pub > 5000) { MQTT_Publish_Data(); last_pub = now; }
+                MQTT_Handle_Incoming();
+                break;
+            default: break;
+        }
+    }
+}</code></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════ TAB 5：Vibe Prompts ══════════════════════ -->
+<div id="tab-prompts" class="tab-panel p-6 max-w-4xl mx-auto">
+  <h2 class="text-xl font-bold text-white mb-1">Vibe Coding · WorkBuddy / QClaw + GLM-4 黄金 Prompt</h2>
+  <div class="bg-yellow-900/30 border border-yellow-700 rounded-xl p-4 mb-6 text-xs text-yellow-200">
+    ⚡ GLM-4 使用要点：① 必须说"输出完整可运行代码，不省略" ② 异步链用 Promise.then 而非 async/await（GLM 易生成竞态） ③ 每次只做一个功能点 ④ 最后附加"列出需要人工验证的3个关键点"
+  </div>
+
+  <div class="space-y-6">
+
+    <!-- Step 1 -->
+    <div class="prompt-card">
+      <div class="text-xs text-blue-400 font-semibold mb-3">📶 Step 1 · 蓝牙搜索 + 设备列表（WorkBuddy 输入）</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">复制</button>
+      <pre>你是微信小程序开发专家，使用原生 JS（不用 TypeScript）。
+帮我实现一个蓝牙搜索页面，要求如下：
+
+【功能要求】
+1. 页面加载时(onLoad)调用 wx.openBluetoothAdapter 初始化蓝牙
+2. 点击"搜索"按钮：调用 wx.startBluetoothDevicesDiscovery({allowDuplicatesKey: false})
+   监听 wx.onBluetoothDeviceFound，将每个发现的设备追加进 data.devices 数组
+   设备对象结构：{ deviceId, name, RSSI }，name 为空时显示"未知设备"
+3. 点击"停止"按钮：调用 wx.stopBluetoothDevicesDiscovery
+4. 点击列表中某个设备：将 deviceId 和 name 存入 app.globalData，
+   跳转到连接页面 /pages/connect/connect
+5. 页面销毁(onUnload)时必须调用 wx.closeBluetoothAdapter
+
+【代码规范】
+- 所有微信异步 API 使用 Promise 封装（success/fail 都处理）
+- 不使用 async/await
+- wx.showToast 显示错误信息
+- 设备列表用 wx-open-data 或普通 view 渲染即可
+
+【输出格式】
+输出完整可运行的 4 个文件（不省略任何代码）：
+index.js / index.wxml / index.wxss / index.json
+
+最后列出"需要人工验证的3个关键点"</pre>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="prompt-card">
+      <div class="text-xs text-green-400 font-semibold mb-3">🔗 Step 2 · 连接设备 + 发现特征值 + 发送测试字节（QClaw 续写）</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">复制</button>
+      <pre>在上一步的基础上，继续完成连接页面 /pages/connect/connect，要求：
+
+【上下文】
+- app.globalData.deviceId 已存有目标设备 ID（DX-BT24 BLE 模块）
+- app.globalData.deviceName 已存有设备名
+
+【功能要求】
+1. 页面加载时自动开始连接流程（严格按以下顺序，每步成功才执行下一步）：
+   ① wx.createBLEConnection({ deviceId })
+   ② wx.getBLEDeviceServices({ deviceId })
+      取第一个 serviceId 存入 globalData.serviceId
+   ③ wx.getBLEDeviceCharacteristics({ deviceId, serviceId })
+      找出 properties.write == true 的 characteristicId
+      存入 globalData.characteristicId
+   ④ 连接成功后显示"已连接"状态，并自动发送测试字节 [0x41, 0x42, 0x43]
+
+2. 封装函数 sendBytes(uint8Array)：
+   - 参数为 Uint8Array
+   - 内部将 Uint8Array 转为 ArrayBuffer
+   - 调用 wx.writeBLECharacteristicValue
+   - 返回 Promise
+
+3. UI 状态显示：
+   连接中（转圈）→ 已连接（绿点）→ 发送成功（✓）→ 失败（红叉+错误信息）
+
+【代码规范】
+- 全部使用 Promise.then 链（禁止 async/await）
+- 每个步骤失败均 wx.showToast 提示
+- 输出完整可运行代码，不省略
+
+最后列出"需要人工验证的3个关键点"</pre>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="prompt-card">
+      <div class="text-xs text-purple-400 font-semibold mb-3">📡 Step 3 · 配网 UI + 协议帧发送 + ACK 监听（QClaw 续写）</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">复制</button>
+      <pre>在前两步的基础上，在 connect 页面底部添加配网区域，要求：
+
+【上下文】
+- globalData.deviceId / serviceId / characteristicId 已就绪
+- sendBytes(uint8Array) 函数已封装完毕
+
+【功能要求】
+1. 配网表单：
+   - SSID 输入框（placeholder: "WiFi 名称"）
+   - 密码输入框（type="password"，右侧有"显示/隐藏"切换按钮）
+   - "发送配网指令"按钮
+
+2. 点击按钮时：
+   ① 验证 SSID 和密码不为空，否则 showToast 提示
+   ② 拼接字符串：`$WIFI:${ssid},${password}#`
+   ③ 用 TextEncoder().encode() 转为 Uint8Array
+   ④ 调用 sendBytes 发送
+   ⑤ 发送后按钮置灰，显示"等待 STM32 确认..."
+   ⑥ 调用 wx.notifyBLECharacteristicValueChange 监听 notify
+      若3秒内收到包含 0xAA 的数据，显示"✅ 配网成功！"
+      超过3秒未收到，显示"⏱ 超时，请重试"并恢复按钮
+
+3. 配网成功后，在 globalData 中设置 isProvisioned = true
+   底部显示"前往控制台"按钮，跳转到 /pages/dashboard/dashboard
+
+【代码规范】
+- 全部 Promise.then 链
+- ArrayBuffer 与 Uint8Array 转换必须正确
+- 输出完整可运行代码，不省略
+
+最后列出"需要人工验证的3个关键点"</pre>
+    </div>
+
+    <!-- Step 4 MQTT -->
+    <div class="prompt-card">
+      <div class="text-xs text-orange-400 font-semibold mb-3">☁️ Step 4 · Dashboard · MQTT 订阅 + 数据展示 + 控制（WorkBuddy）</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">复制</button>
+      <pre>帮我实现微信小程序的 dashboard 页面，通过华为云 IoTDA 的 MQTT 接收传感器数据
+并发送控制指令，要求：
+
+【华为云 MQTT 配置】
+- Broker: ${YOUR_IOTDA_ENDPOINT}:1883
+- ClientId / Username / Password: 来自华为云设备三元组
+- 上行 Topic: $oc/devices/{deviceId}/sys/messages/up
+- 下行 Topic: $oc/devices/{deviceId}/sys/messages/down
+
+【功能要求】
+1. 页面加载时用 wx.connectSocket 建立 MQTT over WebSocket 连接
+   连接成功后订阅下行 Topic
+
+2. 收到下行消息时：
+   解析 payload 字符串，格式为 "$DATA:T=xx.x,H=xx,R=x#"
+   更新页面：温度数值、湿度数值、继电器状态
+
+3. 继电器开关（toggle 组件）：
+   用户拨动时，构造字符串 "$CMD:RELAY=x#" 通过 wx.sendSocketMessage 发送
+   同时乐观更新 UI
+
+4. 连接状态指示：顶部圆点绿/红色
+
+【代码规范】
+- 不使用第三方 MQTT 库，用原生 WebSocket
+- 处理断线重连（3次重试，间隔5秒）
+- 页面销毁时 wx.closeSocket
+- 输出完整可运行代码
+
+最后列出"需要人工验证的3个关键点"</pre>
+    </div>
+
+    <!-- GLM 技巧 -->
+    <div class="bg-gray-900 border border-yellow-700 rounded-xl p-5">
+      <div class="text-sm font-semibold text-yellow-400 mb-4">🧠 GLM-4 使用技巧 · 课堂发放</div>
+      <div class="grid grid-cols-1 gap-3 text-xs">
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-red-400 font-semibold mb-1">❌ 错误用法（GLM 易出问题）</div>
+          <div class="text-gray-300">"帮我写一个蓝牙配网小程序"<br>→ GLM 会一次性生成全部代码，async/await 竞态问题多，且省略错误处理</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-green-400 font-semibold mb-1">✅ 正确用法（分步 + 约束）</div>
+          <div class="text-gray-300">① 每次只要一个功能 ② 明确"Promise.then 链，禁止 async/await" ③ 结尾加"输出完整可运行代码，不省略" ④ 加"最后列出3个需人工验证的点"</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-3">
+          <div class="text-blue-400 font-semibold mb-1">🔍 人工验证清单（BLE 代码必查）</div>
+          <div class="space-y-1 text-gray-300 mt-1">
+            <div>□ writeBLECharacteristicValue 的数据类型是否为 ArrayBuffer？</div>
+            <div>□ getBLEDeviceCharacteristics 后是否检查了 properties.write === true？</div>
+            <div>□ onBluetoothDeviceFound 是否在 startDiscovery 之前注册监听？</div>
+            <div>□ createBLEConnection 的 success 回调后才调用 getServices？</div>
+            <div>□ onUnload 时是否调用了 closeBluetoothAdapter？</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════ JavaScript ══════════════════════ -->
+<script>
+/* ── Tab 切换 ── */
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+/* ── 知识导图卡片展开 ── */
+function toggleCard(el) {
+  const wasExpanded = el.classList.contains('expanded');
+  document.querySelectorAll('.day-card').forEach(c => c.classList.remove('expanded'));
+  if (!wasExpanded) el.classList.add('expanded');
+}
+
+/* ── 任务清单数据 ── */
+const TASKS = [
+  { day: 'D0 · 课前', color: '#6B7280', items: [
+    { id: 't00', text: '完成华为云账号注册 + 实名认证', meta: '登录 console.huaweicloud.com', warn: true },
+    { id: 't01', text: '创建 IoTDA 测试产品 + 测试设备', meta: '截图三元组（ClientId / Username / Password）提交' },
+    { id: 't02', text: '安装微信开发者工具，申请测试 AppID', meta: 'mp.weixin.qq.com 申请' },
+    { id: 't03', text: '安装 QClaw 编辑器 + 配置 WorkBuddy 账号', meta: 'Tencent 官方渠道下载' },
+    { id: 't04', text: '安装 SSCOM / XCOM 串口助手', meta: '用于监控蓝牙和 ESP8266 串口' },
+    { id: 't05', text: '安装 MQTTX 客户端', meta: 'mqttx.app 下载' },
+  ]},
+  { day: 'Day 1', color: '#3B82F6', items: [
+    { id: 't10', text: '理解系统双阶段数据流，能用自己语言复述', meta: '课堂：看 HMI 原型交互演示' },
+    { id: 't11', text: '用 QClaw + GLM-4 生成"温湿度卡片"UI 跑通真机预览', meta: 'Vibe Coding 破冰任务' },
+    { id: 't12', text: '完成小程序脚手架：pages 目录、app.js globalData 结构', meta: '4个页面：scan / connect / dashboard / setting' },
+    { id: 't13', text: '理解 WXML 数据绑定和页面生命周期', meta: 'onLoad / onShow / onUnload' },
+  ]},
+  { day: 'Day 2', color: '#10B981', items: [
+    { id: 't20', text: '完成帧设计：配网帧/数据帧/控制帧/ACK帧规范定稿', meta: '小组讨论 → 帧字典表' },
+    { id: 't21', text: 'DX-BT24 AT 配置：设置设备名 "DX-BT24-xxx"、波特率 115200', meta: 'AT+NAME / AT+BAUD 指令' },
+    { id: 't22', text: 'STM32 USART1 中断接收，环形缓冲区接收蓝牙数据', meta: '串口助手发 $TEST# 验证' },
+    { id: 't23', text: 'strstr+strchr 解析 $WIFI:SSID,PWD# 帧，串口打印拆包结果', meta: '使用串口助手模拟发送' },
+    { id: 't24', text: '手机蓝牙设置中能搜索到 DX-BT24 设备', meta: '验证广播名正确' },
+  ]},
+  { day: 'Day 3', color: '#8B5CF6', items: [
+    { id: 't30', text: 'Step 1：用 WorkBuddy+GLM 生成蓝牙扫描页，真机能显示设备列表', meta: '必须真机测试，模拟器无蓝牙' },
+    { id: 't31', text: 'Step 2：连接 DX-BT24，发送 [0x41,0x42,0x43]，串口助手收到"ABC"', meta: '验证 ArrayBuffer 类型正确' },
+    { id: 't32', text: 'Step 3：发送 $WIFI:xxx,xxx#，STM32 点亮配网成功 LED', meta: '配网接力赛验证' },
+    { id: 't33', text: '小程序收到 STM32 回传的 $ACK:OK# notify', meta: 'notifyBLECharacteristicValueChange 监听' },
+  ]},
+  { day: 'Day 4', color: '#F59E0B', items: [
+    { id: 't40', text: '串口助手手动发 AT+CWJAP 成功联网，看到 IP 地址', meta: '验证 AT 固件版本正确' },
+    { id: 't41', text: '实现非阻塞双状态机，配网完成后自动切换工作模式', meta: 'SysTick_GetMs() 时间戳轮询' },
+    { id: 't42', text: 'ESP8266 通过 MQTT 连接华为云，MQTTX 看到设备在线', meta: 'AT+CIPSTART + MQTT CONNECT 报文' },
+    { id: 't43', text: '周期（5秒）发送 $DATA:T=xx,H=xx,R=x# 到华为云', meta: '云端 IoTDA 消息追踪验证' },
+  ]},
+  { day: 'Day 5', color: '#EF4444', items: [
+    { id: 't50', text: '完成蓝牙超时重连逻辑（3次重试，间隔3s）', meta: '断开后自动重连' },
+    { id: 't51', text: '完成 AT 指令重试逻辑（超时无响应重发，最多3次）', meta: 'SysTick 计时' },
+    { id: 't52', text: '完成 MQTT 断线重连（onSocketClose 回调触发重连）', meta: '小程序侧 WebSocket 重连' },
+    { id: 't53', text: '云端下发 $CMD:RELAY=1#，板子继电器/LED 响应', meta: '手机点按钮 → 云端 → STM32 → 继电器' },
+    { id: 't54', text: '完成 5min 项目 Demo 路演，展示完整链路', meta: '配网 → 数据上云 → 手机控制' },
+  ]},
+];
+
+function renderTasks() {
+  const container = document.getElementById('taskList');
+  container.innerHTML = '';
+  TASKS.forEach(group => {
+    const saved = JSON.parse(localStorage.getItem('tasks') || '{}');
+    const done = group.items.filter(t => saved[t.id]).length;
+    const pct = Math.round(done / group.items.length * 100);
+    const card = document.createElement('div');
+    card.className = 'bg-gray-900 border border-gray-700 rounded-xl overflow-hidden';
+    card.innerHTML = `
+      <div style="padding:12px 16px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${group.color};flex-shrink:0"></div>
+        <span class="font-semibold text-sm text-white">${group.day}</span>
+        <div class="ml-auto flex items-center gap-3">
+          <div class="text-xs text-gray-500">${done}/${group.items.length}</div>
+          <div style="width:80px" class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${group.color}"></div></div>
+        </div>
+      </div>
+      <div class="space-y-0">
+        ${group.items.map(t => {
+          const checked = saved[t.id] ? 'checked' : '';
+          const warnBadge = t.warn ? '<span style="font-size:10px;color:#FBBF24;margin-left:4px">★ 必做</span>' : '';
+          return `<div class="task-item ${saved[t.id] ? 'done' : ''}" id="item-${t.id}">
+            <input type="checkbox" id="${t.id}" ${checked} onchange="checkTask('${t.id}', this.checked)"/>
+            <label for="${t.id}" class="task-label">
+              <div>${t.text}${warnBadge}</div>
+              <div class="task-meta">${t.meta}</div>
+            </label>
+          </div>`;
+        }).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+  updateTotalProgress();
+}
+
+function checkTask(id, checked) {
+  const saved = JSON.parse(localStorage.getItem('tasks') || '{}');
+  saved[id] = checked;
+  localStorage.setItem('tasks', JSON.stringify(saved));
+  const item = document.getElementById('item-' + id);
+  if (item) { checked ? item.classList.add('done') : item.classList.remove('done'); }
+  updateTotalProgress();
+  // re-render progress bars
+  renderTasks();
+}
+
+function updateTotalProgress() {
+  const saved = JSON.parse(localStorage.getItem('tasks') || '{}');
+  const allTasks = TASKS.flatMap(g => g.items);
+  const done = allTasks.filter(t => saved[t.id]).length;
+  const pct = Math.round(done / allTasks.length * 100);
+  document.getElementById('totalPct').textContent = pct + '%';
+  document.getElementById('totalBar').style.width = pct + '%';
+}
+
+function resetTasks() {
+  if (!confirm('确定重置所有任务进度？')) return;
+  localStorage.removeItem('tasks');
+  renderTasks();
+}
+
+renderTasks();
+
+/* ── 原型交互 ── */
+let bleConnected = false;
+let mqttOnline = false;
+let scanInterval = null;
+const fakeDevices = [
+  { id: 'DX-BT24-A3F1', name: 'DX-BT24-A3F1', rssi: -58 },
+  { id: 'BT-ESP-001', name: 'BT-ESP-001', rssi: -72 },
+  { id: 'Unknown', name: '未知设备', rssi: -85 },
+];
+
+function log(msg, type='info') {
+  const el = document.getElementById('serialLog');
+  const div = document.createElement('div');
+  div.className = 'log-' + type;
+  div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function frameLog(msg) {
+  const el = document.getElementById('frameLog');
+  const div = document.createElement('div');
+  div.className = 'slide-in';
+  div.style.color = '#A5F3FC';
+  div.style.fontFamily = 'monospace';
+  div.style.fontSize = '11px';
+  div.textContent = msg;
+  if (el.children[0]?.textContent?.includes('暂无')) el.innerHTML = '';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function startScan() {
+  const btn = document.getElementById('scanBtn');
+  const hint = document.getElementById('scanHint');
+  const list = document.getElementById('deviceList');
+  btn.textContent = '搜索中...';
+  btn.disabled = true;
+  hint.textContent = '正在扫描附近 BLE 设备...';
+  log('开始扫描 BLE 设备', 'info');
+  list.innerHTML = '<div style="padding:8px 16px;font-size:11px;color:#9CA3AF;background:#F9FAFB;">发现的设备</div>';
+  list.style.display = 'block';
+
+  let idx = 0;
+  scanInterval = setInterval(() => {
+    if (idx >= fakeDevices.length) {
+      clearInterval(scanInterval);
+      btn.textContent = '重新搜索';
+      btn.disabled = false;
+      hint.textContent = `发现 ${fakeDevices.length} 个设备`;
+      log(`扫描完成，发现 ${fakeDevices.length} 个设备`, 'ok');
+      return;
+    }
+    const d = fakeDevices[idx++];
+    const bars = getRssiBars(d.rssi);
+    const item = document.createElement('div');
+    item.className = 'device-item slide-in';
+    item.innerHTML = `
+      <div>
+        <div style="font-size:13px;font-weight:500;color:#1F2937">${d.name}</div>
+        <div style="font-size:11px;color:#9CA3AF">${d.id} · ${d.rssi}dBm</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="rssi-bar">${bars}</div>
+        <button class="mp-btn mp-btn-primary mp-btn-sm" onclick="connectDevice('${d.id}','${d.name}')">连接</button>
+      </div>`;
+    list.appendChild(item);
+    log(`发现设备: ${d.name} (${d.rssi}dBm)`, 'info');
+  }, 800);
+}
+
+function getRssiBars(rssi) {
+  const level = rssi > -60 ? 4 : rssi > -70 ? 3 : rssi > -80 ? 2 : 1;
+  return [1,2,3,4].map(h =>
+    `<div class="rssi-seg ${h <= level ? 'active' : ''}" style="height:${h*4}px"></div>`
+  ).join('');
+}
+
+function connectDevice(id, name) {
+  document.getElementById('bleStatus').textContent = '连接中...';
+  document.getElementById('bleStatus').style.background = '#FEF3C7';
+  document.getElementById('bleStatus').style.color = '#92400E';
+  log(`正在连接 ${name}...`, 'warn');
+  frameLog(`[BLE] createBLEConnection → ${id}`);
+  setTimeout(() => {
+    bleConnected = true;
+    document.getElementById('bleStatus').textContent = '已连接';
+    document.getElementById('bleStatus').style.background = '#D1FAE5';
+    document.getElementById('bleStatus').style.color = '#065F46';
+    document.getElementById('connectedName').textContent = name;
+    document.getElementById('wifiForm').style.display = 'block';
+    document.getElementById('deviceList').style.display = 'none';
+    document.getElementById('scanBtn').style.display = 'none';
+    log(`已连接 ${name}，发现 WRITE 特征值`, 'ok');
+    frameLog(`[BLE] ✓ 已连接，characteristicId: 0xFFE1`);
+  }, 1500);
+}
+
+function togglePwd() {
+  const input = document.getElementById('pwdInput');
+  const btn = event.currentTarget;
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '隐藏'; }
+  else { input.type = 'password'; btn.textContent = '显示'; }
+}
+
+function sendWifiConfig() {
+  const ssid = document.getElementById('ssidInput').value.trim();
+  const pwd = document.getElementById('pwdInput').value.trim();
+  const result = document.getElementById('sendResult');
+  const btn = document.getElementById('sendWifiBtn');
+  if (!ssid || !pwd) {
+    result.style.display = 'block';
+    result.style.color = '#EF4444';
+    result.textContent = '⚠️ SSID 和密码不能为空';
+    return;
+  }
+  const frame = `$WIFI:${ssid},${pwd}#`;
+  btn.disabled = true;
+  btn.textContent = '发送中...';
+  result.style.display = 'block';
+  result.style.color = '#F59E0B';
+  result.textContent = '⏳ 等待 STM32 确认...';
+  log(`发送配网帧: ${frame}`, 'info');
+  frameLog(`[TX→BLE] ${frame}`);
+  setTimeout(() => {
+    log(`[BLE] 收到 $WIFI 帧，开始解析...`, 'ok');
+    frameLog(`[STM32] 解析 → SSID="${ssid}" PWD="${pwd}"`);
+    setTimeout(() => {
+      log(`[ESP] AT+CWJAP="${ssid}","${pwd}"`, 'info');
+      frameLog(`[AT→ESP] AT+CWJAP="${ssid}","${pwd}"`);
+      setTimeout(() => {
+        log(`[ESP] WIFI CONNECTED, 获取 IP...`, 'ok');
+        frameLog(`[ESP] WIFI CONNECTED`);
+        setTimeout(() => {
+          result.style.color = '#10B981';
+          result.textContent = '✅ 配网成功！设备已联网';
+          btn.textContent = '配网成功';
+          document.getElementById('devStatus').textContent = '● 已联网';
+          document.getElementById('devStatus').style.background = 'rgba(209,250,229,.9)';
+          document.getElementById('devStatus').style.color = '#065F46';
+          log(`配网成功！STM32 切换工作模式`, 'ok');
+          frameLog(`[RX←BLE] $ACK:OK#`);
+          frameLog(`[SYS] 切换 → WORK_FSM`);
+          setTimeout(simulateOnline, 1500);
+        }, 1000);
+      }, 1200);
+    }, 800);
+  }, 600);
+}
+
+function simulateOnline() {
+  mqttOnline = true;
+  document.getElementById('mqttDot').style.background = '#10B981';
+  document.getElementById('mqttBadge').textContent = '在线';
+  document.getElementById('mqttBadge').className = 'mp-badge badge-online';
+  log('[MQTT] 连接华为云 IoTDA 成功', 'ok');
+  frameLog('[MQTT] CONNACK → 已连接华为云');
+  updateSensorData();
+  setInterval(updateSensorData, 5000);
+}
+
+function updateSensorData() {
+  const temp = (22 + Math.random() * 8).toFixed(1);
+  const hum = Math.round(50 + Math.random() * 30);
+  document.getElementById('tempVal').textContent = temp;
+  document.getElementById('humVal').textContent = hum;
+  document.getElementById('tempBar').style.width = ((temp - 10) / 40 * 100) + '%';
+  document.getElementById('humBar').style.width = hum + '%';
+  document.getElementById('lastReport').textContent = new Date().toLocaleTimeString();
+  const r1 = document.getElementById('relay1').classList.contains('on') ? 1 : 0;
+  const frame = `$DATA:T=${temp},H=${hum},R=${r1}#`;
+  log(`上报: ${frame}`, 'ok');
+  frameLog(`[TX→MQTT] ${frame}`);
+}
+
+function simulateCmd() {
+  const relay = document.getElementById('relay1');
+  const isOn = !relay.classList.contains('on');
+  const cmd = `$CMD:RELAY=${isOn ? 1 : 0}#`;
+  frameLog(`[RX←MQTT] ${cmd}`);
+  log(`收到云端控制: ${cmd}`, 'warn');
+  setTimeout(() => {
+    relay.classList.toggle('on', isOn);
+    const status = document.getElementById('relay1Status');
+    status.textContent = `当前状态：${isOn ? '开启' : '关闭'}`;
+    frameLog(`[STM32] GPIO → RELAY ${isOn ? 'ON' : 'OFF'}`);
+    frameLog(`[TX→MQTT] $ACK:OK#`);
+    log(`继电器1已${isOn ? '开启' : '关闭'}，回传 ACK`, 'ok');
+  }, 300);
+}
+
+function toggleRelay(n) {
+  const el = document.getElementById('relay' + n);
+  el.classList.toggle('on');
+  const isOn = el.classList.contains('on');
+  document.getElementById('relay' + n + 'Status').textContent = `当前状态：${isOn ? '开启' : '关闭'}`;
+  const cmd = `$CMD:RELAY=${isOn ? 1 : 0}#`;
+  if (mqttOnline) {
+    log(`发送控制指令: ${cmd}`, 'info');
+    frameLog(`[TX→MQTT] ${cmd}`);
+  } else {
+    log('[MQTT] 未连接，指令未发送', 'err');
+  }
+}
+
+function resetProto() {
+  bleConnected = false; mqttOnline = false;
+  if (scanInterval) clearInterval(scanInterval);
+  document.getElementById('bleStatus').textContent = '未连接';
+  document.getElementById('bleStatus').style.background = '#F3F4F6';
+  document.getElementById('bleStatus').style.color = '#6B7280';
+  document.getElementById('devStatus').textContent = '● 未配网';
+  document.getElementById('devStatus').style.background = 'rgba(254,243,199,.9)';
+  document.getElementById('devStatus').style.color = '#92400E';
+  document.getElementById('wifiForm').style.display = 'none';
+  document.getElementById('deviceList').innerHTML = '<div style="padding:8px 16px;font-size:11px;color:#9CA3AF;background:#F9FAFB;">发现的设备</div>';
+  document.getElementById('deviceList').style.display = 'none';
+  document.getElementById('scanBtn').style.display = '';
+  document.getElementById('scanBtn').textContent = '搜索';
+  document.getElementById('scanBtn').disabled = false;
+  document.getElementById('scanHint').textContent = '点击开始扫描附近设备';
+  document.getElementById('sendWifiBtn').disabled = false;
+  document.getElementById('sendWifiBtn').textContent = '发送配网指令';
+  document.getElementById('sendResult').style.display = 'none';
+  document.getElementById('ssidInput').value = '';
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('mqttDot').style.background = '#D1D5DB';
+  document.getElementById('mqttBadge').textContent = '离线';
+  document.getElementById('mqttBadge').className = 'mp-badge badge-offline';
+  document.getElementById('tempVal').textContent = '--';
+  document.getElementById('humVal').textContent = '--';
+  document.getElementById('tempBar').style.width = '0%';
+  document.getElementById('humBar').style.width = '0%';
+  document.getElementById('lastReport').textContent = '--';
+  ['relay1','relay2'].forEach(id => {
+    document.getElementById(id).classList.remove('on');
+    document.getElementById(id + 'Status').textContent = '当前状态：关闭';
+  });
+  document.getElementById('serialLog').innerHTML = `
+    <div class="log-info">[SYS] STM32F407 启动中...</div>
+    <div class="log-ok">[SYS] 系统初始化完成</div>
+    <div class="log-warn">[BLE] 等待配网指令...</div>`;
+  document.getElementById('frameLog').innerHTML = '<div style="color:#58A6FF;font-family:monospace;font-size:11px">[待操作] 暂无帧数据</div>';
+}
+
+/* ── 数据帧解析器 ── */
+function parseWifiFrame() {
+  const raw = document.getElementById('wifiFrameInput').value.trim();
+  const result = document.getElementById('wifiParseResult');
+  result.innerHTML = '';
+  const match = raw.match(/^\$WIFI:(.+),(.+)#$/);
+  if (!match) {
+    result.innerHTML = '<div style="color:#F85149">❌ 帧格式错误，期望格式：$WIFI:SSID,PASSWORD#</div>';
+    return;
+  }
+  const [, ssid, pwd] = match;
+  result.innerHTML = `
+    <div style="color:#3FB950">✅ 解析成功</div>
+    <div style="color:#A5F3FC">帧头: <span style="color:#F0883E">$</span></div>
+    <div style="color:#A5F3FC">命令: <span style="color:#79C0FF">WIFI</span></div>
+    <div style="color:#A5F3FC">SSID: <span style="color:#F0883E">${ssid}</span>  (${ssid.length} bytes)</div>
+    <div style="color:#A5F3FC">密码: <span style="color:#F0883E">${pwd}</span>  (${pwd.length} bytes)</div>
+    <div style="color:#A5F3FC">帧尾: <span style="color:#F0883E">#</span></div>
+    <div style="color:#8B949E;margin-top:4px">C解析: strstr(buf,"$WIFI:") → strtok → strchr(buf,'#')</div>
+  `;
+}
+
+function generateDataFrame() {
+  const t = parseFloat(document.getElementById('genTemp').value).toFixed(1);
+  const h = parseInt(document.getElementById('genHum').value);
+  const r = document.getElementById('genRelay').value;
+  const frame = `$DATA:T=${t},H=${h},R=${r}#`;
+  document.getElementById('dataFrameOutput').textContent = frame;
+}
+
+generateDataFrame();
+
+/* ── Prompt 复制 ── */
+function copyPrompt(btn) {
+  const text = btn.closest('.prompt-card').querySelector('pre').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制 ✓';
+    btn.style.background = '#10B981';
+    btn.style.color = 'white';
+    setTimeout(() => { btn.textContent = '复制'; btn.style.background = ''; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

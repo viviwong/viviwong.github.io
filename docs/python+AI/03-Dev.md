@@ -75,11 +75,10 @@ deactivate
 
 ```bash
 # ☁️ 阿里云 (常用推荐)
-pip config set global.index-url [https://mirrors.aliyun.com/pypi/simple](https://mirrors.aliyun.com/pypi/simple)
+pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
 
 # 🎓 清华大学 (教育网/在校推荐)
-pip config set global.index-url [https://pypi.tuna.tsinghua.edu.cn/simple](https://pypi.tuna.tsinghua.edu.cn/simple)
-
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## 🚀 第五站：依赖包安装 (高手进阶)
