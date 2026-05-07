@@ -999,7 +999,7 @@ static uint8_t DHT11_Read_Bit(void) {
 // 数据格式(5字节): [湿整][湿小][温整][温小][校验=前四字节和的低8位]</pre>
 
   <h3>③ 裸机主循环轮询框架</h3>
-  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>/* main.c - 无RTOS裸机主循环设计 */
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">/* main.c - 无RTOS裸机主循环设计 */
 int main(void) {
     system_clock_config();   // 168MHz时钟
     board_init();            // SysTick等
@@ -1029,7 +1029,7 @@ int main(void) {
 }</pre>
 
   <h3>④ DHT11数据三路上报</h3>
-  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>/* frame_parser.c */
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">/* frame_parser.c */
 void trigger_dht11_report(void) {
     float temp=0, humi=0;
     if (BSP_DHT11_Read_Data(&temp, &humi) != 0) return;
@@ -1048,7 +1048,7 @@ void trigger_dht11_report(void) {
 }</pre>
 
   <h3>⑤ W25Q128 Flash 配置持久化</h3>
-  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>/* Flash地址分区 */
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">/* Flash地址分区 */
 #define FLASH_WIFI_ADDR  0x000000  // WiFi配置 (4KB扇区0)
 #define FLASH_IOT_ADDR   0x001000  // IoT配置  (4KB扇区1)
 #define FLASH_SYS_ADDR   0x002000  // 系统参数 (4KB扇区2)
@@ -1185,7 +1185,7 @@ int flash_read_wifi_config(Flash_WiFi_Config_TypeDef *cfg) {
 <div class="card">
   <h2>📋 小程序核心代码解析</h2>
   <h3>protocol.js — 帧构建（与MCU对称）</h3>
-  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// 构建LED控制帧
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// 构建LED控制帧
 buildLedFrame(ledId, isOn) {
   const arr = new Uint8Array([0xAA, 0x05, ledId, isOn ? 0xFF : 0x00])
   let sum = 0
@@ -1226,7 +1226,7 @@ buildWifiDataFrame(ssid, password) {
 }</pre>
 
   <h3>control.js — BLE发送LED命令</h3>
-  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>toggleLed(e) {
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">toggleLed(e) {
   const idx = e.currentTarget.dataset.index
   const newState = !this.data.ledStates[idx]
   const ledIds = [0x11, 0x12, 0x13, 0x14]
@@ -1245,7 +1245,7 @@ buildWifiDataFrame(ssid, password) {
 }</pre>
 
   <h3>app.js — 全局BLE数据监听</h3>
-  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// 特征值通知回调 (全局注册)
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// 特征值通知回调 (全局注册)
 wx.onBLECharacteristicValueChange(res => {
   const sensorData = protocol.parseSensorJson(res.value)
   if (sensorData) {
@@ -1426,7 +1426,7 @@ wx.onBLECharacteristicValueChange(res => {
 
 <div class="card">
   <h2>📡 ESP8266 AT指令连接华为云</h2>
-  <pre style="font-size:14.5px;line-height:1.85;padding:22px 24px;overflow:auto;white-space:pre"><button class="copy-btn" onclick="copyCode(this)">复制</button>/* esp8266.c - 完整连接时序 */
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">/* esp8266.c - 完整连接时序 */
 
 // ① 初始化
 AT+RST                            // 复位
@@ -1460,7 +1460,7 @@ AT+CIPCLOSE</pre>
   </div>
 
   <h3 style="margin-top:16px">上报数据格式</h3>
-  <pre style="font-size:14.5px;line-height:1.85;padding:22px 24px;overflow:auto;white-space:pre"><button class="copy-btn" onclick="copyCode(this)">复制</button>// 方式1: 直接JSON（适合教学快速验证）
+  <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// 方式1: 直接JSON（适合教学快速验证）
 {"temp":26.1,"humi":55.3}
 
 // 方式2: 华为云标准属性上报格式（推荐）
@@ -1559,7 +1559,7 @@ AT+CIPCLOSE</pre>
 <div class="card">
   <h2>📋 AT文本命令（串口助手字符串模式）</h2>
   <div class="grid-2">
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// 查看帮助（所有命令列表）
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// 查看帮助（所有命令列表）
 AT+HELP
 
 // 配置WiFi并自动连接
@@ -1581,7 +1581,7 @@ AT+INTERVAL=30
 AT+SCAN</pre>
     <div>
       <h3>正常启动串口输出</h3>
-      <pre style="font-size:11px"><button class="copy-btn" onclick="copyCode(this)">复制</button>========================================
+      <pre style="font-size:11px"><button class="copy-btn" onclick="copyCode(this)">复制</button">========================================
   IoT Center Controller v1.0
   STM32F407ZET6 @ 168MHz
 ========================================
