@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嵌入式软件开发流程与文档体系</title>
+<style>
+  /* ===== CSS 变量：双主题 ===== */
+  :root {
+    --bg-page:       #0f1117;
+    --bg-panel:      #161b27;
+    --bg-inset:      #0f1117;
+    --border-main:   #2d3748;
+    --border-subtle: #1e2535;
+    --text-h:        #ffffff;
+    --text-primary:  #e2e8f0;
+    --text-secondary:#a0aec0;
+    --text-muted:    #718096;
+    --text-dim:      #4a5568;
+    --dot-bg:        #0f1117;
+    --hover-overlay: rgba(255,255,255,0.04);
+    --code-bg:       rgba(56,178,172,0.12);
+    --code-color:    #81e6d9;
+    --hero-grad:     linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    /* 主题切换按钮 */
+    --toggle-bg:     #1e2535;
+    --toggle-border: #2d3748;
+    --toggle-color:  #a0aec0;
+    --toggle-hover:  #2d3748;
+    /* type badge 在暗色 */
+    --ts-bg: rgba(72,187,120,0.10); --ts-color: #68d391; --ts-border: rgba(72,187,120,0.25);
+    --tm-bg: rgba(246,173,85,0.10); --tm-color: #f6ad55; --tm-border: rgba(246,173,85,0.25);
+    --tl-bg: rgba(252,129,129,0.10);--tl-color: #fc8181; --tl-border: rgba(252,129,129,0.25);
+    /* 图例 skip dot */
+    --leg-skip: #4a5568;
+    /* phase title colors (暗色 pastels) */
+    --ph1-title: #90cdf4;
+    --ph2-title: #a3bffa;
+    --ph3-title: #d6bcfa;
+    --ph4-title: #fbb6ce;
+    --ph5-title: #fbd38d;
+    --ph6-title: #9ae6b4;
+    --ph7-title: #81e6d9;
+    /* section title */
+    --section-title-color: #4a5568;
+    /* principle heading */
+    --principle-h-color: #a0aec0;
+    /* principle hl */
+    --principle-hl: #e2e8f0;
+    /* skip item */
+    --skip-name-color: #718096;
+  }
+
+  [data-theme="light"] {
+    --bg-page:       #f0f4f8;
+    --bg-panel:      #ffffff;
+    --bg-inset:      #f7fafc;
+    --border-main:   #e2e8f0;
+    --border-subtle: #edf2f7;
+    --text-h:        #1a202c;
+    --text-primary:  #2d3748;
+    --text-secondary:#4a5568;
+    --text-muted:    #64748b;
+    --text-dim:      #94a3b8;
+    --dot-bg:        #f0f4f8;
+    --hover-overlay: rgba(0,0,0,0.04);
+    --code-bg:       rgba(0,120,110,0.08);
+    --code-color:    #0f766e;
+    --hero-grad:     linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+    --toggle-bg:     #ffffff;
+    --toggle-border: #e2e8f0;
+    --toggle-color:  #4a5568;
+    --toggle-hover:  #f7fafc;
+    --ts-bg: rgba(21,128,61,0.08);  --ts-color: #166534; --ts-border: rgba(21,128,61,0.20);
+    --tm-bg: rgba(154,52,18,0.08);  --tm-color: #9a3412; --tm-border: rgba(154,52,18,0.20);
+    --tl-bg: rgba(153,27,27,0.08);  --tl-color: #991b1b; --tl-border: rgba(153,27,27,0.20);
+    --leg-skip: #94a3b8;
+    --ph1-title: #1e40af;
+    --ph2-title: #3730a3;
+    --ph3-title: #5b21b6;
+    --ph4-title: #9d174d;
+    --ph5-title: #92400e;
+    --ph6-title: #14532d;
+    --ph7-title: #134e4a;
+    --section-title-color: #94a3b8;
+    --principle-h-color: #475569;
+    --principle-hl: #1e293b;
+    --skip-name-color: #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  /* ===== 主题切换按钮 ===== */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    background: var(--toggle-bg);
+    border: 1px solid var(--toggle-border);
+    border-radius: 20px;
+    color: var(--toggle-color);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .theme-toggle:hover {
+    background: var(--toggle-hover);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+  }
+  .theme-toggle .toggle-icon { font-size: 15px; line-height: 1; }
+
+  /* ===== 顶部标题 ===== */
+  .hero {
+    background: var(--hero-grad);
+    border-bottom: 1px solid var(--border-main);
+    padding: 40px 60px 32px;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .hero h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-h);
+    letter-spacing: 0.5px;
+  }
+  .hero p {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ===== 项目类型图例 ===== */
+  .type-bar {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 20px 60px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-main);
+    flex-wrap: wrap;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .type-bar .label { font-size: 12px; color: var(--text-muted); margin-right: 4px; }
+  
+  /* 更新了 type-badge 的鼠标样式和过渡效果 */
+  .type-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer; /* 变更为手型指针 */
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+  /* 悬停微调，提示可点击 */
+  .type-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  .type-badge .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .type-s { background: var(--ts-bg); color: var(--ts-color); border: 1px solid var(--ts-border); }
+  .type-s .dot { background: currentColor; }
+  .type-m { background: var(--tm-bg); color: var(--tm-color); border: 1px solid var(--tm-border); }
+  .type-m .dot { background: currentColor; }
+  .type-l { background: var(--tl-bg); color: var(--tl-color); border: 1px solid var(--tl-border); }
+  .type-l .dot { background: currentColor; }
+
+  .legend-group { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+  .leg-must   { background: #68d391; }
+  .leg-should { background: #f6ad55; }
+  .leg-skip   { background: var(--leg-skip); }
+
+  /* ===== 主内容布局 ===== */
+  .main {
+    display: flex;
+    gap: 0;
+    padding: 40px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ===== 时间线 ===== */
+  .timeline {
+    width: 4px;
+    background: linear-gradient(to bottom, #4299e1, #667eea, #9f7aea, #ed64a6, #f6ad55, #68d391, #38b2ac);
+    border-radius: 4px;
+    margin-right: 32px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* ===== 阶段容器 ===== */
+  .phases { flex: 1; display: flex; flex-direction: column; gap: 0; }
+
+  .phase {
+    display: flex;
+    gap: 0;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  /* 阶段圆点 */
+  .phase-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-left: -16px;
+    margin-top: 16px;
+    position: relative;
+    z-index: 2;
+    background: var(--dot-bg);
+    transition: background 0.25s;
+  }
+
+  /* 阶段内容卡片 */
+  .phase-card {
+    flex: 1;
+    margin-left: 20px;
+    margin-bottom: 32px;
+    border-radius: 12px;
+    border: 1px solid var(--border-main);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .phase-card:hover { border-color: var(--text-dim); }
+
+  /* 阶段标题行 */
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-main);
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .phase-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .phase-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .phase-num {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /* 文档表格 */
+  .doc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: var(--bg-inset);
+    transition: background 0.25s;
+  }
+  
+  /* 更新了 doc-col 的过渡效果 */
+  .doc-col {
+    padding: 16px 18px;
+    border-right: 1px solid var(--border-subtle);
+    transition: border-color 0.25s, opacity 0.3s ease, filter 0.3s ease;
+  }
+  .doc-col:last-child { border-right: none; }
+  .doc-col-header {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.25s;
+  }
+
+  /* 文档项 */
+  .doc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .doc-item:hover { background: var(--hover-overlay); }
+
+  .doc-item .ind {
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .must   .ind { background: #68d391; }
+  .should .ind { background: #f6ad55; }
+  .skip   .ind { background: var(--leg-skip); opacity: 0.5; }
+  .skip { opacity: 0.45; }
+
+  .doc-item .doc-name { color: var(--text-primary); font-weight: 500; }
+  .doc-item .doc-note { color: var(--text-muted); font-size: 11px; margin-top: 1px; }
+  .doc-item.skip .doc-name { color: var(--skip-name-color); text-decoration: line-through; }
+
+  .tag-new, .tag-code, .tag-tool {
+    display: inline-block;
+    border-radius: 4px;
+    font-size: 10px;
+    padding: 1px 5px;
+    margin-left: 4px;
+    vertical-align: middle;
+    font-weight: 600;
+  }
+  .tag-new { background: rgba(102,126,234,0.2); color: #a78bfa; border: 1px solid rgba(102,126,234,0.3); }
+  .tag-code { background: rgba(56,178,172,0.15); color: #2c9e9e; border: 1px solid rgba(56,178,172,0.25); }
+  [data-theme="light"] .tag-code { background: rgba(0,120,110,0.1); color: #0f766e; border-color: rgba(0,120,110,0.2); }
+  .tag-tool { background: rgba(246,173,85,0.15); color: #c05621; border: 1px solid rgba(246,173,85,0.30); }
+  [data-theme="dark"] .tag-code  { color: #81e6d9; }
+  [data-theme="dark"] .tag-tool  { color: #fbd38d; }
+
+  /* ===== 阶段颜色主题 ===== */
+  .ph1 .phase-icon { background: rgba(66,153,225,0.15); }
+  .ph1 .phase-dot  { border-color: #4299e1; color: #4299e1; }
+  .ph1 .phase-title { color: var(--ph1-title); font-size: 16px; font-weight: 700; }
+
+  .ph2 .phase-icon { background: rgba(102,126,234,0.15); }
+  .ph2 .phase-dot  { border-color: #667eea; color: #667eea; }
+  .ph2 .phase-title { color: var(--ph2-title); font-size: 16px; font-weight: 700; }
+
+  .ph3 .phase-icon { background: rgba(159,122,234,0.15); }
+  .ph3 .phase-dot  { border-color: #9f7aea; color: #9f7aea; }
+  .ph3 .phase-title { color: var(--ph3-title); font-size: 16px; font-weight: 700; }
+
+  .ph4 .phase-icon { background: rgba(237,100,166,0.15); }
+  .ph4 .phase-dot  { border-color: #ed64a6; color: #ed64a6; }
+  .ph4 .phase-title { color: var(--ph4-title); font-size: 16px; font-weight: 700; }
+
+  .ph5 .phase-icon { background: rgba(246,173,85,0.15); }
+  .ph5 .phase-dot  { border-color: #f6ad55; color: #f6ad55; }
+  .ph5 .phase-title { color: var(--ph5-title); font-size: 16px; font-weight: 700; }
+
+  .ph6 .phase-icon { background: rgba(104,211,145,0.15); }
+  .ph6 .phase-dot  { border-color: #68d391; color: #68d391; }
+  .ph6 .phase-title { color: var(--ph6-title); font-size: 16px; font-weight: 700; }
+
+  .ph7 .phase-icon { background: rgba(56,178,172,0.15); }
+  .ph7 .phase-dot  { border-color: #38b2ac; color: #38b2ac; }
+  .ph7 .phase-title { color: var(--ph7-title); font-size: 16px; font-weight: 700; }
+
+  /* ===== 底部原则卡片 ===== */
+  .principles {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 60px 60px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .principle-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    border-radius: 12px;
+    padding: 20px;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .principle-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--principle-h-color);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .principle-card p, .principle-card li {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .principle-card ul { padding-left: 16px; }
+  .principle-card li { margin-bottom: 4px; }
+  .principle-card .hl { color: var(--principle-hl); }
+  .principle-card code {
+    background: var(--code-bg);
+    color: var(--code-color);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* 分隔标题 */
+  .section-title {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8px 60px 24px;
+    font-size: 12px;
+    color: var(--section-title-color);
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* ===== 高亮交互核心 CSS ===== */
+  body[data-active-filter="s"] .doc-col:not([data-size="s"]),
+  body[data-active-filter="m"] .doc-col:not([data-size="m"]),
+  body[data-active-filter="l"] .doc-col:not([data-size="l"]) {
+    opacity: 0.15;
+    filter: grayscale(100%);
+    pointer-events: none; /* 禁用未激活列的悬停交互 */
+  }
+
+  body[data-active-filter="s"] .type-badge:not([data-size="s"]),
+  body[data-active-filter="m"] .type-badge:not([data-size="m"]),
+  body[data-active-filter="l"] .type-badge:not([data-size="l"]) {
+    opacity: 0.3;
+    filter: grayscale(100%);
+  }
+
+  /* 响应式 */
+  @media (max-width: 900px) {
+    .main { padding: 24px 20px; }
+    .hero { padding: 28px 20px 24px; }
+    .type-bar { padding: 16px 20px; }
+    .doc-grid { grid-template-columns: 1fr; }
+    .doc-col { border-right: none; border-bottom: 1px solid var(--border-subtle); }
+    .principles { padding: 0 20px 40px; grid-template-columns: 1fr; }
+    .section-title { padding: 8px 20px 24px; }
+    .legend-group { margin-left: 0; width: 100%; }
+    .theme-toggle { top: 12px; right: 12px; padding: 6px 11px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">
+  <span class="toggle-icon" id="toggleIcon">☀️</span>
+  <span id="toggleLabel">亮色</span>
+</button>
+
+<div class="hero">
+  <h1>嵌入式软件开发流程 &amp; 文档体系</h1>
+  <p>不同规模项目应当产出的文档，以及真正需要维护的内容 · 避免过度工程化</p>
+</div>
+
+<div class="type-bar">
+  <span class="label">项目类型：</span>
+  <div class="type-badge type-s" data-size="s"><div class="dot"></div>🟢 小型 / 个人 · 1人 &lt;1个月</div>
+  <div class="type-badge type-m" data-size="m"><div class="dot"></div>🟡 中型 / 小团队 · 2~5人 1~6个月 <strong>← 你的项目</strong></div>
+  <div class="type-badge type-l" data-size="l"><div class="dot"></div>🔴 大型 / 合规 · 5+人 车规·医疗·工业安全</div>
+  <div class="legend-group">
+    <div class="leg-item"><div class="leg-dot leg-must"></div>必须</div>
+    <div class="leg-item"><div class="leg-dot leg-should"></div>建议</div>
+    <div class="leg-item"><div class="leg-dot leg-skip"></div>可跳过</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="timeline"></div>
+
+  <div class="phases">
+
+    <div class="phase ph1">
+      <div class="phase-dot">1</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">📋</div>
+          <div>
+            <div class="phase-title">需求分析</div>
+            <div class="phase-sub">明确「做什么」— 功能边界、约束条件、验收标准</div>
+          </div>
+          <div class="phase-num">PHASE 01</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">功能清单（.md 一页）</div><div class="doc-note">列出要做的功能，5分钟写完</div></div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">SRS 软件需求规格</div><div class="doc-note">过重，不写</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">需求清单（带优先级）</div><div class="doc-note">P0/P1/P2 分级，约1页</div></div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div><div class="doc-name">约束条件说明</div><div class="doc-note">硬件平台、库版本、性能上限</div></div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">正式 SRS（FR-xx 编号）</div><div class="doc-note">除非有合同约束，否则跳过</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">SRS（IEEE 830 标准）</div><div class="doc-note">FR/NFR 完整编号，可追溯</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">用例规格说明（UCS）</div><div class="doc-note">每个用例前置/后置条件</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">安全需求分析（HARA）</div><div class="doc-note">ISO 26262 / IEC 62304 要求</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase ph2">
+      <div class="phase-dot">2</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">🏗️</div>
+          <div>
+            <div class="phase-title">系统架构设计</div>
+            <div class="phase-sub">明确「如何组织」— 硬件连接、软件分层、数据流向、关键决策</div>
+          </div>
+          <div class="phase-num">PHASE 02</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">架构草图 <span class="tag-tool">draw.io</span></div>
+                <div class="doc-note">一张图说清楚硬件连接和软件分层</div>
+              </div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">SAD 架构设计文档</div><div class="doc-note">有图就够，不写正式文档</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">架构图（含数据流）</div>
+                <div class="doc-note">硬件拓扑 + 软件分层 + 数据流向</div>
+              </div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">ADR 架构决策记录 <span class="tag-new">推荐</span></div>
+                <div class="doc-note">记录「为什么」：裸机 vs RTOS、选择原因</div>
+              </div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">完整 SAD 文档</div><div class="doc-note">图+ADR已够，正式文档维护成本高</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">SAD 系统架构设计文档</div><div class="doc-note">含安全架构视图</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">FMEA 故障模式分析</div><div class="doc-note">每个模块失效后的系统影响</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">ADR 架构决策记录</div><div class="doc-note">每个关键决策可追溯</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase ph3">
+      <div class="phase-dot">3</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">🔌</div>
+          <div>
+            <div class="phase-title">接口设计</div>
+            <div class="phase-sub">⚠️ 最容易被忽视、最影响联调效率 — 多端协议约定必须书面化</div>
+          </div>
+          <div class="phase-num">PHASE 03</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">协议说明（README 一节）</div>
+                <div class="doc-note">帧格式 + 设备号表，一个代码块足够</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">ICD 接口控制文档 🔑</div>
+                <div class="doc-note">帧格式、DevID 表、JSON格式、AT指令 — 三端对齐基准</div>
+              </div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">帧速查表（HEX）</div>
+                <div class="doc-note">每种帧的实际字节序列，调试必备</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">ICD 接口控制文档</div><div class="doc-note">含版本号、变更控制、兼容性说明</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">接口安全分析</div><div class="doc-note">输入验证、边界检查规范</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">接口测试规范</div><div class="doc-note">每个接口的测试覆盖要求</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase ph4">
+      <div class="phase-dot">4</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">📐</div>
+          <div>
+            <div class="phase-title">详细设计</div>
+            <div class="phase-sub">模块内部实现方案 — 状态机、算法、数据结构</div>
+          </div>
+          <div class="phase-num">PHASE 04</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">代码注释即设计 <span class="tag-code">Doxygen</span></div>
+                <div class="doc-note">@brief @param @return 注释函数即可</div>
+              </div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">SDD 软件详细设计文档</div><div class="doc-note">完全不必要，维护即过时</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">代码注释 <span class="tag-code">Doxygen</span></div>
+                <div class="doc-note">公共函数必须注释，私有函数重要逻辑注释</div>
+              </div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">关键状态机图 <span class="tag-tool">draw.io</span></div>
+                <div class="doc-note">帧解析状态机、ESP8266状态机等复杂逻辑</div>
+              </div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">SDD 独立文档</div><div class="doc-note">代码+状态机图已覆盖，不单独维护</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">SDD 软件详细设计文档</div><div class="doc-note">每个模块的设计规格，独立可审查</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">状态机规格说明</div><div class="doc-note">形式化状态转换表</div></div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div><div class="doc-name">内存安全分析</div><div class="doc-note">栈/堆使用量估算</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase ph5">
+      <div class="phase-dot">5</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">💻</div>
+          <div>
+            <div class="phase-title">编码实现</div>
+            <div class="phase-sub">工具和规范比文档更重要 — 用工具强制保证质量</div>
+          </div>
+          <div class="phase-num">PHASE 05</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">Git 版本控制 <span class="tag-tool">必须</span></div>
+                <div class="doc-note">哪怕一个人也要用，不用是反模式</div>
+              </div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">0 Warning 原则</div>
+                <div class="doc-note">-Wall 编译选项，警告即错误</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">Git + 约定式提交 <span class="tag-new">规范</span></div>
+                <div class="doc-note">feat/fix/docs/refactor 前缀提交信息</div>
+              </div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">编码规范（1页）</div>
+                <div class="doc-note">命名规则、禁止项（goto/全局变量滥用）</div>
+              </div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">cppcheck 静态分析 <span class="tag-tool">工具</span></div>
+                <div class="doc-note">提交前跑一次，替代大量代码审查</div>
+              </div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">Code Review（轻量）</div>
+                <div class="doc-note">关键模块 PR 合并前互审</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">MISRA C 合规报告</div><div class="doc-note">车规/医疗强制要求</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">代码审查记录</div><div class="doc-note">每次审查留存书面记录</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">静态分析报告</div><div class="doc-note">PC-lint / Polyspace 输出</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">编码规范文档</div><div class="doc-note">正式发布，团队签字确认</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase ph6">
+      <div class="phase-dot">6</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">🧪</div>
+          <div>
+            <div class="phase-title">测试验证</div>
+            <div class="phase-sub">TestCase 是核心，TestPlan 只是流程文件</div>
+          </div>
+          <div class="phase-num">PHASE 06</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">手工测试清单</div>
+                <div class="doc-note">发版前逐项勾选，markdown表格即可</div>
+              </div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">TestPlan 测试计划</div><div class="doc-note">一个人不需要计划文档</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">TestCase 测试用例集 🔑</div>
+                <div class="doc-note">关键路径 + 边界 + 异常，含实际操作步骤</div>
+              </div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">单元测试（关键模块）</div>
+                <div class="doc-note">帧解析、校验和计算等可自动化验证</div>
+              </div>
+            </div>
+            <div class="doc-item skip">
+              <div class="ind"></div>
+              <div><div class="doc-name">TestPlan 正式测试计划</div><div class="doc-note">TestCase 首页写测试环境即可</div></div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">TestPlan 测试计划</div><div class="doc-note">包含测试策略、资源、通过准则</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">TestCase 测试用例</div><div class="doc-note">需求到测试用例可追溯矩阵</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">测试报告（每次发版）</div><div class="doc-note">通过率、遗留缺陷、测试签字</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">代码覆盖率报告</div><div class="doc-note">MC/DC 覆盖（车规 DAL B+）</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase ph7">
+      <div class="phase-dot">7</div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <div class="phase-icon">🚀</div>
+          <div>
+            <div class="phase-title">发布与维护</div>
+            <div class="phase-sub">让 6 个月后的自己（和同事）能独立复现整个过程</div>
+          </div>
+          <div class="phase-num">PHASE 07</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#16a34a">🟢 小型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">README.md</div>
+                <div class="doc-note">怎么编译、怎么烧录、引脚连接</div>
+              </div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">git tag v1.0.0</div>
+                <div class="doc-note">打标签即发版，不需要单独 ChangeLog</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#d97706">🟡 中型项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">BuildGuide 构建烧录指南</div>
+                <div class="doc-note">Keil 配置要点 + 常见编译错误 + 烧录步骤</div>
+              </div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">git tag + Release Notes</div>
+                <div class="doc-note">每个 tag 附一段本版本变更说明</div>
+              </div>
+            </div>
+            <div class="doc-item should">
+              <div class="ind"></div>
+              <div>
+                <div class="doc-name">CHANGELOG.md（自动生成）</div>
+                <div class="doc-note">用 conventional-changelog 工具生成，不手写</div>
+              </div>
+            </div>
+          </div>
+          <div class="doc-col">
+            <div class="doc-col-header" style="color:#dc2626">🔴 合规项目</div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">发布说明（Release Note）</div><div class="doc-note">含测试结果摘要、已知问题</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">配置管理计划（SCM）</div><div class="doc-note">版本控制、基线管理规范</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">维护手册</div><div class="doc-note">故障诊断、现场升级流程</div></div>
+            </div>
+            <div class="doc-item must">
+              <div class="ind"></div>
+              <div><div class="doc-name">软件物料清单（SBOM）</div><div class="doc-note">第三方库版本、许可证记录</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div></div><div class="section-title">核心原则</div>
+<div class="principles">
+
+  <div class="principle-card">
+    <h3>⚖️ 文档的本质</h3>
+    <ul>
+      <li><span class="hl">文档是沟通工具，不是目的</span> — 只写有人读的文档</li>
+      <li>会过时的文档比没有文档更危险</li>
+      <li><span class="hl">代码是最准确的文档</span> — <code>Doxygen</code> 注释 = SDD</li>
+      <li>Git 历史是最好的 ChangeLog — 不要手动维护</li>
+      <li>ICD 是唯一必须独立存在的设计文档（多端协作）</li>
+    </ul>
+  </div>
+
+  <div class="principle-card">
+    <h3>🔧 比文档更有效的工具</h3>
+    <ul>
+      <li><code>Git + 约定式提交</code> → 替代 ChangeLog.md</li>
+      <li><code>Doxygen</code> → 替代 SDD 详细设计文档</li>
+      <li><code>cppcheck / PC-lint</code> → 替代大量人工代码审查</li>
+      <li><code>-Wall -Werror</code> → 0 Warning 原则强制执行</li>
+      <li><code>draw.io</code> → 架构图比文字描述有效 10 倍</li>
+      <li><code>git tag</code> → 版本发布即打标签</li>
+    </ul>
+  </div>
+
+  <div class="principle-card">
+    <h3>🎯 你的项目（中型）最小文档集</h3>
+    <ul>
+      <li>✅ <span class="hl">ICD 接口控制文档</span> — 三端联调基准</li>
+      <li>✅ <span class="hl">架构图 + ADR</span> — 一张图 + 关键决策</li>
+      <li>✅ <span class="hl">TestCase 测试用例集</span> — 发版 checklist</li>
+      <li>✅ <span class="hl">BuildGuide / README</span> — 构建烧录步骤</li>
+      <li>✅ <span class="hl">Doxygen 注释</span> — 代码即设计文档</li>
+      <li>✅ <span class="hl">git tag + release notes</span> — 版本记录</li>
+      <li>❌ SRS/SDD/TestPlan — 维护成本 &gt; 收益</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  // 主题切换逻辑
+  (function() {
+    var saved = localStorage.getItem('theme');
+    if (saved === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('toggleIcon').textContent  = '🌙';
+      document.getElementById('toggleLabel').textContent = '暗色';
+    }
+  })();
+
+  function toggleTheme() {
+    var html    = document.documentElement;
+    var icon    = document.getElementById('toggleIcon');
+    var label   = document.getElementById('toggleLabel');
+    var current = html.getAttribute('data-theme');
+
+    if (current === 'dark') {
+      html.setAttribute('data-theme', 'light');
+      icon.textContent  = '🌙';
+      label.textContent = '暗色';
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      icon.textContent  = '☀️';
+      label.textContent = '亮色';
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  // ===== 交互逻辑：高亮文档列 =====
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. 自动为文档表格的三列打上 data-size 标签（s/m/l），无需手动修改每一行 HTML
+    const grids = document.querySelectorAll('.doc-grid');
+    grids.forEach(grid => {
+      const cols = grid.querySelectorAll('.doc-col');
+      if (cols.length === 3) {
+        cols[0].setAttribute('data-size', 's');
+        cols[1].setAttribute('data-size', 'm');
+        cols[2].setAttribute('data-size', 'l');
+      }
+    });
+
+    // 2. 绑定点击事件到图例上的 badge
+    const badges = document.querySelectorAll('.type-badge');
+    badges.forEach(badge => {
+      badge.addEventListener('click', function() {
+        const size = this.getAttribute('data-size');
+        const currentFilter = document.body.getAttribute('data-active-filter');
+        
+        if (currentFilter === size) {
+          // 如果点击的是已经激活的分类，则取消过滤（恢复全亮）
+          document.body.removeAttribute('data-active-filter');
+        } else {
+          // 否则，为 body 设置对应的过滤器状态
+          document.body.setAttribute('data-active-filter', size);
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
