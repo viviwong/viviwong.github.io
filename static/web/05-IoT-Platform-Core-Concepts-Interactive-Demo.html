@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT 平台核心概念 · 交互教学演示</title>
+<style>
+/* =====================================================
+   CSS 变量：亮色为默认，[data-theme="dark"] 覆盖为暗色
+   亮色下大部分字体颜色无需改动，只修改原来的白色字
+===================================================== */
+:root {
+  /* 背景层次（亮色） */
+  --bg:      #f5f7fa;
+  --bg2:     #ffffff;
+  --bg3:     #f0f4f8;
+  --border:  #e2e8f0;
+  --border2: #edf2f7;
+
+  /* 文字颜色（亮色下改动最大的部分：原白色 → 深色） */
+  --text:    #1e293b;
+  --muted:   #64748b;
+  --dim:     #94a3b8;
+
+  /* 强调色：选用中深色调，亮色背景可读，暗色背景也可见 */
+  --blue:    #2563eb;
+  --indigo:  #4338ca;
+  --green:   #16a34a;
+  --amber:   #d97706;
+  --red:     #dc2626;
+  --teal:    #0d9488;
+  --purple:  #7c3aed;
+
+  /* Hero 渐变 */
+  --hero-grad: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+
+  /* 切换按钮 */
+  --toggle-bg:     #ffffff;
+  --toggle-border: #e2e8f0;
+  --toggle-color:  #64748b;
+  --toggle-hover:  #f0f4f8;
+
+  /* 设备面板数值色（亮色） */
+  --val-temp:  #dc2626;
+  --val-humi:  #2563eb;
+  --val-led:   #16a34a;
+  --val-rssi:  #7c3aed;
+  --val-other: #64748b;
+}
+
+/* ── 暗色主题：只覆盖需要变的变量 ── */
+[data-theme="dark"] {
+  --bg:      #0d1117;
+  --bg2:     #161b27;
+  --bg3:     #1e2535;
+  --border:  #2d3748;
+  --border2: #1e2535;
+
+  --text:    #e2e8f0;   /* 关键：原来的白色文字 */
+  --muted:   #718096;
+  --dim:     #4a5568;
+
+  --blue:    #4299e1;
+  --indigo:  #667eea;
+  --green:   #68d391;
+  --amber:   #f6ad55;
+  --red:     #fc8181;
+  --teal:    #38b2ac;
+  --purple:  #9f7aea;
+
+  --hero-grad: linear-gradient(135deg, #12182b 0%, #0d1117 100%);
+
+  --toggle-bg:     #1e2535;
+  --toggle-border: #2d3748;
+  --toggle-color:  #a0aec0;
+  --toggle-hover:  #2d3748;
+
+  --val-temp:  #fc8181;
+  --val-humi:  #63b3ed;
+  --val-led:   #68d391;
+  --val-rssi:  #a78bfa;
+  --val-other: #718096;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
+}
+a { text-decoration: none; }
+
+/* ── 主题切换按钮 ── */
+.theme-toggle {
+  position: fixed; top: 16px; right: 20px; z-index: 1000;
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 14px; border-radius: 20px;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  color: var(--toggle-color);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: inherit; user-select: none; white-space: nowrap;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+  transition: background 0.25s, border-color 0.25s, color 0.25s, box-shadow 0.2s;
+}
+.theme-toggle:hover { background: var(--toggle-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.14); }
+.theme-toggle .t-icon { font-size: 15px; line-height: 1; }
+
+/* ── Hero ── */
+.hero {
+  background: var(--hero-grad);
+  border-bottom: 1px solid var(--border);
+  padding: 44px 60px 36px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.hero-tag {
+  display: inline-block;
+  background: rgba(67,56,202,0.10); color: var(--indigo);
+  border: 1px solid rgba(67,56,202,0.25);
+  border-radius: 20px; font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 4px 12px; margin-bottom: 14px;
+  transition: color 0.3s;
+}
+[data-theme="dark"] .hero-tag {
+  background: rgba(102,126,234,0.15);
+  border-color: rgba(102,126,234,0.3);
+}
+.hero h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.3px; }
+.hero h1 .accent { color: var(--indigo); transition: color 0.3s; }
+.hero .sub { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 580px; line-height: 1.7; }
+.hero-nav { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.nav-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 1px solid;
+  transition: all 0.2s;
+}
+.nav-pill:hover { transform: translateY(-1px); }
+.np1 { color: var(--teal);   border-color: rgba(13,148,136,0.35);  background: rgba(13,148,136,0.07); }
+.np2 { color: var(--indigo); border-color: rgba(67,56,202,0.35);   background: rgba(67,56,202,0.07); }
+.np3 { color: var(--amber);  border-color: rgba(217,119,6,0.35);   background: rgba(217,119,6,0.07); }
+[data-theme="dark"] .np1 { border-color: rgba(56,178,172,0.35); background: rgba(56,178,172,0.07); }
+[data-theme="dark"] .np2 { border-color: rgba(102,126,234,0.35); background: rgba(102,126,234,0.07); }
+[data-theme="dark"] .np3 { border-color: rgba(246,173,85,0.35);  background: rgba(246,173,85,0.07); }
+
+/* ── 布局 ── */
+.wrap { max-width: 1240px; margin: 0 auto; padding: 52px 40px; }
+.sec-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+.sec-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.sec-desc  { font-size: 14px; color: var(--muted); max-width: 660px; margin-bottom: 32px; }
+hr.div { border: none; border-top: 1px solid var(--border2); transition: border-color 0.3s; }
+
+/* ── Section 1 ── */
+.triparty { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+.diagram-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  transition: background 0.3s, border-color 0.3s;
+}
+.diagram-card svg { display: block; width: 100%; }
+#flowSvg rect, #flowSvg line,
+#flowSvg text { transition: fill 0.3s, stroke 0.3s; }
+#pDevPlat, #pPlatSub, #pSubDev { transition: stroke 0.3s; }
+
+.flow-panel { display: flex; flex-direction: column; gap: 10px; }
+.flow-panel-title { font-size: 12px; color: var(--dim); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+
+.fbtn {
+  display: block; width: 100%; padding: 13px 16px;
+  border-radius: 10px; border: 1px solid;
+  background: transparent; cursor: pointer;
+  text-align: left; font-family: inherit; transition: all 0.2s;
+}
+.fbtn:hover { transform: translateX(3px); }
+.fbtn .fb-top { display: flex; align-items: center; gap: 8px; }
+.fbtn .fb-icon { font-size: 16px; }
+.fbtn .fb-name { font-size: 13px; font-weight: 700; }
+.fbtn .fb-info { font-size: 11px; margin-top: 4px; opacity: 0.7; }
+/* 亮色下用深色调边框 */
+.fbtn.fg { color: var(--green); border-color: rgba(22,163,74,0.35); }
+.fbtn.fg:hover { background: rgba(22,163,74,0.07); }
+.fbtn.fb { color: var(--blue);  border-color: rgba(37,99,235,0.35); }
+.fbtn.fb:hover { background: rgba(37,99,235,0.07); }
+.fbtn.fr { color: var(--red);   border-color: rgba(220,38,38,0.35); }
+.fbtn.fr:hover { background: rgba(220,38,38,0.07); }
+/* 暗色下用浅色调边框 */
+[data-theme="dark"] .fbtn.fg { border-color: rgba(104,211,145,0.3); }
+[data-theme="dark"] .fbtn.fg:hover { background: rgba(104,211,145,0.08); }
+[data-theme="dark"] .fbtn.fb { border-color: rgba(66,153,225,0.3); }
+[data-theme="dark"] .fbtn.fb:hover { background: rgba(66,153,225,0.08); }
+[data-theme="dark"] .fbtn.fr { border-color: rgba(252,129,129,0.3); }
+[data-theme="dark"] .fbtn.fr:hover { background: rgba(252,129,129,0.08); }
+
+.log-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px;
+  font-size: 11.5px; font-family: 'Courier New', monospace;
+  min-height: 110px; max-height: 140px; overflow-y: auto;
+  color: var(--muted); line-height: 2; margin-top: 4px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.log-box .lg { color: var(--green); }
+.log-box .lb { color: var(--blue);  }
+.log-box .lr { color: var(--red);   }
+.log-box .ld { color: var(--dim);   }
+.log-box .la { color: var(--amber); }
+
+/* ── Section 2 ── */
+.product-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.pm-card {
+  position: relative; border: 2px dashed var(--indigo);
+  border-radius: 14px; padding: 22px; margin-bottom: 28px;
+  background: rgba(67,56,202,0.03);
+  transition: border-color 0.3s;
+}
+[data-theme="dark"] .pm-card { background: rgba(102,126,234,0.03); }
+.pm-badge {
+  position: absolute; top: -12px; left: 20px;
+  background: var(--indigo); color: #fff;
+  font-size: 10px; font-weight: 700; padding: 3px 12px;
+  border-radius: 6px; letter-spacing: 1.5px; text-transform: uppercase;
+  transition: background 0.3s;
+}
+.pm-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.pm-icon { font-size: 28px; }
+.pm-name { font-size: 16px; font-weight: 700; }
+.pm-id   { font-size: 11px; color: var(--dim); font-family: monospace; margin-top: 2px; }
+.pm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.pm-col  {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.pm-col-head { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.pm-col.props .pm-col-head { color: var(--green); }
+.pm-col.svcs  .pm-col-head { color: var(--blue);  }
+.pm-col.evts  .pm-col-head { color: var(--red);   }
+.pm-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border2); font-size: 12px; }
+.pm-row:last-child { border-bottom: none; }
+.pm-row .pr-name { flex: 1; font-weight: 500; color: var(--text); }
+.pm-row .pr-type { color: var(--dim); font-family: monospace; font-size: 11px; }
+.pr-dir { font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+.dir-up   { background: rgba(22,163,74,0.12);  color: var(--green); }
+.dir-down { background: rgba(37,99,235,0.12);  color: var(--blue);  }
+.dir-both { background: rgba(124,58,237,0.12); color: var(--purple);}
+.dir-up2  { background: rgba(220,38,38,0.12);  color: var(--red);   }
+[data-theme="dark"] .dir-up   { background: rgba(104,211,145,0.15); }
+[data-theme="dark"] .dir-down { background: rgba(66,153,225,0.15);  }
+[data-theme="dark"] .dir-both { background: rgba(159,122,234,0.15); }
+[data-theme="dark"] .dir-up2  { background: rgba(252,129,129,0.15); }
+
+.instance-sep {
+  text-align: center; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 16px;
+  color: var(--dim); font-size: 12px;
+}
+.instance-sep::before, .instance-sep::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.dev-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.dev-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 10px; text-align: center;
+  cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+.dev-card:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+.dev-card.selected { border-color: var(--blue); background: rgba(37,99,235,0.05); }
+[data-theme="dark"] .dev-card.selected { background: rgba(66,153,225,0.06); }
+.dev-icon  { font-size: 26px; margin-bottom: 6px; }
+.dev-id    { font-size: 10px; font-family: monospace; color: var(--dim); }
+.dev-name  { font-size: 12px; font-weight: 600; margin: 4px 0; }
+.dev-status{ font-size: 10px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.dot-on  { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; }
+.dot-off { width:6px; height:6px; border-radius:50%; background:var(--dim); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.dev-data-panel {
+  margin-top: 16px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; display: none;
+  transition: background 0.3s, border-color 0.3s;
+}
+.dev-data-panel.show { display: block; }
+.dev-data-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.dev-data-header .icon  { font-size: 20px; }
+.dev-data-header .title { font-size: 14px; font-weight: 700; }
+.dev-data-header .id    { font-size: 11px; color: var(--dim); font-family: monospace; }
+.dev-props { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.dp-item { background: var(--bg2); border-radius: 8px; padding: 12px; border: 1px solid var(--border); transition: background 0.3s, border-color 0.3s; }
+.dp-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.dp-val   { font-size: 20px; font-weight: 700; font-family: monospace; }
+.dp-unit  { font-size: 11px; color: var(--dim); }
+.val-temp  { color: var(--val-temp);  }
+.val-humi  { color: var(--val-humi);  }
+.val-led   { color: var(--val-led);   }
+.val-rssi  { color: var(--val-rssi);  }
+.val-other { color: var(--val-other); }
+
+/* ── Section 3 ── */
+.trio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.trio-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  transition: border-color 0.25s, transform 0.2s, background 0.3s;
+}
+.trio-card:hover { transform: translateY(-2px); }
+.trio-card.tc-attr { border-color: rgba(22,163,74,0.45); }
+.trio-card.tc-svc  { border-color: rgba(37,99,235,0.45); }
+.trio-card.tc-evt  { border-color: rgba(220,38,38,0.45); }
+[data-theme="dark"] .trio-card.tc-attr { border-color: rgba(104,211,145,0.4); }
+[data-theme="dark"] .trio-card.tc-svc  { border-color: rgba(66,153,225,0.4);  }
+[data-theme="dark"] .trio-card.tc-evt  { border-color: rgba(252,129,129,0.4); }
+
+.trio-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 14px; transition: border-color 0.3s; }
+.trio-ico { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.tc-attr .trio-ico { background: rgba(22,163,74,0.10); }
+.tc-svc  .trio-ico { background: rgba(37,99,235,0.10); }
+.tc-evt  .trio-ico { background: rgba(220,38,38,0.10); }
+[data-theme="dark"] .tc-attr .trio-ico { background: rgba(104,211,145,0.12); }
+[data-theme="dark"] .tc-svc  .trio-ico { background: rgba(66,153,225,0.12);  }
+[data-theme="dark"] .tc-evt  .trio-ico { background: rgba(252,129,129,0.12); }
+.trio-label { font-size: 14px; font-weight: 700; }
+.tc-attr .trio-label { color: var(--green); }
+.tc-svc  .trio-label { color: var(--blue);  }
+.tc-evt  .trio-label { color: var(--red);   }
+.trio-en { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.trio-body { padding: 16px 20px 20px; }
+
+.flow-row {
+  display: flex; align-items: center; gap: 6px; padding: 10px 12px; margin-bottom: 14px;
+  background: var(--bg); border-radius: 8px; font-size: 12px; flex-wrap: wrap;
+  transition: background 0.3s;
+}
+.fn { padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.fn-dev  { background: rgba(13,148,136,0.10); color: var(--teal);   border: 1px solid rgba(13,148,136,0.3); }
+.fn-plat { background: rgba(67,56,202,0.10);  color: var(--indigo); border: 1px solid rgba(67,56,202,0.3); }
+.fn-app  { background: rgba(217,119,6,0.10);  color: var(--amber);  border: 1px solid rgba(217,119,6,0.3); }
+[data-theme="dark"] .fn-dev  { background: rgba(56,178,172,0.15);  border-color: rgba(56,178,172,0.3); }
+[data-theme="dark"] .fn-plat { background: rgba(102,126,234,0.15); border-color: rgba(102,126,234,0.3); }
+[data-theme="dark"] .fn-app  { background: rgba(246,173,85,0.15);  border-color: rgba(246,173,85,0.3); }
+.fa { color: var(--dim); font-size: 14px; line-height: 1; }
+
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.meta-item { background: var(--bg); border-radius: 7px; padding: 9px 11px; transition: background 0.3s; }
+.meta-k { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--dim); margin-bottom: 3px; }
+.meta-v { font-size: 12px; color: var(--text); }
+
+.cblock {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px;
+  font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.8;
+  color: var(--muted); overflow-x: auto;
+  transition: background 0.3s, border-color 0.3s;
+}
+.cblock .topic { color: var(--teal);   }
+.cblock .ck    { color: var(--purple); }
+.cblock .cv    { color: var(--green);  }
+.cblock .cs    { color: var(--amber);  }
+.cblock .cn    { color: var(--blue);   }
+.cblock .cm    { color: var(--dim); font-style: italic; }
+.cblock-label  { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 8px; }
+
+.dbtn {
+  display: block; width: 100%; margin-top: 12px;
+  padding: 9px; border-radius: 8px; border: 1px solid;
+  background: transparent; font-family: inherit;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.dbtn-g { color: var(--green); border-color: rgba(22,163,74,0.35); }
+.dbtn-g:hover { background: rgba(22,163,74,0.07); }
+.dbtn-b { color: var(--blue);  border-color: rgba(37,99,235,0.35); }
+.dbtn-b:hover { background: rgba(37,99,235,0.07); }
+.dbtn-r { color: var(--red);   border-color: rgba(220,38,38,0.35); }
+.dbtn-r:hover { background: rgba(220,38,38,0.07); }
+[data-theme="dark"] .dbtn-g { border-color: rgba(104,211,145,0.3); }
+[data-theme="dark"] .dbtn-g:hover { background: rgba(104,211,145,0.10); }
+[data-theme="dark"] .dbtn-b { border-color: rgba(66,153,225,0.3); }
+[data-theme="dark"] .dbtn-b:hover { background: rgba(66,153,225,0.10); }
+[data-theme="dark"] .dbtn-r { border-color: rgba(252,129,129,0.3); }
+[data-theme="dark"] .dbtn-r:hover { background: rgba(252,129,129,0.10); }
+
+/* ── 对比表格 ── */
+.compare-wrap {
+  margin-top: 32px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  transition: background 0.3s, border-color 0.3s;
+}
+.compare-table { width: 100%; border-collapse: collapse; }
+.compare-table th, .compare-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border2); font-size: 13px; transition: border-color 0.3s; }
+.compare-table th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); background: var(--bg3); transition: background 0.3s; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table .row-attr td:first-child { color: var(--green); font-weight: 700; }
+.compare-table .row-svc  td:first-child { color: var(--blue);  font-weight: 700; }
+.compare-table .row-evt  td:first-child { color: var(--red);   font-weight: 700; }
+.compare-table td { color: var(--text); }
+.compare-table td:not(:first-child) { color: var(--muted); }
+.compare-table code { background: var(--bg3); color: var(--teal); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: 'Courier New', monospace; transition: background 0.3s; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  max-width: 340px; min-width: 240px; padding: 14px 18px;
+  border-radius: 12px; font-size: 13px; font-weight: 500;
+  opacity: 0; transform: translateY(16px);
+  transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+  z-index: 9999; pointer-events: none;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15); line-height: 1.5;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+/* 亮色 toast */
+.toast.tg { background: #f0fdf4; border: 1px solid rgba(22,163,74,0.5);  color: #166534; }
+.toast.tb { background: #eff6ff; border: 1px solid rgba(37,99,235,0.5);  color: #1d4ed8; }
+.toast.tr { background: #fef2f2; border: 1px solid rgba(220,38,38,0.5);  color: #991b1b; }
+.toast.ta { background: #fffbeb; border: 1px solid rgba(217,119,6,0.5);  color: #92400e; }
+/* 暗色 toast */
+[data-theme="dark"] .toast.tg { background: #1a3d2e; border-color: #68d391; color: #9ae6b4; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
+[data-theme="dark"] .toast.tb { background: #15304a; border-color: #4299e1; color: #90cdf4; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
+[data-theme="dark"] .toast.tr { background: #3d1a1a; border-color: #fc8181; color: #feb2b2; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
+[data-theme="dark"] .toast.ta { background: #3d2a0e; border-color: #f6ad55; color: #fbd38d; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
+
+/* ── 响应式 ── */
+@media (max-width: 900px) {
+  .wrap { padding: 32px 20px; }
+  .hero { padding: 28px 20px; }
+  .triparty { grid-template-columns: 1fr; }
+  .pm-grid { grid-template-columns: 1fr; }
+  .dev-grid { grid-template-columns: repeat(2, 1fr); }
+  .trio-grid { grid-template-columns: 1fr; }
+  .dev-props { grid-template-columns: repeat(2, 1fr); }
+  .meta-grid { grid-template-columns: 1fr; }
+  .theme-toggle { top: 12px; right: 12px; padding: 6px 11px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── 主题切换按钮（默认亮色，显示切换到暗色） ── -->
+<button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">
+  <span class="t-icon" id="toggleIcon">🌙</span>
+  <span id="toggleLabel">暗色</span>
+</button>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-tag">IoT Platform · Interactive Teaching</div>
+  <h1>物联网平台 <span class="accent">核心概念</span> 交互演示</h1>
+  <p class="sub">通过动画演示理解三方协作关系，以及属性、服务、事件如何驱动设备与云端的数据交互</p>
+  <div class="hero-nav">
+    <div class="nav-pill np1" onclick="scrollToSection('s1')">① 三方关系：平台 / 设备 / 订阅者</div>
+    <div class="nav-pill np2" onclick="scrollToSection('s2')">② 产品模型与设备实例</div>
+    <div class="nav-pill np3" onclick="scrollToSection('s3')">③ 属性 · 服务 · 事件</div>
+  </div>
+</div>
+
+<!-- ── SECTION 1 ── -->
+<div id="s1">
+<div class="wrap">
+  <div class="sec-label">Section 01</div>
+  <div class="sec-title">三方关系：平台 · 设备 · 订阅者</div>
+  <p class="sec-desc">
+    物联网平台是<strong style="color:var(--indigo)">消息中转枢纽（Broker）</strong>，设备是数据的<strong style="color:var(--teal)">生产者与执行者</strong>，订阅者是数据的<strong style="color:var(--amber)">消费者与指令发起方</strong>。
+    三方之间通过 <strong>MQTT 主题（Topic）</strong>解耦通信 — 设备和应用都不直接对话，全程经由平台路由。
+  </p>
+
+  <div class="triparty">
+    <div class="diagram-card">
+      <svg id="flowSvg" viewBox="0 0 580 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-g" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-b" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-r" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- 背景 & 网格 -->
+        <rect id="svgBg" width="580" height="360" fill="#f0f4f8" rx="0"/>
+        <line id="svgL1" x1="0" y1="180" x2="580" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+        <line id="svgL2" x1="290" y1="0" x2="290" y2="360" stroke="#e2e8f0" stroke-width="1"/>
+        <!-- 连接路径 -->
+        <path id="pDevPlat" d="M 120,232 C 180,200 220,150 255,110" stroke="#cbd5e0" stroke-width="1.5" fill="none" stroke-dasharray="5,4"/>
+        <path id="pPlatSub" d="M 325,110 C 360,150 400,200 460,232" stroke="#cbd5e0" stroke-width="1.5" fill="none" stroke-dasharray="5,4"/>
+        <path id="pSubDev"  d="M 440,280 C 340,310 240,310 140,280" stroke="#e2e8f0" stroke-width="1"   fill="none" stroke-dasharray="3,5"/>
+        <!-- 路径标签 -->
+        <text id="svgT1" x="165" y="185" fill="#94a3b8" font-size="10" font-family="PingFang SC,sans-serif" transform="rotate(-38,165,185)">MQTT · TCP</text>
+        <text id="svgT2" x="395" y="185" fill="#94a3b8" font-size="10" font-family="PingFang SC,sans-serif" transform="rotate(38,395,185)">MQTT · TCP</text>
+        <text id="svgT3" x="290" y="325" fill="#cbd5e0" font-size="9"  font-family="PingFang SC,sans-serif" text-anchor="middle">（通过平台间接通信）</text>
+        <!-- 平台节点 -->
+        <g id="node-plat">
+          <rect id="nr-plat" x="195" y="28" width="190" height="80" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="290" y="60" text-anchor="middle" font-size="26">☁️</text>
+          <text id="svgNPlatTitle" x="290" y="82" text-anchor="middle" fill="#1e293b" font-size="14" font-weight="700" font-family="PingFang SC,sans-serif">物联网平台</text>
+          <text id="svgNPlatSub"   x="290" y="99" text-anchor="middle" fill="#718096" font-size="10" font-family="PingFang SC,sans-serif">Broker · 数据存储 · 规则引擎</text>
+        </g>
+        <!-- 设备节点 -->
+        <g id="node-dev">
+          <rect id="nr-dev" x="18" y="218" width="202" height="80" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="60" y="252" text-anchor="middle" font-size="26">🔌</text>
+          <text id="svgNDevTitle" x="150" y="252" text-anchor="middle" fill="#1e293b" font-size="14" font-weight="700" font-family="PingFang SC,sans-serif">设备</text>
+          <text id="svgNDevSub1"  x="119" y="270" text-anchor="middle" fill="#718096" font-size="10" font-family="PingFang SC,sans-serif">STM32 + ESP8266</text>
+          <text id="svgNDevSub2"  x="119" y="284" text-anchor="middle" fill="#718096" font-size="9"  font-family="PingFang SC,sans-serif">MQTT Publisher &amp; Subscriber</text>
+        </g>
+        <!-- 订阅者节点 -->
+        <g id="node-sub">
+          <rect id="nr-sub" x="360" y="218" width="202" height="80" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="406" y="252" text-anchor="middle" font-size="26">📱</text>
+          <text id="svgNSubTitle" x="470" y="252" text-anchor="middle" fill="#1e293b" font-size="14" font-weight="700" font-family="PingFang SC,sans-serif">订阅者</text>
+          <text id="svgNSubSub1"  x="461" y="270" text-anchor="middle" fill="#718096" font-size="10" font-family="PingFang SC,sans-serif">小程序 · 后台应用</text>
+          <text id="svgNSubSub2"  x="461" y="284" text-anchor="middle" fill="#718096" font-size="9"  font-family="PingFang SC,sans-serif">MQTT Subscriber &amp; Publisher</text>
+        </g>
+        <!-- 角色标签 -->
+        <text id="svgRoleDev"  x="119" y="215" text-anchor="middle" fill="#0d9488" font-size="10" font-weight="700" font-family="PingFang SC,sans-serif" letter-spacing="1">发布者 / 执行者</text>
+        <text id="svgRoleSub"  x="461" y="215" text-anchor="middle" fill="#d97706" font-size="10" font-weight="700" font-family="PingFang SC,sans-serif" letter-spacing="1">订阅者 / 指令方</text>
+        <text id="svgRolePlat" x="290" y="22"  text-anchor="middle" fill="#4338ca" font-size="10" font-weight="700" font-family="PingFang SC,sans-serif" letter-spacing="1">消息枢纽 / 路由</text>
+        <!-- 动画层 & 高亮环 -->
+        <g id="packetLayer"></g>
+        <circle id="ring-plat" cx="290" cy="68"  r="58" fill="none" stroke="#4338ca" stroke-width="0" opacity="0"/>
+        <circle id="ring-dev"  cx="119" cy="258" r="58" fill="none" stroke="#0d9488" stroke-width="0" opacity="0"/>
+        <circle id="ring-sub"  cx="461" cy="258" r="58" fill="none" stroke="#d97706" stroke-width="0" opacity="0"/>
+      </svg>
+    </div>
+
+    <div class="flow-panel">
+      <div class="flow-panel-title">点击模拟数据流</div>
+      <button class="fbtn fg" onclick="runFlow('attr')">
+        <div class="fb-top"><span class="fb-icon">📊</span><span class="fb-name">模拟属性上报</span></div>
+        <div class="fb-info">设备 → 平台 → 订阅者 · 温湿度数据推送</div>
+      </button>
+      <button class="fbtn fb" onclick="runFlow('cmd')">
+        <div class="fb-top"><span class="fb-icon">⚙️</span><span class="fb-name">模拟服务调用</span></div>
+        <div class="fb-info">订阅者 → 平台 → 设备 · 下发指令</div>
+      </button>
+      <button class="fbtn fr" onclick="runFlow('evt')">
+        <div class="fb-top"><span class="fb-icon">🚨</span><span class="fb-name">模拟事件告警</span></div>
+        <div class="fb-info">设备 → 平台 → 订阅者 · 温度超限告警</div>
+      </button>
+      <div class="flow-panel-title" style="margin-top:4px">消息日志</div>
+      <div class="log-box" id="msgLog">
+        <span class="ld">▷ 点击上方按钮开始模拟...</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ── SECTION 2 ── -->
+<div id="s2">
+<div class="wrap">
+  <div class="sec-label">Section 02</div>
+  <div class="sec-title">产品模型与设备实例</div>
+  <p class="sec-desc">
+    <strong style="color:var(--indigo)">产品（Product Model）</strong> 是设备的<strong>「类定义」</strong> — 描述这类设备有哪些能力；
+    <strong style="color:var(--teal)">设备（Device）</strong> 是产品的<strong>「实例」</strong> — 每台实体硬件对应一个设备记录，共享同一份能力模型但拥有独立的数据。
+  </p>
+
+  <div class="product-wrap">
+    <div class="pm-card">
+      <div class="pm-badge">PRODUCT MODEL · 产品模型（模板 / 类）</div>
+      <div class="pm-header">
+        <div class="pm-icon">🌡️</div>
+        <div>
+          <div class="pm-name">IoT 中控传感器</div>
+          <div class="pm-id">product_id: IOT_CENTER_001 · 协议: MQTT · 数据格式: JSON</div>
+        </div>
+      </div>
+      <div class="pm-grid">
+        <div class="pm-col props">
+          <div class="pm-col-head">🟢 属性（Properties）</div>
+          <div class="pm-row"><span class="pr-name">temperature</span><span class="pr-type">float</span><span class="pr-dir dir-both">上报/读取</span></div>
+          <div class="pm-row"><span class="pr-name">humidity</span>   <span class="pr-type">float</span><span class="pr-dir dir-both">上报/读取</span></div>
+          <div class="pm-row"><span class="pr-name">led_states</span><span class="pr-type">array</span><span class="pr-dir dir-down">下发/读取</span></div>
+          <div class="pm-row"><span class="pr-name">wifi_rssi</span> <span class="pr-type">int</span>  <span class="pr-dir dir-up">上报</span></div>
+        </div>
+        <div class="pm-col svcs">
+          <div class="pm-col-head">🔵 服务（Services）</div>
+          <div class="pm-row"><span class="pr-name">setBrightness</span><span class="pr-type">cmd</span><span class="pr-dir dir-down">下发</span></div>
+          <div class="pm-row"><span class="pr-name">setLed</span>       <span class="pr-type">cmd</span><span class="pr-dir dir-down">下发</span></div>
+          <div class="pm-row"><span class="pr-name">reboot</span>       <span class="pr-type">cmd</span><span class="pr-dir dir-down">下发</span></div>
+          <div class="pm-row"><span class="pr-name">factoryReset</span><span class="pr-type">cmd</span><span class="pr-dir dir-down">下发</span></div>
+        </div>
+        <div class="pm-col evts">
+          <div class="pm-col-head">🔴 事件（Events）</div>
+          <div class="pm-row"><span class="pr-name">tempAlarm</span>     <span class="pr-type">alert</span><span class="pr-dir dir-up2">上报</span></div>
+          <div class="pm-row"><span class="pr-name">humiAlarm</span>     <span class="pr-type">alert</span><span class="pr-dir dir-up2">上报</span></div>
+          <div class="pm-row"><span class="pr-name">wifiDisconnect</span><span class="pr-type">info</span> <span class="pr-dir dir-up2">上报</span></div>
+          <div class="pm-row"><span class="pr-name">bootComplete</span>  <span class="pr-type">info</span> <span class="pr-dir dir-up2">上报</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="instance-sep">↓&nbsp; 每台实体设备注册后，生成独立设备实例（共享产品模型能力定义）&nbsp;↓</div>
+
+    <div class="dev-grid">
+      <div class="dev-card" id="dc0" onclick="selectDevice(0)">
+        <div class="dev-icon">🔌</div>
+        <div class="dev-id">dev_A8F3C1</div>
+        <div class="dev-name">实验室设备 A</div>
+        <div class="dev-status"><div class="dot-on"></div><span style="color:var(--green)">在线</span></div>
+      </div>
+      <div class="dev-card" id="dc1" onclick="selectDevice(1)">
+        <div class="dev-icon">🔌</div>
+        <div class="dev-id">dev_B2D9E7</div>
+        <div class="dev-name">会议室设备 B</div>
+        <div class="dev-status"><div class="dot-on"></div><span style="color:var(--green)">在线</span></div>
+      </div>
+      <div class="dev-card" id="dc2" onclick="selectDevice(2)">
+        <div class="dev-icon">🔌</div>
+        <div class="dev-id">dev_C5F041</div>
+        <div class="dev-name">仓库设备 C</div>
+        <div class="dev-status"><div class="dot-off"></div><span style="color:var(--dim)">离线</span></div>
+      </div>
+      <div class="dev-card" id="dc3" onclick="selectDevice(3)">
+        <div class="dev-icon">🔌</div>
+        <div class="dev-id">dev_D7A2B8</div>
+        <div class="dev-name">测试设备 D</div>
+        <div class="dev-status"><div class="dot-on"></div><span style="color:var(--green)">在线</span></div>
+      </div>
+    </div>
+
+    <div class="dev-data-panel" id="devPanel">
+      <div class="dev-data-header">
+        <div class="icon">📊</div>
+        <div>
+          <div class="title" id="devPanelTitle">设备数据</div>
+          <div class="id"    id="devPanelId">dev_xxx</div>
+        </div>
+      </div>
+      <div class="dev-props" id="devPanelProps"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ── SECTION 3 ── -->
+<div id="s3">
+<div class="wrap">
+  <div class="sec-label">Section 03</div>
+  <div class="sec-title">属性 · 服务 · 事件 的区别与用法</div>
+  <p class="sec-desc">
+    产品模型的三种能力定义，分别对应设备数据的三种交互模式：状态读写（属性）、指令执行（服务）、主动通知（事件）。
+  </p>
+
+  <div class="trio-grid">
+    <!-- 属性 -->
+    <div class="trio-card tc-attr">
+      <div class="trio-header">
+        <div class="trio-ico">🌡️</div>
+        <div><div class="trio-label">属性（Properties）</div><div class="trio-en">Device State / Data Points</div></div>
+      </div>
+      <div class="trio-body">
+        <div class="flow-row">
+          <span class="fn fn-dev">设备</span><span class="fa">→</span><span class="fn fn-plat">平台</span><span class="fa">→</span><span class="fn fn-app">应用</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">（上报）</span>
+        </div>
+        <div class="flow-row">
+          <span class="fn fn-app">应用</span><span class="fa">→</span><span class="fn fn-plat">平台</span><span class="fa">→</span><span class="fn fn-dev">设备</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">（写入）</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item"><div class="meta-k">触发时机</div><div class="meta-v">定时 / 值变化 / 平台主动读</div></div>
+          <div class="meta-item"><div class="meta-k">方向</div><div class="meta-v">双向（上报 + 可写）</div></div>
+          <div class="meta-item"><div class="meta-k">类比</div><div class="meta-v">类的成员变量</div></div>
+          <div class="meta-item"><div class="meta-k">典型场景</div><div class="meta-v">温度、湿度、LED 状态</div></div>
+        </div>
+        <div class="cblock-label">MQTT Topic（属性上报）</div>
+        <div class="cblock">
+<span class="topic">$oc/devices/{device_id}/sys/properties/report</span>
+
+{
+  <span class="ck">"services"</span>: [{
+    <span class="ck">"service_id"</span>: <span class="cs">"sensor"</span>,
+    <span class="ck">"properties"</span>: {
+      <span class="ck">"temperature"</span>: <span class="cn">26.1</span>,
+      <span class="ck">"humidity"</span>:    <span class="cn">55.3</span>
+    },
+    <span class="ck">"eventTime"</span>: <span class="cs">"20260507T102030Z"</span>
+  }]
+}</div>
+        <button class="dbtn dbtn-g" onclick="demoAttr()">▶ 演示：设备上报温湿度</button>
+      </div>
+    </div>
+
+    <!-- 服务 -->
+    <div class="trio-card tc-svc">
+      <div class="trio-header">
+        <div class="trio-ico">⚙️</div>
+        <div><div class="trio-label">服务（Services）</div><div class="trio-en">Command / RPC Call</div></div>
+      </div>
+      <div class="trio-body">
+        <div class="flow-row">
+          <span class="fn fn-app">应用</span><span class="fa">→</span><span class="fn fn-plat">平台</span><span class="fa">→</span><span class="fn fn-dev">设备</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">（下发）</span>
+        </div>
+        <div class="flow-row">
+          <span class="fn fn-dev">设备</span><span class="fa">→</span><span class="fn fn-plat">平台</span><span class="fa">→</span><span class="fn fn-app">应用</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">（响应）</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item"><div class="meta-k">触发时机</div><div class="meta-v">应用/用户主动发起</div></div>
+          <div class="meta-item"><div class="meta-k">方向</div><div class="meta-v">应用 → 设备（+响应）</div></div>
+          <div class="meta-item"><div class="meta-k">类比</div><div class="meta-v">类的成员方法调用</div></div>
+          <div class="meta-item"><div class="meta-k">典型场景</div><div class="meta-v">开关LED、设置亮度、重启</div></div>
+        </div>
+        <div class="cblock-label">MQTT Topic（命令下发）</div>
+        <div class="cblock">
+<span class="topic">$oc/devices/{device_id}/sys/commands/{cmd_id}</span>
+
+{
+  <span class="cm">// 平台 → 设备：下发指令</span>
+  <span class="ck">"command_name"</span>: <span class="cs">"setBrightness"</span>,
+  <span class="ck">"paras"</span>: {
+    <span class="ck">"brightness"</span>: <span class="cn">80</span>
+  }
+}
+
+<span class="cm">// 设备 → 平台：执行响应</span>
+{ <span class="ck">"result_code"</span>: <span class="cn">0</span>, <span class="ck">"response_name"</span>: <span class="cs">"setBrightness"</span> }</div>
+        <button class="dbtn dbtn-b" onclick="demoSvc()">▶ 演示：下发 setLed 指令</button>
+      </div>
+    </div>
+
+    <!-- 事件 -->
+    <div class="trio-card tc-evt">
+      <div class="trio-header">
+        <div class="trio-ico">🚨</div>
+        <div><div class="trio-label">事件（Events）</div><div class="trio-en">Device-initiated Alert / Notify</div></div>
+      </div>
+      <div class="trio-body">
+        <div class="flow-row">
+          <span class="fn fn-dev">设备</span><span class="fa">→</span><span class="fn fn-plat">平台</span><span class="fa">→</span><span class="fn fn-app">应用/告警</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">（主动推）</span>
+        </div>
+        <div class="flow-row" style="opacity:0.35;pointer-events:none">
+          <span style="font-size:12px;color:var(--dim)">✕ 应用无法主动触发 · 设备决定何时上报</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item"><div class="meta-k">触发时机</div><div class="meta-v">设备检测到异常条件时</div></div>
+          <div class="meta-item"><div class="meta-k">方向</div><div class="meta-v">单向：设备 → 平台</div></div>
+          <div class="meta-item"><div class="meta-k">类比</div><div class="meta-v">中断 / Callback 回调</div></div>
+          <div class="meta-item"><div class="meta-k">典型场景</div><div class="meta-v">温度超限、WiFi断开告警</div></div>
+        </div>
+        <div class="cblock-label">MQTT Topic（事件上报）</div>
+        <div class="cblock">
+<span class="topic">$oc/devices/{device_id}/sys/events/up</span>
+
+{
+  <span class="ck">"services"</span>: [{
+    <span class="ck">"service_id"</span>: <span class="cs">"sensor"</span>,
+    <span class="ck">"event_type"</span>: <span class="cs">"tempAlarm"</span>,
+    <span class="ck">"event_time"</span>: <span class="cs">"20260507T103045Z"</span>,
+    <span class="ck">"paras"</span>: {
+      <span class="ck">"temperature"</span>: <span class="cn">85.0</span>,
+      <span class="ck">"severity"</span>: <span class="cs">"critical"</span>
+    }
+  }]
+}</div>
+        <button class="dbtn dbtn-r" onclick="demoEvt()">▶ 演示：触发温度超限告警</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 对比表格 -->
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>概念</th><th>谁发起</th><th>方向</th><th>触发时机</th>
+          <th>有无响应</th><th>MQTT Topic 关键词</th><th>典型例子</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-attr">
+          <td>属性 Properties</td><td>设备（上报）/ 应用（写入读取）</td>
+          <td>双向</td><td>定时 / 变化 / 请求</td>
+          <td>读写有响应</td><td><code>/properties/report</code></td><td>温度 26.1℃、湿度 55%</td>
+        </tr>
+        <tr class="row-svc">
+          <td>服务 Services</td><td>应用 / 平台规则</td>
+          <td>应用 → 设备（+响应）</td><td>用户/规则主动触发</td>
+          <td>有响应（success/fail）</td><td><code>/commands/{id}</code></td><td>setLed(ON)、setBrightness(80)</td>
+        </tr>
+        <tr class="row-evt">
+          <td>事件 Events</td><td>设备（条件触发）</td>
+          <td>设备 → 平台（单向）</td><td>设备检测到异常</td>
+          <td>无响应（Fire &amp; Forget）</td><td><code>/events/up</code></td><td>tempAlarm 85℃、WiFi断开</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   主题切换
+============================================================ */
+function toggleTheme() {
+  var html = document.documentElement;
+  var cur  = html.getAttribute('data-theme') || 'light';
+  var next = cur === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('toggleIcon').textContent  = next === 'light' ? '🌙' : '☀️';
+  document.getElementById('toggleLabel').textContent = next === 'light' ? '暗色' : '亮色';
+  localStorage.setItem('iot-theme', next);
+  updateSVGTheme(next);
+}
+
+function updateSVGTheme(theme) {
+  var light = (theme === 'light');
+  var set = function(id, attr, v) { var e=document.getElementById(id); if(e) e.setAttribute(attr,v); };
+
+  set('svgBg',  'fill',   light ? '#f0f4f8' : '#161b27');
+  set('svgL1',  'stroke', light ? '#e2e8f0' : '#1e2535');
+  set('svgL2',  'stroke', light ? '#e2e8f0' : '#1e2535');
+  set('pDevPlat','stroke',light ? '#cbd5e0' : '#2d3748');
+  set('pPlatSub','stroke',light ? '#cbd5e0' : '#2d3748');
+  set('pSubDev', 'stroke',light ? '#e2e8f0' : '#1e2535');
+  set('svgT1',  'fill',   light ? '#94a3b8' : '#4a5568');
+  set('svgT2',  'fill',   light ? '#94a3b8' : '#4a5568');
+  set('svgT3',  'fill',   light ? '#cbd5e0' : '#2d3748');
+  // 节点背景矩形
+  ['nr-plat','nr-dev','nr-sub'].forEach(function(id){
+    set(id, 'fill',   light ? '#ffffff' : '#1e2535');
+    set(id, 'stroke', light ? '#e2e8f0' : '#4a5568');
+  });
+  // 节点主标题文字（原白色 → 需修改）
+  ['svgNPlatTitle','svgNDevTitle','svgNSubTitle'].forEach(function(id){
+    set(id, 'fill', light ? '#1e293b' : '#e2e8f0');
+  });
+  // 角色标签
+  set('svgRoleDev',  'fill', light ? '#0d9488' : '#38b2ac');
+  set('svgRoleSub',  'fill', light ? '#d97706' : '#f6ad55');
+  set('svgRolePlat', 'fill', light ? '#4338ca' : '#667eea');
+}
+
+/* 初始化：读取 localStorage */
+(function() {
+  var saved = localStorage.getItem('iot-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('toggleIcon').textContent  = saved === 'light' ? '🌙' : '☀️';
+  document.getElementById('toggleLabel').textContent = saved === 'light' ? '暗色' : '亮色';
+  updateSVGTheme(saved);
+})();
+
+/* ============================================================
+   平滑滚动 —— 自定义 easeInOutQuart + 自适应时长
+   比 scrollIntoView 更流畅、可控，真正"缓慢滑入"
+============================================================ */
+function scrollToSection(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+
+  var startY    = window.pageYOffset;
+  var targetY   = el.getBoundingClientRect().top + startY - 20; // 留 20px 呼吸
+  var distance  = targetY - startY;
+  if (Math.abs(distance) < 2) return;
+
+  // 自适应时长：距离越远耗时适当延长，最短 600ms，最长 1200ms
+  var duration  = Math.min(Math.max(Math.abs(distance) * 0.55, 600), 1200);
+  var startTime = null;
+
+  function easeInOutQuart(t) {
+    return t < 0.5 ? 8*t*t*t*t : 1 - 8*(--t)*t*t*t;
+  }
+
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var elapsed  = ts - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    window.scrollTo(0, startY + distance * easeInOutQuart(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+}
+
+/* ============================================================
+   Section 1: 流程动画
+============================================================ */
+var pLayer   = document.getElementById('packetLayer');
+var logBox   = document.getElementById('msgLog');
+var animLock = false;
+
+function log(cls, txt) {
+  var el = document.createElement('div');
+  el.innerHTML = '<span class="' + cls + '">' + txt + '</span>';
+  logBox.appendChild(el);
+  logBox.scrollTop = logBox.scrollHeight;
+}
+function clearLog() { logBox.innerHTML = ''; }
+
+function animPacket(pathId, reverse, color, size, dur, onDone) {
+  var path  = document.getElementById(pathId);
+  var total = path.getTotalLength();
+  var circ  = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  circ.setAttribute('r', size || 8);
+  circ.setAttribute('fill', color);
+  var fid = color === '#68d391' || color === '#16a34a' ? 'glow-g'
+           :(color === '#4299e1' || color === '#2563eb' ? 'glow-b' : 'glow-r');
+  circ.setAttribute('filter', 'url(#' + fid + ')');
+  pLayer.appendChild(circ);
+  var t0 = null;
+  function step(ts) {
+    if (!t0) t0 = ts;
+    var p  = Math.min((ts - t0) / dur, 1);
+    var t  = p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2,3)/2;
+    var pt = path.getPointAtLength(reverse ? total*(1-t) : total*t);
+    circ.setAttribute('cx', pt.x);
+    circ.setAttribute('cy', pt.y);
+    if (p < 1) requestAnimationFrame(step);
+    else { setTimeout(function(){ circ.remove(); },50); if(onDone) onDone(); }
+  }
+  requestAnimationFrame(step);
+}
+
+function glowNode(id, color, dur) {
+  var el = document.getElementById('ring-'+id);
+  if (!el) return;
+  el.setAttribute('stroke', color);
+  el.setAttribute('stroke-width','3');
+  el.setAttribute('opacity','0.6');
+  setTimeout(function(){ el.setAttribute('opacity','0'); el.setAttribute('stroke-width','0'); }, dur||600);
+}
+
+function getPacketColor(base) {
+  // 始终用饱和色便于 SVG 上可见
+  var map = { green:'#16a34a', blue:'#2563eb', red:'#dc2626' };
+  return map[base] || base;
+}
+
+function runFlow(type) {
+  if (animLock) return;
+  animLock = true;
+  clearLog();
+  if (type === 'attr') {
+    log('ld','▷ 设备定时上报属性...');
+    glowNode('dev','#0d9488',500);
+    animPacket('pDevPlat',false,'#16a34a',9,900,function(){
+      glowNode('plat','#4338ca',500);
+      log('lg','↑ 设备 → 平台  $oc/.../properties/report');
+      log('ld','  {"temperature":26.1,"humidity":55.3}');
+      setTimeout(function(){
+        log('ld','▷ 平台路由推送到订阅者...');
+        animPacket('pPlatSub',false,'#16a34a',9,900,function(){
+          glowNode('sub','#d97706',500);
+          log('lg','↓ 平台 → 订阅者  数据推送成功');
+          log('la','  📱 小程序收到: 温度 26.1°C  湿度 55.3%');
+          animLock = false;
+        });
+      },400);
+    });
+  } else if (type === 'cmd') {
+    log('ld','▷ 应用发起服务调用...');
+    glowNode('sub','#d97706',500);
+    animPacket('pPlatSub',true,'#2563eb',9,900,function(){
+      glowNode('plat','#4338ca',500);
+      log('lb','↑ 订阅者 → 平台  下发指令 setLed');
+      log('ld','  {"command_name":"setLed","paras":{"id":1,"state":"ON"}}');
+      setTimeout(function(){
+        log('ld','▷ 平台转发到目标设备...');
+        animPacket('pDevPlat',true,'#2563eb',9,900,function(){
+          glowNode('dev','#0d9488',500);
+          log('lb','↓ 平台 → 设备  命令送达');
+          log('lg','  ✓ 设备响应: LED1 已点亮，result_code=0');
+          animLock = false;
+        });
+      },400);
+    });
+  } else if (type === 'evt') {
+    log('lr','🚨 设备检测到温度超限...');
+    glowNode('dev','#dc2626',500);
+    animPacket('pDevPlat',false,'#dc2626',11,700,function(){
+      glowNode('plat','#dc2626',600);
+      log('lr','↑ 设备 → 平台  事件上报 tempAlarm');
+      log('ld','  {"event_type":"tempAlarm","temperature":85.0,"severity":"critical"}');
+      setTimeout(function(){
+        log('lr','▷ 平台触发告警规则 → 推送订阅者');
+        animPacket('pPlatSub',false,'#dc2626',11,700,function(){
+          glowNode('sub','#dc2626',600);
+          log('lr','↓ 平台 → 订阅者  告警推送');
+          log('lr','  🔔 短信/钉钉/邮件通知已发出 — 温度 85.0°C!');
+          animLock = false;
+        });
+      },350);
+    });
+  }
+}
+
+/* ============================================================
+   Section 2: 设备选择
+============================================================ */
+var deviceData = [
+  { name:'实验室设备 A', id:'dev_A8F3C1', online:true,  temp:'26.1', humi:'55.3', led:'[ON,OFF,ON,OFF]', rssi:'-67 dBm' },
+  { name:'会议室设备 B', id:'dev_B2D9E7', online:true,  temp:'23.8', humi:'48.2', led:'[ON,ON,ON,ON]',   rssi:'-55 dBm' },
+  { name:'仓库设备 C',   id:'dev_C5F041', online:false, temp:'--',   humi:'--',   led:'[--]',             rssi:'离线' },
+  { name:'测试设备 D',   id:'dev_D7A2B8', online:true,  temp:'31.4', humi:'62.0', led:'[OFF,OFF,OFF,OFF]',rssi:'-72 dBm' }
+];
+var selDev = -1;
+function selectDevice(idx) {
+  for (var i=0;i<4;i++) document.getElementById('dc'+i).classList.remove('selected');
+  var panel = document.getElementById('devPanel');
+  if (selDev === idx) { selDev=-1; panel.classList.remove('show'); return; }
+  selDev = idx;
+  document.getElementById('dc'+idx).classList.add('selected');
+  var d = deviceData[idx];
+  document.getElementById('devPanelTitle').textContent = d.name;
+  document.getElementById('devPanelId').textContent    = d.id;
+  var props = document.getElementById('devPanelProps');
+  props.innerHTML = '';
+  var fields = [
+    { label:'temperature', val:d.temp,  unit:'°C', cls:'val-temp' },
+    { label:'humidity',    val:d.humi,  unit:'%',  cls:'val-humi' },
+    { label:'led_states',  val:d.led,   unit:'',   cls:'val-led'  },
+    { label:'wifi_rssi',   val:d.rssi,  unit:'',   cls:'val-rssi' },
+    { label:'online',      val:d.online?'true':'false', unit:'', cls:d.online?'val-led':'val-other' },
+    { label:'上次更新',    val:d.online?'刚刚':'未知',  unit:'', cls:'val-other' }
+  ];
+  fields.forEach(function(f){
+    var el = document.createElement('div');
+    el.className = 'dp-item';
+    var sz = f.val.length > 8 ? '13px' : '20px';
+    el.innerHTML = '<div class="dp-label">'+f.label+'</div>'
+                 + '<div class="dp-val '+f.cls+'" style="font-size:'+sz+'">'+f.val+'</div>'
+                 + (f.unit ? '<div class="dp-unit">'+f.unit+'</div>' : '');
+    props.appendChild(el);
+  });
+  panel.classList.add('show');
+}
+
+/* ============================================================
+   Section 3: Demo 按钮
+============================================================ */
+function showToast(msg, type, dur) {
+  var t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = 'toast '+type+' show';
+  setTimeout(function(){ t.className = 'toast '+type; }, dur||3500);
+}
+function demoAttr() {
+  showToast('📊 <strong>属性上报</strong><br>设备发布 <code style="opacity:0.8;font-size:11px">$oc/.../properties/report</code><br>温度 26.1°C · 湿度 55.3%','tg',4000);
+  runFlow('attr');
+}
+function demoSvc() {
+  showToast('⚙️ <strong>服务调用</strong><br>平台推送 <code style="opacity:0.8;font-size:11px">setLed</code> 到设备<br>LED1 已点亮 · result_code=0','tb',4000);
+  runFlow('cmd');
+}
+function demoEvt() {
+  showToast('🚨 <strong>事件告警</strong><br>设备主动上报 <code style="opacity:0.8;font-size:11px">tempAlarm</code><br>温度 85.0°C · severity=critical','tr',4000);
+  runFlow('evt');
+}
+</script>
+
+</body>
+</html>
