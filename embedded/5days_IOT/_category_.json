@@ -1,0 +1,8 @@
+{
+  "label": "5Days-IoT+VibeCoding",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "从 STM32 硬件控制到华为云 MQTT 协议接入，掌握智慧农业、温湿度监控等物联网全栈实战项目。"
+  }
+}
