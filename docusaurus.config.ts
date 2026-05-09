@@ -96,7 +96,7 @@ const config: Config = {
         src: 'img/logo.png',
       },
       items: [
-        {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: '讲义'},
+        {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: 'AI'},
         {to: '/blog', label: '博客', position: 'left'},
         
         // 【修正点 2：对于多实例 Docs，建议使用 to 链接到文件夹下的首页】

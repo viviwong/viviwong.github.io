@@ -6,11 +6,20 @@ toc_max_heading_level: 4
 
 # 5 - MQTT 与华为云 IoT 平台
 
-> **课程定位：** 5天IoT实训 · 第五天 666
-> **主题：** MQTT 协议 · 华为云 IoTDA 平台接入 · STM32 + ESP8266 串口透传
+
+> **课程定位：** 5天IoT实训 · 第五天  
+> **主题：** MQTT 协议 · 华为云 IoTDA 平台接入 · STM32 + ESP8266 串口透传  
 > **目标：** 完成设备注册 → MQTTX 模拟上报 → 上位机 API 下发指令全链路调通
 
 ---
+## 使用的调试工具
+
+<img src={require("./img/0510-20-叩丁狼IoT调试工具1.png").default} width="48%" />
+<img src={require("./img/0510-21-叩丁狼调试工具2.png").default} width="48%" />
+
+
+
+
 
 ## 一、整体架构
 
