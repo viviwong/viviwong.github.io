@@ -97,11 +97,12 @@ const config: Config = {
         // style: { height: '44px' }, 
       },
       items: [
+        {to: '/embedded/', label: '嵌入式', position: 'left'},
         {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: 'AI'},
-        {to: '/blog', label: '博客', position: 'left'},
+        {to: '/blog', label: '实训', position: 'left'},
         
         // 【修正点 2：对于多实例 Docs，建议使用 to 链接到文件夹下的首页】
-        {to: '/embedded/', label: '嵌入式', position: 'left'},
+        
         {
           type: 'dropdown',
           label: '🛠️ 实训工具箱',

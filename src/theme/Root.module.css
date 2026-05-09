@@ -97,7 +97,7 @@
   border-radius: 6px;
   object-fit: contain;
   display: block;
-  border: 1px solid var(--ifm-color-emphasis-200, #e8ecef);
+  /* border: 1px solid var(--ifm-color-emphasis-200, #e8ecef); */
 }
 
 .qrLabel {
