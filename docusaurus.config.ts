@@ -90,10 +90,11 @@ const config: Config = {
       defaultMode: 'dark',
     },
     navbar: {
-      title: '嵌入式AI',
+      title: '',
       logo: {
         alt: 'Logo',
         src: 'img/logo.png',
+        // style: { height: '44px' }, 
       },
       items: [
         {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: 'AI'},

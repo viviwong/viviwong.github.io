@@ -42,3 +42,9 @@
 .navbar__item:hover {
   color: var(--ifm-color-primary) !important;
 }
+
+/* 设置导航栏 Logo 的高度 */
+.navbar__logo {
+  height: 3rem;  /* 你可以根据需要调整这个数值，如 40px 或 2.5rem */
+  width: auto;   /* 保持纵横比 */
+}
