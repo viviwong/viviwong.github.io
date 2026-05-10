@@ -57,12 +57,18 @@ const config: Config = {
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'embedded',             
-        path: 'embedded',           
+        id: 'embedded',
+        path: 'embedded',
         routeBasePath: 'embedded',
-        // 告诉它使用哪个侧边栏文件，或者设为 false（如果不想要侧边栏）
-        // 【关键修改】显式指定使用 sidebars.ts 里的哪个 key
-        // 只需要指向侧边栏文件即可
+        sidebarPath: require.resolve('./sidebars.ts'),
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'training',
+        path: 'training',
+        routeBasePath: 'training',
         sidebarPath: require.resolve('./sidebars.ts'),
       },
     ],
@@ -123,7 +129,7 @@ const config: Config = {
       items: [
         {to: '/embedded/', label: '嵌入式', position: 'left'},
         {type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: 'AI'},
-        {to: '/blog', label: '实训', position: 'left'},
+        {to: '/training', label: '实训', position: 'left'},
         
         // 【修正点 2：对于多实例 Docs，建议使用 to 链接到文件夹下的首页】
         
