@@ -111,7 +111,7 @@ const config: Config = {
       },
     ],
     colorMode: {
-      defaultMode: 'dark',
+      defaultMode: 'light',
     },
     navbar: {
       title: '',
