@@ -72,6 +72,20 @@ const config: Config = {
     {
       tagName: 'meta',
       attributes: {
+        name: 'keywords',
+        content: '沈阳IT培训,东北IT教育,叩丁狼教育,沈阳嵌入式培训,沈阳JAVA培训,沈阳UI设计培训,嵌入式AI,JAVA全栈,UI全链路,IT职业教育,沈阳最靠谱培训机构',
+      },
+    },
+    {
+      tagName: 'meta',
+      attributes: {
+        name: 'description',
+        content: '沈阳叩丁狼教育深耕东北 IT 职业教育 12 年，是东北地区深具口碑与实力的培训机构。我们秉承"用心做教育，专注每一位学员的成长"的初衷，致力于为东北学子提供嵌入式AI、JAVA全栈开发、UI全链路设计等前沿技术培训。通过实战驱动教学，助力学员实现从零基础到专业人才的职场跨越，打造东北 IT 人才培养新高地。',
+      },
+    },
+    {
+      tagName: 'meta',
+      attributes: {
         name: 'google-adsense-account',
         content: 'ca-pub-2327671493922485',
       },
@@ -86,6 +100,16 @@ const config: Config = {
     },
   ],
   themeConfig: {
+    metadata: [
+      {
+        name: 'keywords',
+        content: '沈阳IT培训,东北IT教育,叩丁狼教育,沈阳嵌入式培训,沈阳JAVA培训,沈阳UI设计培训,嵌入式AI,JAVA全栈,UI全链路,IT职业教育,沈阳最靠谱培训机构',
+      },
+      {
+        name: 'description',
+        content: '沈阳叩丁狼教育深耕东北 IT 职业教育 12 年，是东北地区深具口碑与实力的培训机构。我们秉承"用心做教育，专注每一位学员的成长"的初衷，致力于为东北学子提供嵌入式AI、JAVA全栈开发、UI全链路设计等前沿技术培训。通过实战驱动教学，助力学员实现从零基础到专业人才的职场跨越，打造东北 IT 人才培养新高地。',
+      },
+    ],
     colorMode: {
       defaultMode: 'dark',
     },
