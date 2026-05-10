@@ -1,26 +1,19 @@
-# Dependencies
-/node_modules
+# 基础依赖
+node_modules/
 
-# Production
-/build
+# 部署与构建产物
+/build/
+.docusaurus/
+.cache-loader/
 
-# Generated files
-.docusaurus
-.claude
-.cache-loader
-.github
+# AI 与 工作流工具 (标红区域)
+.claude/
+.github/
+tina/
 一键发布.bat
 
-# Misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-node_modules
+# 本地环境变量与系统日志
 .env
+.env.*
+.DS_Store
+npm-debug.log*
