@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS弹性布局演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        .demo-section {
+            margin-bottom: 40px;
+        }
+        
+        .container {
+            display: flex;
+            border: 2px solid #333;
+            padding: 10px;
+            margin: 10px 0;
+            min-height: 100px;
+        }
+        
+        .item {
+            width: 80px;
+            height: 80px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            font-weight: bold;
+        }
+        
+        /* flex-direction 演示 */
+        .direction-row {
+            flex-direction: row;
+        }
+        
+        .direction-column {
+            flex-direction: column;
+        }
+        
+        /* flex-wrap 演示 */
+        .wrap {
+            flex-wrap: wrap;
+        }
+        
+        /* justify-content 演示 */
+        .justify-start {
+            justify-content: flex-start;
+        }
+        
+        .justify-end {
+            justify-content: flex-end;
+        }
+        
+        .justify-center {
+            justify-content: center;
+        }
+        
+        .justify-around {
+            justify-content: space-around;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .justify-evenly {
+            justify-content: space-evenly;
+        }
+        
+        /* align-items 演示 */
+        .align-start {
+            align-items: flex-start;
+        }
+        
+        .align-end {
+            align-items: flex-end;
+        }
+        
+        .align-center {
+            align-items: center;
+        }
+        
+        /* align-content 演示 */
+        .content-start {
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
+        
+        .content-end {
+            flex-wrap: wrap;
+            align-content: flex-end;
+        }
+        
+        .content-center {
+            flex-wrap: wrap;
+            align-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS弹性布局(Flexbox)演示</h1>
+    
+    <div class="demo-section">
+        <h2>flex-direction 主轴方向</h2>
+        <p>【横向排列】flex-direction:row</p>
+        <div class="container direction-row">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+        
+        <p>【纵向排列】flex-direction:column</p>
+        <div class="container direction-column">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>flex-wrap 换行</h2>
+        <p>【允许换行】flex-wrap:wrap</p>
+        <div class="container wrap" style="width: 300px;">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>justify-content 主轴对齐</h2>
+        <p>【靠左/靠上】justify-content:flex-start</p>
+        <div class="container justify-start">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+        
+        <p>【靠右/靠下】justify-content:flex-end</p>
+        <div class="container justify-end">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+        
+        <p>【居中】justify-content:center</p>
+        <div class="container justify-center">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+        
+        <p>【四周都有边距】justify-content:space-around</p>
+        <div class="container justify-around">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+        
+        <p>【两者之间有边距】justify-content:space-between</p>
+        <div class="container justify-between">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+        
+        <p>【边距平均分】justify-content:space-evenly</p>
+        <div class="container justify-evenly">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>align-items 次轴对齐</h2>
+        <p>【靠左/靠上】justify-content:flex-start</p>
+        <div class="container align-start" style="height: 150px;">
+            <div class="item" style="height: 40px;">1</div>
+            <div class="item" style="height: 60px;">2</div>
+            <div class="item" style="height: 80px;">3</div>
+        </div>
+        
+        <p>【靠右/靠下】justify-content:flex-end</p>
+        <div class="container align-end" style="height: 150px;">
+            <div class="item" style="height: 40px;">1</div>
+            <div class="item" style="height: 60px;">2</div>
+            <div class="item" style="height: 80px;">3</div>
+        </div>
+        
+        <p>【居中】justify-content:center</p>
+        <div class="container align-center" style="height: 150px;">
+            <div class="item" style="height: 40px;">1</div>
+            <div class="item" style="height: 60px;">2</div>
+            <div class="item" style="height: 80px;">3</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>align-content 多行对齐</h2>
+        <p>【靠左/靠上】justify-content:flex-start</p>
+        <div class="container content-start" style="height: 200px;">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+            <div class="item">7</div>
+            <div class="item">8</div>
+        </div>
+        
+        <p>【靠右/靠下】justify-content:flex-end</p>
+        <div class="container content-end" style="height: 200px;">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+            <div class="item">7</div>
+            <div class="item">8</div>
+        </div>
+        
+        <p>【居中】justify-content:center</p>
+        <div class="container content-center" style="height: 200px;">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+            <div class="item">7</div>
+            <div class="item">8</div>
+        </div>
+    </div>
+</body>
+</html>
