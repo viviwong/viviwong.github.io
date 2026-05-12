@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 生活助手 · 4 天实训交互教学（含沙盒工具）</title>
+<style>
+:root{
+  --blue:#2563eb;--blue-light:#dbeafe;--green:#16a34a;--green-light:#dcfce7;
+  --orange:#ea580c;--orange-light:#ffedd5;--red:#dc2626;--red-light:#fee2e2;
+  --purple:#7c3aed;--purple-light:#ede9fe;--gray:#334155;--gray-light:#f1f5f9;
+  --bg:#f6f7fb;--card:#fff;--shadow:0 10px 30px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft YaHei',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#0f172a;line-height:1.75}
+nav{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#312e81,#0ea5e9);color:#fff;display:flex;align-items:center;padding:0 16px;height:56px;box-shadow:0 8px 24px rgba(2,6,23,.25)}
+nav .logo{font-weight:800;margin-right:16px;white-space:nowrap;font-size:15px}
+nav .tabs{display:flex;gap:6px;overflow-x:auto;flex:1}
+nav .tabs button{background:transparent;border:none;color:rgba(255,255,255,.78);padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12px;white-space:nowrap}
+nav .tabs button.active,nav .tabs button:hover{background:rgba(255,255,255,.16);color:#fff}
+.container{max-width:1200px;margin:0 auto;padding:18px 14px 40px}
+.section{display:none;animation:fade .25s ease}
+.section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:18px;margin:14px 0;border:1px solid rgba(148,163,184,.22)}
+.card h2{font-size:18px;color:#1e3a8a;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3{font-size:15px;color:var(--gray);margin:14px 0 8px;font-weight:700}
+.hero{background:radial-gradient(120% 120% at 10% 10%,#eef2ff,#fff);border:1px solid rgba(99,102,241,.18);border-radius:16px;padding:22px 18px;margin:10px 0}
+.hero h1{font-size:22px;font-weight:900;color:#0f172a;margin-bottom:8px}
+.hero p{color:#475569;font-size:14px;max-width:900px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.badge.blue{background:var(--blue-light);color:var(--blue)}
+.badge.green{background:var(--green-light);color:var(--green)}
+.badge.orange{background:var(--orange-light);color:var(--orange)}
+.badge.purple{background:var(--purple-light);color:var(--purple)}
+.tip{border-left:4px solid;border-radius:0 10px 10px 0;padding:10px 12px;margin:10px 0;font-size:13px}
+.tip.blue{border-color:var(--blue);background:var(--blue-light)}
+.tip.orange{border-color:var(--orange);background:var(--orange-light)}
+.tip.red{border-color:var(--red);background:var(--red-light)}
+.tip strong{display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{background:#1e293b;color:#fff;padding:9px 10px;text-align:left}
+td{padding:8px 10px;border-bottom:1px solid #e8edf3}
+tr:nth-child(even) td{background:#f8fafc}
+pre{background:#0b1220;color:#e2e8f0;border-radius:12px;padding:14px;overflow:auto;font-size:12.5px;line-height:1.55}
+code{background:#eef2ff;color:#312e81;padding:2px 6px;border-radius:4px;font-size:12.5px}
+.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.day-tab{padding:8px 14px;border:2px solid #2563eb;border-radius:10px;background:#fff;color:#2563eb;cursor:pointer;font-weight:800;font-size:13px}
+.day-tab.active{background:#2563eb;color:#fff}
+.day-pane{display:none}
+.day-pane.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:#475569;font-weight:700;margin:8px 0 4px}
+input,select,textarea{width:100%;padding:10px 10px;border-radius:10px;border:1px solid rgba(148,163,184,.55);background:#fff;font-size:13px}
+textarea{min-height:110px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row > *{flex:1;min-width:220px}
+button.primary{background:linear-gradient(90deg,#6366f1,#0ea5e9);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:900;cursor:pointer}
+button.secondary{background:#fff;border:1px solid rgba(148,163,184,.55);padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#f1f5f9;font-size:12px;color:#0f172a;font-weight:700}
+.phone{width:min(420px,92vw);margin:0 auto;border-radius:26px;border:10px solid #0f172a;background:#0f172a;box-shadow:0 24px 60px rgba(2,6,23,.35);overflow:hidden}
+.phone .notch{height:14px;display:flex;align-items:center;justify-content:center}
+.phone .notch span{width:120px;height:6px;background:#334155;border-radius:999px}
+.phone .screen{height:640px;background:linear-gradient(180deg,#f8fafc,#eef2ff);padding:10px;overflow:auto}
+.mp-tabbar{display:flex;border-top:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.92)}
+.mp-tab{flex:1;text-align:center;padding:10px 6px;font-size:12px;color:#64748b;font-weight:800;cursor:pointer}
+.mp-tab.active{color:#4f46e5}
+.mp-page{display:none}
+.mp-page.active{display:block}
+.mp-card{background:#fff;border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin:10px 0}
+.mp-title{font-weight:900;font-size:16px;margin-bottom:6px}
+.mp-sub{color:#64748b;font-size:12px;line-height:1.55}
+.chat{display:flex;flex-direction:column;gap:10px}
+.bubble{max-width:92%;padding:10px 12px;border-radius:14px;font-size:13px;white-space:pre-wrap}
+.bubble.user{margin-left:auto;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+.bubble.ai{margin-right:auto;background:#fff;border:1px solid rgba(148,163,184,.35);color:#0f172a}
+.meta{font-size:12px;color:#cbd5e1;background:#0b1220;border-radius:12px;padding:10px;border:1px solid rgba(148,163,184,.25)}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;font-size:12px;margin-top:6px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.tabs2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.tabs2 button{padding:8px 10px;border-radius:10px;border:1px solid rgba(148,163,184,.55);background:#fff;cursor:pointer;font-weight:800;font-size:12px}
+.tabs2 button.active{border-color:#2563eb;color:#1d4ed8;background:#eff6ff}
+.small{font-size:12px;color:#64748b}
+.hr{height:1px;background:rgba(148,163,184,.35);margin:12px 0}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🎓 AI生活助手实训</div>
+  <div class="tabs">
+    <button class="active" onclick="showSection('overview',this)">总览</button>
+    <button onclick="showSection('days',this)">4天课程</button>
+    <button onclick="showSection('lab-llm',this)">大模型沙盒</button>
+    <button onclick="showSection('lab-http',this)">HTTP调试</button>
+    <button onclick="showSection('lab-mp',this)">小程序原型</button>
+    <button onclick="showSection('refs',this)">域名/接口</button>
+  </div>
+</nav>
+
+<div id="section-overview" class="section active">
+  <div class="container">
+    <div class="hero">
+      <h1>微信小程序 × 聚合数据 × 多厂商大模型：AI 生活助手实训</h1>
+      <p>本页是「教学讲义 + 课堂沙盒」一体化单文件：包含 4 天主线的学习目标、课堂组织建议、与浏览器端可交互的工具（Key 仅存本机 localStorage）。第 5 天以小程序上传/体验版部署为主。</p>
+      <div class="badge-row">
+        <span class="badge blue">WXML / WXSS / JS</span>
+        <span class="badge green">wx.request</span>
+        <span class="badge orange">juhe.cn</span>
+        <span class="badge purple">OpenAI兼容</span>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>🎯 学生要带走的能力</h2>
+        <ul style="padding-left:18px;color:#475569;font-size:13px">
+          <li>把需求拆成页面：首页入口、列表、详情、配置、对话。</li>
+          <li>理解 GET/POST、Header、JSON、错误兜底与 mock。</li>
+          <li>理解「合法域名」与浏览器 CORS 的差异。</li>
+          <li>能把 Key 放到本地缓存：不写死在源码里。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>🧭 推荐目录（本次已生成）</h2>
+        <table>
+          <tr><th>目录</th><th>用途</th></tr>
+          <tr><td><code>WXMP-new2</code></td><td>完整终稿示例（可直接当演示项目）</td></tr>
+          <tr><td><code>day3-code</code></td><td>第3天授课：发现页 + juhe + 电商 JSON + mock</td></tr>
+          <tr><td><code>day4-code</code></td><td>第4天授课：在终稿结构上强化「多模型 AI」</td></tr>
+          <tr><td><code>try3</code></td><td>你原先的第3天草稿（可对比迁移点）</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="tip blue">
+      <strong>安全与合规（课堂必须讲清）</strong>
+      API Key 属于凭证：本页与小程序示例都只用本地存储演示流程。作业提交前提醒学生清理 Key、不要把真实 Key 推到 GitHub/Gitee 公仓。
+    </div>
+
+    <div class="tip orange">
+      <strong>浏览器沙盒的限制（不讲会踩坑）</strong>
+      大模型厂商接口通常不允许浏览器随意跨域调用。本页会真实发起 <code>fetch</code>：若失败，请优先在「小程序真机/开发者工具」里用 <code>wx.request</code> 验证；或教研室提供同域后端转发。
+    </div>
+  </div>
+</div>
+
+<div id="section-days" class="section">
+  <div class="container">
+    <div class="hero">
+      <h1>4 天课程内容（第 5 天部署 1 小时）</h1>
+      <p>结构参考 <code>03-5daysIOT2.html</code> 的「导航 + 卡片 + 表格 + 步骤」交互讲义风格；内容对齐你仓库中的《AI生活助手4天实训教学任务》与课堂实际节奏（每天约 1 小时）。</p>
+    </div>
+
+    <div class="day-tabs">
+      <button class="day-tab active" type="button" onclick="showDay('d1',this)">Day1</button>
+      <button class="day-tab" type="button" onclick="showDay('d2',this)">Day2</button>
+      <button class="day-tab" type="button" onclick="showDay('d3',this)">Day3</button>
+      <button class="day-tab" type="button" onclick="showDay('d4',this)">Day4</button>
+      <button class="day-tab" type="button" onclick="showDay('d5',this)">Day5</button>
+    </div>
+
+    <div id="day-d1" class="day-pane active">
+      <div class="card">
+        <h2>Day1：项目启动与小程序基础</h2>
+        <h3>教学目标</h3>
+        <p class="small">建立「能跑起来 → 能改一点 → 能解释结构」的信心。</p>
+        <h3>课堂流程（60min 建议）</h3>
+        <ol style="padding-left:18px;color:#475569;font-size:13px">
+          <li>10min：小程序生态与开发者工具；AppID / 测试号 / 预览。</li>
+          <li>15min：<code>app.json</code> 页面注册、窗口配置、目录结构。</li>
+          <li>20min：开屏/欢迎页 + 首页静态布局（view/text/image）。</li>
+          <li>15min：改标题/改颜色/改文案，真机预览与排错。</li>
+        </ol>
+        <h3>验收点</h3>
+        <ul style="padding-left:18px;color:#475569;font-size:13px">
+          <li>能说明 <code>app.js / app.json / app.wxss</code> 的职责。</li>
+          <li>能解释：小程序启动第一个页面由 <code>pages</code> 数组顺序决定。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="day-d2" class="day-pane">
+      <div class="card">
+        <h2>Day2：多页面、tabBar、布局与交互</h2>
+        <h3>教学目标</h3>
+        <p class="small">把「一个页面」扩展成「一个小产品骨架」。</p>
+        <h3>课堂流程（60min 建议）</h3>
+        <ol style="padding-left:18px;color:#475569;font-size:13px">
+          <li>15min：<code>navigateTo</code> vs <code>switchTab</code>；页面栈概念。</li>
+          <li>20min：配置 tabBar（图标尺寸、选中态、常见报错）。</li>
+          <li>25min：Flex 卡片布局 + rpx；做一个「功能入口宫格」首页。</li>
+        </ol>
+        <h3>验收点</h3>
+        <ul style="padding-left:18px;color:#475569;font-size:13px">
+          <li>至少 5 个页面可跳转；tabBar 可切换。</li>
+          <li>模拟器里文字不溢出、按钮可点、热区合理。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="day-d3" class="day-pane">
+      <div class="card">
+        <h2>Day3：网络请求 + juhe 生活服务 + 兜底 mock</h2>
+        <h3>教学目标</h3>
+        <p class="small">让学生理解：接口是产品的心脏，但课堂要有「不断电」的备份方案。</p>
+        <h3>课堂主线（对齐 <code>day3-code</code>）</h3>
+        <ol style="padding-left:18px;color:#475569;font-size:13px">
+          <li><strong>封装请求</strong>：<code>utils/request.js</code> 统一成功/失败处理。</li>
+          <li><strong>聚合数据</strong>：新闻头条、笑话列表；解释 <code>error_code</code> 与字段映射。</li>
+          <li><strong>星座</strong>：<code>picker</code> + 展示多字段；说明 http/https 与域名限制可能导致回退 mock。</li>
+          <li><strong>电商 JSON</strong>：解析复杂嵌套（cards/datasource），对应 <code>pages/shop/shop</code>。</li>
+          <li><strong>WebView</strong>：列表跳详情，传参 <code>?url=encodeURIComponent</code>。</li>
+        </ol>
+        <div class="tip red">
+          <strong>教师演示建议</strong>
+          课堂上先演示「无 Key → mock」，再演示「有 Key → 真数据」。避免一半学生卡在申请 Key。
+        </div>
+      </div>
+    </div>
+
+    <div id="day-d4" class="day-pane">
+      <div class="card">
+        <h2>Day4：多模型配置 + AI 对话 + 模型信息展示</h2>
+        <h3>教学目标</h3>
+        <p class="small">把「聊天」做成可验收的工程能力：配置、请求、观测、复盘。</p>
+        <h3>课堂主线（对齐 <code>day4-code</code> / <code>WXMP-new2</code>）</h3>
+        <ol style="padding-left:18px;color:#475569;font-size:13px">
+          <li>OpenAI 兼容格式：<code>model / messages / temperature</code>。</li>
+          <li>四厂商：字节豆包（火山方舟）、阿里千问（DashScope 兼容模式）、Kimi（Moonshot）、DeepSeek。</li>
+          <li>本地缓存：<code>wx.setStorageSync</code> 保存 Key 与模型名（豆包为 Endpoint ID）。</li>
+          <li>对话页展示：HTTP 状态码、耗时、Token usage、原始响应摘要。</li>
+        </ol>
+        <h3>课堂演示脚本（5 分钟）</h3>
+        <p class="small">我的 → 选厂商 → 粘贴 Key → 保存 → AI 页快捷提问 → 展开「本次调用信息」。</p>
+      </div>
+    </div>
+
+    <div id="day-d5" class="day-pane">
+      <div class="card">
+        <h2>Day5：小程序部署与答辩（以 1 小时为上限）</h2>
+        <h3>上午/下午可拆分</h3>
+        <ul style="padding-left:18px;color:#475569;font-size:13px">
+          <li>检查：tabBar、页面路径、关键按钮、空态/错误提示。</li>
+          <li>域名：按「域名/接口」分区配置 request 合法域名、webview 业务域名。</li>
+          <li>上传：开发版本 + 版本说明；体验成员扫码。</li>
+          <li>答辩：3~5 分钟演示路径 + 1 段核心代码讲解（建议 <code>utils/aiChat.js</code>）。</li>
+        </ul>
+        <div class="tip blue">
+          <strong>部署提醒</strong>
+          真机预览可在开发阶段勾选「不校验合法域名」；答辩前至少演示一次「按正式规则配置域名」的流程。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="section-lab-llm" class="section">
+  <div class="container">
+    <div class="card">
+      <h2>🧠 大模型沙盒（Key 仅存浏览器 localStorage）</h2>
+      <p class="small">选择厂商 → 填写 Key/模型 → 发送。下方展示「模型信息 + usage + 原始摘要」。若浏览器报 CORS，请用本页「HTTP调试」验证网络与 JSON，再回到小程序侧验证。</p>
+      <div class="hr"></div>
+
+      <div class="tabs2" id="llmVendorTabs">
+        <button type="button" class="active" data-v="deepseek">DeepSeek</button>
+        <button type="button" data-v="qwen">阿里千问</button>
+        <button type="button" data-v="moonshot">Kimi</button>
+        <button type="button" data-v="doubao">字节豆包</button>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>API Key（Bearer）</label>
+          <input id="llmKey" autocomplete="off" placeholder="粘贴 Key（不会上传到我方服务器；仅在浏览器直连厂商）" />
+
+          <label>模型 / Endpoint</label>
+          <input id="llmModel" placeholder="例如 deepseek-chat / qwen-turbo / moonshot-v1-8k / ep-xxxx" />
+
+          <label>Endpoint（可改）</label>
+          <input id="llmUrl" class="mono" />
+          <div class="row" style="margin-top:10px">
+            <button class="primary" type="button" onclick="llmSave()">保存到本机</button>
+            <button class="secondary" type="button" onclick="llmLoad()">读取本机</button>
+          </div>
+        </div>
+        <div>
+          <label>用户消息</label>
+          <textarea id="llmPrompt">用 6 行以内说明：为什么课堂项目不要把 API Key 写死在代码里？</textarea>
+          <div class="row" style="margin-top:10px">
+            <button class="primary" type="button" onclick="llmSend()">发送测试</button>
+            <button class="secondary" type="button" onclick="llmClearOut()">清空输出</button>
+          </div>
+          <p class="small" style="margin-top:10px">提示：豆包方舟需要把模型名填成 <span class="mono">ep-...</span> Endpoint ID（与控制台一致）。</p>
+        </div>
+      </div>
+
+      <div id="llmOut" class="meta" style="margin-top:12px;display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div id="section-lab-http" class="section">
+  <div class="container">
+    <div class="card">
+      <h2>🌐 HTTP 调试：GET / POST + JSON 格式化</h2>
+      <p class="small">用于课堂演示 juhe、公开测试接口、或你们自建转发服务。浏览器同样可能遇到 CORS；这正好用于解释「为什么小程序也要配合法域名」。</p>
+      <div class="hr"></div>
+
+      <div class="grid2">
+        <div>
+          <label>URL</label>
+          <input id="httpUrl" class="mono" value="https://v.juhe.cn/toutiao/index?type=top&amp;key=YOUR_JUHE_KEY" />
+
+          <label>Method</label>
+          <select id="httpMethod">
+            <option>GET</option>
+            <option>POST</option>
+          </select>
+
+          <label>Headers（JSON，可选）</label>
+          <textarea id="httpHeaders">{}</textarea>
+
+          <label>Body（JSON，POST 用）</label>
+          <textarea id="httpBody">{}</textarea>
+
+          <div class="row" style="margin-top:10px">
+            <button class="primary" type="button" onclick="httpSend()">发送</button>
+            <button class="secondary" type="button" onclick="httpFillJuhe()">填入 juhe 头条模板</button>
+            <button class="secondary" type="button" onclick="httpFillEcho()">填入 echo 模板（JSONPlaceholder）</button>
+          </div>
+        </div>
+        <div>
+          <label>响应（格式化 JSON）</label>
+          <pre id="httpOut" style="min-height:360px">{}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="section-lab-mp" class="section">
+  <div class="container">
+    <div class="card">
+      <h2>📱 小程序「原型级」交互演示（非真机，仅 UI 结构）</h2>
+      <p class="small">用于课堂讲解信息架构：底部 Tab、首页入口、AI 对话、我的配置。点击底部 Tab 切换。</p>
+      <div class="phone" style="margin-top:12px">
+        <div class="notch"><span></span></div>
+        <div class="screen">
+          <div id="mp-page-home" class="mp-page active">
+            <div class="mp-title">首页</div>
+            <div class="mp-sub">宫格入口：新闻 / 笑话 / 星座 / 电商 JSON / AI / 我的。</div>
+            <div class="mp-card"><b>今日一句</b><div class="mp-sub">把「能跑」升级成「好用」：加载态、错误提示、空态。</div></div>
+          </div>
+          <div id="mp-page-ai" class="mp-page">
+            <div class="mp-title">AI</div>
+            <div class="chat">
+              <div class="bubble user">帮我生成一个「校园生活」小程序功能清单。</div>
+              <div class="bubble ai">可以：课表提醒、食堂热量、社团活动、二手书、失物招领…（课堂演示：真实回复来自后端/模型）</div>
+            </div>
+            <div class="mp-card mono" style="font-size:12px;color:#334155">
+              模型信息：provider / model / status / duration / tokens…
+            </div>
+          </div>
+          <div id="mp-page-me" class="mp-page">
+            <div class="mp-title">我的</div>
+            <div class="mp-card">聚合数据 Key：<span class="mono">******</span></div>
+            <div class="mp-card">大模型：豆包/千问/Kimi/DeepSeek + API Key 本地保存</div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <div class="mp-tab active" onclick="mpTab('home',this)">首页</div>
+          <div class="mp-tab" onclick="mpTab('ai',this)">AI</div>
+          <div class="mp-tab" onclick="mpTab('me',this)">我的</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="section-refs" class="section">
+  <div class="container">
+    <div class="card">
+      <h2>🔗 合法域名与接口备忘</h2>
+      <table>
+        <tr><th>用途</th><th>典型域名/host</th><th>备注</th></tr>
+        <tr><td>聚合数据</td><td class="mono">v.juhe.cn</td><td>具体路径以控制台申请接口为准</td></tr>
+        <tr><td>DeepSeek</td><td class="mono">api.deepseek.com</td><td>OpenAI 兼容 <code>/v1/chat/completions</code></td></tr>
+        <tr><td>Moonshot</td><td class="mono">api.moonshot.cn</td><td>OpenAI 兼容</td></tr>
+        <tr><td>DashScope</td><td class="mono">dashscope.aliyuncs.com</td><td>兼容模式 <code>/compatible-mode/v1/chat/completions</code></td></tr>
+        <tr><td>火山方舟</td><td class="mono">ark.cn-beijing.volces.com</td><td><code>/api/v3/chat/completions</code></td></tr>
+        <tr><td>电商示例</td><td class="mono">openapi.vmall.com</td><td>课堂解析 JSON 结构用</td></tr>
+      </table>
+      <div class="tip orange">
+        <strong>juhe 示例（GET）</strong>
+        <div class="mono" style="margin-top:6px">https://v.juhe.cn/toutiao/index?type=top&amp;key=你的Key</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PRESETS = {
+    deepseek:{label:'DeepSeek',url:'https://api.deepseek.com/v1/chat/completions',model:'deepseek-chat'},
+    qwen:{label:'阿里千问',url:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',model:'qwen-turbo'},
+    moonshot:{label:'Kimi',url:'https://api.moonshot.cn/v1/chat/completions',model:'moonshot-v1-8k'},
+    doubao:{label:'字节豆包',url:'https://ark.cn-beijing.volces.com/api/v3/chat/completions',model:'请填 ep-xxxx（Endpoint ID）'}
+  }
+  let vendor = 'deepseek'
+
+  window.showSection = function(id, btn){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'))
+    document.querySelectorAll('nav .tabs button').forEach(b=>b.classList.remove('active'))
+    const el = document.getElementById('section-' + id)
+    if(el) el.classList.add('active')
+    if(btn) btn.classList.add('active')
+  }
+
+  window.showDay = function(day, btn){
+    document.querySelectorAll('.day-pane').forEach(p=>p.classList.remove('active'))
+    document.querySelectorAll('.day-tab').forEach(b=>b.classList.remove('active'))
+    const pane = document.getElementById('day-' + day)
+    if(pane) pane.classList.add('active')
+    if(btn) btn.classList.add('active')
+  }
+
+  window.mpTab = function(page, el){
+    document.querySelectorAll('.mp-tab').forEach(t=>t.classList.remove('active'))
+    document.querySelectorAll('.mp-page').forEach(p=>p.classList.remove('active'))
+    el.classList.add('active')
+    const map = {home:'mp-page-home', ai:'mp-page-ai', me:'mp-page-me'}
+    const node = document.getElementById(map[page])
+    if(node) node.classList.add('active')
+  }
+
+  function pretty(obj){
+    try{return JSON.stringify(typeof obj==='string'?JSON.parse(obj):obj,null,2)}catch(e){return String(obj)}
+  }
+
+  // LLM tabs
+  document.querySelectorAll('#llmVendorTabs button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+      document.querySelectorAll('#llmVendorTabs button').forEach(b=>b.classList.remove('active'))
+      btn.classList.add('active')
+      vendor = btn.getAttribute('data-v')
+      const p = PRESETS[vendor]
+      document.getElementById('llmUrl').value = localStorage.getItem('llm_url_'+vendor) || p.url
+      document.getElementById('llmModel').value = localStorage.getItem('llm_model_'+vendor) || p.model
+      document.getElementById('llmKey').value = localStorage.getItem('llm_key_'+vendor) || ''
+    })
+  })
+
+  function llmApplyPreset() {
+    const urlEl = document.getElementById('llmUrl')
+    if (!urlEl.value.trim()) urlEl.value = PRESETS[vendor].url
+    const modelEl = document.getElementById('llmModel')
+    if (!modelEl.value.trim()) modelEl.value = PRESETS[vendor].model
+  }
+
+  window.llmSave = function(){
+    const key = document.getElementById('llmKey').value.trim()
+    const model = document.getElementById('llmModel').value.trim()
+    const url = document.getElementById('llmUrl').value.trim()
+    localStorage.setItem('llm_key_'+vendor, key)
+    localStorage.setItem('llm_model_'+vendor, model)
+    localStorage.setItem('llm_url_'+vendor, url)
+    alert('已保存到浏览器 localStorage（按厂商分键）。')
+  }
+  window.llmLoad = function(){
+    document.getElementById('llmKey').value = localStorage.getItem('llm_key_'+vendor) || ''
+    document.getElementById('llmModel').value = localStorage.getItem('llm_model_'+vendor) || PRESETS[vendor].model
+    document.getElementById('llmUrl').value = localStorage.getItem('llm_url_'+vendor) || PRESETS[vendor].url
+  }
+  window.llmClearOut = function(){
+    const o = document.getElementById('llmOut')
+    o.style.display='none'
+    o.textContent=''
+  }
+
+  window.llmSend = async function(){
+    llmApplyPreset()
+    const apiKey = document.getElementById('llmKey').value.trim()
+    const model = document.getElementById('llmModel').value.trim()
+    const url = document.getElementById('llmUrl').value.trim()
+    const prompt = document.getElementById('llmPrompt').value.trim()
+    const out = document.getElementById('llmOut')
+    out.style.display='block'
+    if(!apiKey || !model || !url || !prompt){
+      out.textContent = pretty({error:'请填写 key / model / url / prompt'})
+      return
+    }
+    const t0 = performance.now()
+    let status = -1
+    let text = ''
+    let usage = null
+    let raw = ''
+    try{
+      const res = await fetch(url,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+          model,
+          temperature: 0.6,
+          messages:[{role:'system',content:'你是课堂助教，回答简洁。'},{role:'user',content:prompt}]
+        })
+      })
+      status = res.status
+      const data = await res.json()
+      raw = JSON.stringify(data).slice(0, 2400)
+      usage = data.usage || null
+      const c0 = data.choices && data.choices[0]
+      text = (c0 && c0.message && c0.message.content) ? c0.message.content : raw
+    }catch(err){
+      text = 'fetch 失败（常见原因：CORS、DNS、公司网络拦截、Key 无效）。\n错误信息：' + (err && err.message ? err.message : String(err))
+    }
+    const ms = Math.round(performance.now() - t0)
+    out.innerHTML = ''
+    const meta = document.createElement('div')
+    const rows = [
+      ['厂商', PRESETS[vendor].label],
+      ['Endpoint', url],
+      ['Model', model],
+      ['HTTP', String(status)],
+      ['耗时(ms)', String(ms)],
+      ['usage', usage ? pretty(usage) : '（无）'],
+    ]
+    const title = document.createElement('div')
+    title.textContent = '本次调用信息'
+    title.style.fontWeight = '900'
+    title.style.marginBottom = '8px'
+    title.style.color = '#fff'
+    meta.appendChild(title)
+    const grid = document.createElement('div')
+    grid.className = 'kv'
+    rows.forEach(([k, v]) => {
+      const kk = document.createElement('div')
+      kk.textContent = k
+      kk.style.color = '#94a3b8'
+      kk.style.fontWeight = '800'
+      const vv = document.createElement('div')
+      vv.textContent = String(v)
+      vv.className = 'mono'
+      vv.style.color = '#e2e8f0'
+      vv.style.wordBreak = 'break-all'
+      grid.appendChild(kk)
+      grid.appendChild(vv)
+    })
+    meta.appendChild(grid)
+    const pre = document.createElement('pre')
+    pre.style.marginTop = '10px'
+    pre.style.whiteSpace = 'pre-wrap'
+    pre.style.wordBreak = 'break-word'
+    pre.textContent = '模型输出：\n' + text + '\n\n原始JSON摘要：\n' + (raw || text)
+    out.appendChild(meta)
+    out.appendChild(pre)
+  }
+
+  window.httpFillJuhe = function(){
+    document.getElementById('httpMethod').value = 'GET'
+    document.getElementById('httpHeaders').value = '{}'
+    document.getElementById('httpBody').value = '{}'
+    document.getElementById('httpUrl').value = 'https://v.juhe.cn/toutiao/index?type=top&key=YOUR_JUHE_KEY'
+  }
+  window.httpFillEcho = function(){
+    document.getElementById('httpMethod').value = 'GET'
+    document.getElementById('httpUrl').value = 'https://jsonplaceholder.typicode.com/todos/1'
+    document.getElementById('httpHeaders').value = '{}'
+    document.getElementById('httpBody').value = '{}'
+  }
+
+  window.httpSend = async function(){
+    const url = document.getElementById('httpUrl').value.trim()
+    const method = document.getElementById('httpMethod').value
+    let headers = {}
+    let body = {}
+    try{ headers = JSON.parse(document.getElementById('httpHeaders').value || '{}') }catch(e){ alert('Headers 不是合法 JSON'); return }
+    try{ body = JSON.parse(document.getElementById('httpBody').value || '{}') }catch(e){ alert('Body 不是合法 JSON'); return }
+    const out = document.getElementById('httpOut')
+    out.textContent = '请求中...'
+    const t0 = performance.now()
+    try{
+      const res = await fetch(url,{
+        method,
+        headers,
+        body: method === 'POST' ? JSON.stringify(body) : undefined
+      })
+      const ms = Math.round(performance.now()-t0)
+      const ct = res.headers.get('content-type') || ''
+      const txt = await res.text()
+      let parsed = txt
+      try{ parsed = JSON.parse(txt) }catch(e){}
+      out.textContent = pretty({
+        ok: res.ok,
+        status: res.status,
+        contentType: ct,
+        durationMs: ms,
+        body: parsed
+      })
+    }catch(err){
+      out.textContent = pretty({error:String(err && err.message || err), hint:'若控制台提示 CORS，可改用小程序 wx.request 或同域后端转发。'})
+    }
+  }
+
+  // init llm defaults
+  vendor = 'deepseek'
+  document.querySelector('#llmVendorTabs button[data-v="deepseek"]').click()
+})()
+</script>
+</body>
+</html>
