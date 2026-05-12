@@ -6,4 +6,4 @@ sidebar_position: 1
 
 ## 小程序和uniapp开发
 
-* <a href="/web/101-flex弹性盒子演示.html" target="_blank">01-嵌入式行业全景架构图 (类云计算视角)</a>
+* <a href="/web/101-flex弹性盒子演示.html" target="_blank">01-flex弹性盒子演示</a>
