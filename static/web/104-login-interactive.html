@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录流程 · 交互教学</title>
+<!-- 防止主题闪烁 -->
+<script>(function(){const t=localStorage.getItem('wxmp-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})()</script>
+<style>
+/* ═══ CSS 主题变量 ═══ */
+:root {
+  --bg:          #0f172a;
+  --surface:     #1e293b;
+  --surface2:    #0f172a;
+  --border:      #334155;
+  --border2:     #475569;
+  --text:        #e2e8f0;
+  --text2:       #94a3b8;
+  --text3:       #64748b;
+  --blue:        #3b82f6;
+  --cyan:        #38bdf8;
+  --green:       #22c55e;
+  --amber:       #f59e0b;
+  --red:         #ef4444;
+  --indigo:      #818cf8;
+  /* SVG 节点颜色 */
+  --n-rect:      #1e293b;
+  --n-rect-s:    #334155;
+  --n-new:       #1a1a3a;
+  --n-new-s:     #818cf8;
+  --n-jsv:       #0c2340;
+  --n-jsv-s:     #38bdf8;
+  --n-start:     #1e3a5f;
+  --n-start-s:   #3b82f6;
+  --n-diam:      #2a1800;
+  --n-diam-s:    #f59e0b;
+  --n-suc:       #14532d;
+  --n-suc-s:     #22c55e;
+  /* text inside nodes */
+  --nt-main:     #e2e8f0;
+  --nt-sub:      #94a3b8;
+  --nt-blue:     #93c5fd;
+  --nt-amber:    #fcd34d;
+  --nt-cyan:     #67e8f9;
+  --nt-green:    #86efac;
+  --nt-indigo:   #a5b4fc;
+  /* arrows */
+  --arrow:       #475569;
+  --arrow-lit:   #38bdf8;
+  /* code */
+  --code-bg:     #0f172a;
+  --code-fg:     #a5f3fc;
+}
+html[data-theme="light"] {
+  --bg:          #f0f5fb;
+  --surface:     #ffffff;
+  --surface2:    #f8fafc;
+  --border:      #e2e8f0;
+  --border2:     #cbd5e1;
+  --text:        #0f172a;
+  --text2:       #475569;
+  --text3:       #94a3b8;
+  --blue:        #2563eb;
+  --cyan:        #0284c7;
+  --green:       #16a34a;
+  --amber:       #d97706;
+  --red:         #dc2626;
+  --indigo:      #4f46e5;
+  --n-rect:      #eff6ff;
+  --n-rect-s:    #bfdbfe;
+  --n-new:       #f0f0ff;
+  --n-new-s:     #a5b4fc;
+  --n-jsv:       #ecfeff;
+  --n-jsv-s:     #22d3ee;
+  --n-start:     #dbeafe;
+  --n-start-s:   #3b82f6;
+  --n-diam:      #fffbeb;
+  --n-diam-s:    #f59e0b;
+  --n-suc:       #dcfce7;
+  --n-suc-s:     #22c55e;
+  --nt-main:     #1e293b;
+  --nt-sub:      #475569;
+  --nt-blue:     #1d4ed8;
+  --nt-amber:    #92400e;
+  --nt-cyan:     #0e7490;
+  --nt-green:    #166534;
+  --nt-indigo:   #3730a3;
+  --arrow:       #94a3b8;
+  --arrow-lit:   #0284c7;
+  --code-bg:     #f1f5f9;
+  --code-fg:     #0369a1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.25s, color 0.25s;
+}
+
+/* ─── Header ─── */
+header {
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky; top: 0; z-index: 100;
+  transition: background 0.25s, border-color 0.25s;
+}
+header h1 { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+.badge {
+  background: var(--blue); color: white;
+  font-size: 0.68rem; padding: 2px 8px;
+  border-radius: 999px; font-weight: 600;
+}
+
+/* ─── Theme Toggle ─── */
+.theme-toggle {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer; font-size: 0.78rem; font-weight: 600;
+  transition: all 0.2s;
+  user-select: none;
+}
+.theme-toggle:hover { border-color: var(--blue); color: var(--blue); }
+.toggle-icon { font-size: 0.95rem; }
+
+/* ─── Main Layout ─── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  height: calc(100vh - 53px);
+}
+
+/* ─── Diagram (Left) ─── */
+.diagram {
+  overflow: auto;
+  padding: 24px 32px;
+  background: var(--bg);
+  transition: background 0.25s;
+}
+svg.flow { width: 100%; min-height: 730px; }
+
+/* SVG CSS theming */
+.n-ellipse    { fill: var(--n-start); stroke: var(--n-start-s); }
+.n-rect       { fill: var(--n-rect);  stroke: var(--n-rect-s);  }
+.n-rect-new   { fill: var(--n-new);   stroke: var(--n-new-s);   }
+.n-rect-db    { fill: var(--n-new);   stroke: var(--n-new-s);   }
+.n-jsv        { fill: var(--n-jsv);   stroke: var(--n-jsv-s);   }
+.n-diamond    { fill: var(--n-diam);  stroke: var(--n-diam-s);  }
+.n-success    { fill: var(--n-suc);   stroke: var(--n-suc-s);   }
+.nt-main      { fill: var(--nt-main); }
+.nt-sub       { fill: var(--nt-sub);  }
+.nt-blue      { fill: var(--nt-blue); }
+.nt-amber     { fill: var(--nt-amber); }
+.nt-cyan      { fill: var(--nt-cyan);  }
+.nt-green     { fill: var(--nt-green); }
+.nt-indigo    { fill: var(--nt-indigo); }
+
+.node { cursor: pointer; transition: filter 0.18s; }
+.node:hover { filter: brightness(1.15) saturate(1.2); }
+.node.active .n-ellipse,
+.node.active .n-rect,
+.node.active .n-rect-new,
+.node.active .n-rect-db,
+.node.active .n-jsv,
+.node.active .n-diamond,
+.node.active .n-success {
+  stroke: var(--amber) !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 7px rgba(245,158,11,.6));
+}
+
+.sv-arrow { stroke: var(--arrow); fill: none; stroke-width: 1.8; }
+.sv-arrow.lit { stroke: var(--arrow-lit); stroke-width: 2.5; }
+.sv-label { font-size: 10px; fill: var(--text3); font-family: inherit; }
+.sv-label.lit { fill: var(--arrow-lit); font-weight: 700; }
+.sv-tag {
+  font-size: 8px; fill: white; font-family: inherit; font-weight: 700;
+  dominant-baseline: middle;
+}
+
+/* ─── Right Panel ─── */
+.panel {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: background 0.25s, border-color 0.25s;
+}
+.panel-hd {
+  padding: 10px 14px;
+  font-size: 0.7rem; font-weight: 700; color: var(--text3);
+  letter-spacing: .08em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+}
+.step-counter {
+  margin-left: auto; font-size: 0.68rem;
+  font-weight: 400; color: var(--text3);
+}
+
+.step-list {
+  max-height: 35vh; overflow-y: auto;
+  padding: 7px; display: flex; flex-direction: column; gap: 3px;
+}
+.step-item {
+  border-radius: 6px; padding: 7px 11px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  display: flex; align-items: center; gap: 8px;
+  transition: background 0.13s, border-color 0.13s;
+}
+.step-item:hover { background: var(--surface2); }
+.step-item.active { background: var(--surface2); border-color: var(--blue); }
+.step-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 700; color: var(--text2);
+}
+.step-item.active .step-dot { background: var(--blue); color: white; }
+.step-item-body h3 { font-size: 0.8rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+.step-tag {
+  font-size: 0.6rem; padding: 1px 5px;
+  border-radius: 3px; font-weight: 700;
+  background: rgba(129,140,248,0.15); color: var(--indigo);
+  margin-left: 4px; vertical-align: middle;
+}
+
+/* ─── Detail Box ─── */
+.detail-box {
+  margin: 0 10px 7px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  flex-shrink: 0;
+  min-height: 110px;
+  transition: background 0.25s, border-color 0.25s;
+}
+.detail-box h4 { font-size: 0.78rem; color: var(--cyan); margin-bottom: 7px; font-weight: 600; }
+.detail-box pre {
+  font-size: 0.69rem; color: var(--code-fg);
+  line-height: 1.65; white-space: pre-wrap;
+  font-family: 'Cascadia Code', 'Courier New', monospace;
+}
+
+/* ─── Simulator ─── */
+.simulator {
+  margin: 0 10px 10px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: background 0.25s, border-color 0.25s;
+}
+.sim-hd {
+  padding: 7px 12px;
+  font-size: 0.68rem; font-weight: 700; color: var(--text3);
+  letter-spacing: .07em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items: center; gap: 6px;
+}
+.fail-badge {
+  margin-left: auto; display: none;
+  align-items: center; gap: 3px;
+  font-size: 0.63rem; padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(239,68,68,.12); color: #f87171;
+}
+.fail-badge.show { display: inline-flex; }
+
+/* 验证阶段条 */
+.phase-bar {
+  display: flex; align-items: center;
+  padding: 6px 12px; gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  overflow-x: auto;
+}
+.ph {
+  font-size: 0.62rem; color: var(--text3);
+  padding: 2px 6px; border-radius: 4px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.ph.active  { color: var(--cyan);  background: rgba(56,189,248,.1); }
+.ph.done    { color: var(--green); background: rgba(34,197,94,.08); }
+.ph.error   { color: #f87171;      background: rgba(239,68,68,.09); }
+.ph-sep     { font-size: 0.58rem; color: var(--border2); margin: 0 1px; }
+
+/* 输入区 */
+.sim-body { padding: 9px 12px; }
+.sim-field { margin-bottom: 7px; position: relative; }
+.sf-icon {
+  position: absolute; left: 9px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem; pointer-events: none; line-height: 1;
+}
+.sf-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px 7px 30px;
+  color: var(--text); font-size: 0.78rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.sf-input:focus { border-color: var(--blue); }
+.sf-input.err   { border-color: var(--red); }
+.sf-input.ok    { border-color: var(--green); }
+.sf-hint {
+  font-size: 0.63rem; min-height: 13px;
+  margin-top: 2px; padding-left: 2px;
+  color: var(--text3);
+}
+.sf-hint.err { color: #f87171; }
+.sf-hint.ok  { color: #4ade80; }
+html[data-theme="light"] .sf-hint.ok { color: #16a34a; }
+
+.sim-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.sim-btn {
+  flex: 1; padding: 7px;
+  border-radius: 6px; border: none;
+  background: var(--blue); color: white;
+  font-weight: 600; font-size: 0.78rem;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.sim-btn:hover { opacity: .88; }
+.sim-btn:disabled { opacity: .45; cursor: not-allowed; }
+.sim-btn-g {
+  padding: 7px 10px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--text2);
+  font-size: 0.75rem; cursor: pointer;
+  transition: all 0.15s;
+}
+.sim-btn-g:hover { border-color: var(--text2); color: var(--text); }
+
+/* 日志 */
+.sim-log {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 0.67rem; font-family: 'Cascadia Code', monospace;
+  min-height: 52px; max-height: 68px; overflow-y: auto;
+  line-height: 1.65;
+  transition: background 0.25s, border-color 0.25s;
+}
+.ll     { color: var(--text2); }
+.ll.info { color: var(--cyan); }
+.ll.ok   { color: #4ade80; }
+.ll.err  { color: #f87171; }
+.ll.warn { color: var(--amber); }
+.ll.db   { color: #c084fc; }
+html[data-theme="light"] .ll.ok { color: #16a34a; }
+
+/* 进度条 */
+.prog-bar { height: 2px; background: var(--border); }
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  transition: width 0.4s ease; width: 0%;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:1.15rem">🔐</span>
+  <h1>登录流程 · 交互教学图</h1>
+  <span class="badge">点击节点探索</span>
+  <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">
+    <span class="toggle-icon" id="toggleIcon">🌙</span>
+    <span id="toggleLabel">暗色</span>
+  </button>
+</header>
+
+<div class="layout">
+
+  <!-- ═══ 流程图 SVG ═══ -->
+  <div class="diagram">
+    <svg class="flow" viewBox="0 0 640 762" id="flowSvg">
+      <defs>
+        <marker id="arr"    markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path id="arrPath"    d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+        </marker>
+        <marker id="arrLit" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path id="arrLitPath" d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+        </marker>
+        <marker id="arrErr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path id="arrErrPath" d="M0,0 L0,6 L8,3 z" fill="#f87171"/>
+        </marker>
+      </defs>
+
+      <!-- ── 连线 ── -->
+      <g id="arrows">
+        <line class="sv-arrow" id="a01"     x1="320" y1="74"  x2="320" y2="100" marker-end="url(#arr)"/>
+        <line class="sv-arrow" id="a12"     x1="320" y1="140" x2="320" y2="165" marker-end="url(#arr)"/>
+        <line class="sv-arrow" id="a2jsv"   x1="320" y1="215" x2="320" y2="246" marker-end="url(#arr)"/>
+
+        <!-- JS验证 → 通过 -->
+        <line class="sv-arrow" id="ajsv_p"  x1="320" y1="302" x2="320" y2="336" marker-end="url(#arr)"/>
+        <text class="sv-label" id="ljsv_p"  x="325" y="323">通过</text>
+        <!-- JS验证 → 失败（左回路）-->
+        <polyline class="sv-arrow" id="ajsv_f"
+          points="266,274 86,274 86,180 220,180"
+          marker-end="url(#arr)"/>
+        <text class="sv-label" id="ljsv_f" x="88" y="268">格式错误↩</text>
+
+        <!-- 请求 → DB -->
+        <line class="sv-arrow" id="areq_db" x1="320" y1="376" x2="320" y2="406" marker-end="url(#arr)"/>
+        <!-- DB → 校验 -->
+        <line class="sv-arrow" id="adb_chk" x1="320" y1="456" x2="320" y2="489" marker-end="url(#arr)"/>
+
+        <!-- 密码校验 → 通过 -->
+        <line class="sv-arrow" id="achk_p"  x1="320" y1="545" x2="320" y2="576" marker-end="url(#arr)"/>
+        <text class="sv-label" id="lchk_p"  x="325" y="563">通过</text>
+        <!-- 密码校验 → 失败（右回路）-->
+        <polyline class="sv-arrow" id="achk_f"
+          points="374,517 558,517 558,180 420,180"
+          marker-end="url(#arr)"/>
+        <text class="sv-label" id="lchk_f" x="424" y="512">错误/重试↩</text>
+
+        <!-- JWT → 存储 → 跳转 -->
+        <line class="sv-arrow" id="a45"     x1="320" y1="616" x2="320" y2="646" marker-end="url(#arr)"/>
+        <line class="sv-arrow" id="a56"     x1="320" y1="686" x2="320" y2="716" marker-end="url(#arr)"/>
+      </g>
+
+      <!-- ── 节点 ── -->
+      <!-- n0: 用户访问 -->
+      <g class="node" id="n0" data-id="0" transform="translate(245,30)">
+        <ellipse cx="75" cy="22" rx="75" ry="22" class="n-ellipse" stroke-width="1.8"/>
+        <text x="75" y="27" text-anchor="middle" class="nt-blue" font-size="13" font-weight="700">用 户 访 问</text>
+      </g>
+
+      <!-- n1: 展示表单 -->
+      <g class="node" id="n1" data-id="1" transform="translate(220,100)">
+        <rect width="200" height="40" rx="8" class="n-rect" stroke-width="1.8"/>
+        <text x="100" y="25" text-anchor="middle" class="nt-main" font-size="12">展示登录表单</text>
+      </g>
+
+      <!-- n2: 用户输入 -->
+      <g class="node" id="n2" data-id="2" transform="translate(220,165)">
+        <rect width="200" height="50" rx="8" class="n-rect" stroke-width="1.8"/>
+        <text x="100" y="22" text-anchor="middle" class="nt-main" font-size="12">用户输入</text>
+        <text x="100" y="38" text-anchor="middle" class="nt-sub"  font-size="10">账号 / 密码</text>
+      </g>
+
+      <!-- nJSV: 前端JS验证 ★新增 -->
+      <g class="node" id="nJSV" data-id="3" transform="translate(266,246)">
+        <polygon points="54,0 108,28 54,56 0,28" class="n-jsv" stroke-width="1.8"/>
+        <text x="54" y="21" text-anchor="middle" class="nt-cyan" font-size="10" font-weight="700">前端JS</text>
+        <text x="54" y="35" text-anchor="middle" class="nt-cyan" font-size="10" font-weight="700">格式验证</text>
+        <!-- NEW 标签 -->
+        <rect x="74" y="2"  width="28" height="11" rx="3" fill="#0891b2" opacity=".9"/>
+        <text x="88" y="9.5" text-anchor="middle" class="sv-tag">NEW</text>
+      </g>
+
+      <!-- nREQ: 发送HTTP请求 ★新增 -->
+      <g class="node" id="nREQ" data-id="4" transform="translate(220,336)">
+        <rect width="200" height="40" rx="8" class="n-rect-new" stroke-width="1.8"/>
+        <text x="100" y="16" text-anchor="middle" class="nt-main"   font-size="11">发送 HTTP 请求</text>
+        <text x="100" y="30" text-anchor="middle" class="nt-sub"    font-size="9.5">POST /api/login</text>
+        <!-- NEW 标签 -->
+        <rect x="166" y="3" width="28" height="11" rx="3" fill="#4f46e5" opacity=".9"/>
+        <text x="180" y="10.5" text-anchor="middle" class="sv-tag">NEW</text>
+      </g>
+
+      <!-- nDB: 数据库查询 ★新增 -->
+      <g class="node" id="nDB" data-id="5" transform="translate(220,406)">
+        <rect width="200" height="50" rx="8" class="n-rect-db" stroke-width="1.8"/>
+        <text x="100" y="20" text-anchor="middle" class="nt-main"   font-size="11">数 据 库 查 询</text>
+        <text x="100" y="36" text-anchor="middle" class="nt-sub"    font-size="9">SELECT * FROM users</text>
+        <!-- NEW 标签 -->
+        <rect x="166" y="3" width="28" height="11" rx="3" fill="#4f46e5" opacity=".9"/>
+        <text x="180" y="10.5" text-anchor="middle" class="sv-tag">NEW</text>
+      </g>
+
+      <!-- nCHK: 密码校验 -->
+      <g class="node" id="nCHK" data-id="6" transform="translate(266,489)">
+        <polygon points="54,0 108,28 54,56 0,28" class="n-diamond" stroke-width="1.8"/>
+        <text x="54" y="21" text-anchor="middle" class="nt-amber" font-size="10" font-weight="700">密码</text>
+        <text x="54" y="35" text-anchor="middle" class="nt-amber" font-size="10" font-weight="700">校验</text>
+      </g>
+
+      <!-- n4: 生成 JWT -->
+      <g class="node" id="n4" data-id="7" transform="translate(220,576)">
+        <rect width="200" height="40" rx="8" class="n-rect" stroke-width="1.8"/>
+        <text x="100" y="25" text-anchor="middle" class="nt-main" font-size="12">生成 JWT Token</text>
+      </g>
+
+      <!-- n5: 存储 Token -->
+      <g class="node" id="n5" data-id="8" transform="translate(220,646)">
+        <rect width="200" height="40" rx="8" class="n-rect" stroke-width="1.8"/>
+        <text x="100" y="25" text-anchor="middle" class="nt-main" font-size="11">存储 Token（Cookie / LS）</text>
+      </g>
+
+      <!-- n6: 登录成功 -->
+      <g class="node" id="n6" data-id="9" transform="translate(245,716)">
+        <ellipse cx="75" cy="18" rx="75" ry="18" class="n-success" stroke-width="1.8"/>
+        <text x="75" y="23" text-anchor="middle" class="nt-green" font-size="12" font-weight="700">登录成功 → 首页</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ═══ 右侧面板 ═══ -->
+  <div class="panel">
+    <div class="panel-hd">
+      步骤说明
+      <span class="step-counter" id="stepCounter">0 / 10</span>
+    </div>
+    <div class="step-list" id="stepList"></div>
+
+    <div class="detail-box" id="detailBox">
+      <h4>点击节点或步骤查看详情</h4>
+      <pre>👆 选择一个步骤开始学习
+
+★ 标注 NEW 的节点为新增内容：
+  · 前端 JS 格式验证
+  · 发送 HTTP 请求
+  · 数据库查询</pre>
+    </div>
+
+    <!-- 模拟登录 -->
+    <div class="simulator">
+      <div class="sim-hd">
+        🧪 模拟登录
+        <span class="fail-badge" id="failBadge">⚠️ 失败 <span id="failCount">0</span>/3</span>
+      </div>
+      <!-- 阶段指示条 -->
+      <div class="phase-bar">
+        <span class="ph" id="ph0">① JS验证</span>
+        <span class="ph-sep">›</span>
+        <span class="ph" id="ph1">② HTTP请求</span>
+        <span class="ph-sep">›</span>
+        <span class="ph" id="ph2">③ DB查询</span>
+        <span class="ph-sep">›</span>
+        <span class="ph" id="ph3">④ 密码校验</span>
+      </div>
+      <div class="sim-body">
+        <!-- 账号 -->
+        <div class="sim-field">
+          <span class="sf-icon">👤</span>
+          <input type="text" class="sf-input" id="simUser"
+            placeholder="账号（admin / user / guest）"
+            oninput="liveValidUser()" autocomplete="off"/>
+          <div class="sf-hint" id="hintUser"></div>
+        </div>
+        <!-- 密码 -->
+        <div class="sim-field">
+          <span class="sf-icon">🔑</span>
+          <input type="password" class="sf-input" id="simPass"
+            placeholder="密码（≥6位）"
+            oninput="liveValidPass()"/>
+          <div class="sf-hint" id="hintPass"></div>
+        </div>
+        <!-- 操作按钮 -->
+        <div class="sim-row">
+          <button class="sim-btn" id="simBtn" onclick="simulate()">登 录</button>
+          <button class="sim-btn-g" onclick="resetSim()">重置</button>
+        </div>
+        <!-- 日志输出 -->
+        <div class="sim-log" id="simLog"><span class="ll">// 等待操作...</span></div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   1. 步骤数据
+═══════════════════════════════════════════════ */
+const steps = [
+  {
+    id: 0, title: '用户访问页面', node: 'n0', arrows: [], tag: '',
+    desc: '浏览器发出 HTTP GET 请求，服务器返回登录页面的 HTML/CSS/JS 资源。',
+    code:
+`GET /login HTTP/1.1
+Host: example.com
+
+// 服务器返回
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8`
+  },
+  {
+    id: 1, title: '展示登录表单', node: 'n1', arrows: ['a01'], tag: '',
+    desc: 'Vue/React 渲染登录组件，包含账号、密码输入框及登录按钮，同时初始化响应式数据。',
+    code:
+`<!-- Vue 3 登录表单 -->
+<input v-model="form.username"
+       placeholder="账号" />
+<input v-model="form.password"
+       type="password" />
+<button @click="handleLogin">登录</button>`
+  },
+  {
+    id: 2, title: '用户输入账号密码', node: 'n2', arrows: ['a01','a12'], tag: '',
+    desc: '用户键入内容，v-model 实时同步到响应式数据对象；同时监听 keyup 触发实时 UI 反馈。',
+    code:
+`const form = reactive({ username: '', password: '' })
+
+// v-model 等价于
+:value="form.username"
+@input="form.username = $event.target.value"`
+  },
+  {
+    id: 3, title: '前端 JS 格式验证', node: 'nJSV', arrows: ['a01','a12','a2jsv'], tag: 'NEW',
+    desc: '提交前在浏览器本地执行格式校验，不消耗服务器资源，即时反馈。验证规则：非空、长度、字符集、密码强度。',
+    code:
+`// ① 非空检查
+if (!form.username) throw '账号不能为空'
+if (!form.password) throw '密码不能为空'
+
+// ② 账号格式（3-20位，字母数字下划线）
+const nameReg = /^[a-zA-Z0-9_一-龥]{3,20}$/
+if (!nameReg.test(form.username))
+  throw '账号格式不正确'
+
+// ③ 密码最小长度
+if (form.password.length < 6)
+  throw '密码不能少于6位'
+
+// 格式验证通过 → 发送请求`
+  },
+  {
+    id: 4, title: '发送 HTTP 请求', node: 'nREQ', arrows: ['a01','a12','a2jsv','ajsv_p'], tag: 'NEW',
+    desc: 'JS 验证通过后，axios 发送 POST 请求，携带表单数据；同时附带 CSRF Token 防止跨站攻击。',
+    code:
+`// 携带 CSRF token
+const csrf = document.cookie.match(/csrf=([^;]+)/)?.[1]
+
+const { data } = await axios.post('/api/login', {
+  username: form.username,
+  password: form.password
+}, {
+  headers: { 'X-CSRF-Token': csrf }
+})
+// → 服务端收到请求，进入 DB 查询`
+  },
+  {
+    id: 5, title: '数据库查询', node: 'nDB', arrows: ['a01','a12','a2jsv','ajsv_p','areq_db'], tag: 'NEW',
+    desc: '服务端在 users 表中按 username 查找记录。若用户不存在直接返回 401，避免暴露账号是否存在的信息（防枚举）。',
+    code:
+`// Node.js / Express
+const user = await db.query(
+  'SELECT id, username, password_hash, role, locked
+   FROM users WHERE username = ? LIMIT 1',
+  [req.body.username]
+)
+if (!user) {
+  return res.status(401).json({ msg: '用户名或密码错误' })
+  // 注意：不区分"用户不存在"和"密码错误"
+}`
+  },
+  {
+    id: 6, title: '密码校验', node: 'nCHK', arrows: ['a01','a12','a2jsv','ajsv_p','areq_db','adb_chk'], tag: '',
+    desc: '用 bcrypt.compare() 将输入密码与数据库中的哈希值对比。绝不明文存储密码！失败3次后锁定账号。',
+    code:
+`const bcrypt = require('bcrypt')
+
+// 检查账号是否被锁定
+if (user.locked) return res.status(423)
+  .json({ msg: '账号已锁定，请15分钟后重试' })
+
+// bcrypt 对比（耗时约 100ms，防暴力破解）
+const ok = await bcrypt.compare(
+  req.body.password,
+  user.password_hash
+)
+if (!ok) {
+  await incrementFailCount(user.id)
+  return res.status(401).json({ msg: '用户名或密码错误' })
+}`
+  },
+  {
+    id: 7, title: '生成 JWT Token', node: 'n4', arrows: ['a01','a12','a2jsv','ajsv_p','areq_db','adb_chk','achk_p'], tag: '',
+    desc: '校验通过后，用私钥签发 JWT（Header.Payload.Signature），Payload 中含用户 ID、角色和过期时间。',
+    code:
+`const jwt = require('jsonwebtoken')
+
+const token = jwt.sign(
+  {
+    userId: user.id,
+    role:   user.role,
+    iat:    Math.floor(Date.now() / 1000)
+  },
+  process.env.JWT_SECRET,  // RS256 私钥
+  { expiresIn: '7d' }
+)
+res.json({ token, user: { id: user.id, role: user.role } })`
+  },
+  {
+    id: 8, title: '存储 Token', node: 'n5', arrows: ['a01','a12','a2jsv','ajsv_p','areq_db','adb_chk','achk_p','a45'], tag: '',
+    desc: '前端选择存储方式：localStorage 简单但有 XSS 风险；HttpOnly Cookie 更安全，JS 无法读取。',
+    code:
+`// 方式一：localStorage（常见，有 XSS 风险）
+localStorage.setItem('token', data.token)
+
+// 方式二：HttpOnly Cookie（推荐，由服务端设置）
+// Set-Cookie: token=xxx; HttpOnly; Secure; SameSite=Strict
+// 前端无需操作，浏览器自动存储和发送
+
+// 后续请求自动携带
+axios.defaults.headers.common['Authorization']
+  = 'Bearer ' + localStorage.getItem('token')`
+  },
+  {
+    id: 9, title: '登录成功 → 跳转首页', node: 'n6', arrows: ['a01','a12','a2jsv','ajsv_p','areq_db','adb_chk','achk_p','a45','a56'], tag: '',
+    desc: '前端路由跳转到首页，后续所有 API 请求在 Headers 携带 token，服务端中间件校验 JWT 有效性。',
+    code:
+`// Vue Router 跳转
+router.push({ name: 'home' })
+
+// axios 请求拦截器（全局设置）
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = 'Bearer ' + token
+  return config
+})
+// 服务端中间件验证 JWT 签名 + 过期时间`
+  }
+]
+
+/* ═══════════════════════════════════════════════
+   2. 步骤渲染 & 选择
+═══════════════════════════════════════════════ */
+let current = null
+
+function renderSteps() {
+  const list = document.getElementById('stepList')
+  list.innerHTML = steps.map(s => `
+    <div class="step-item" id="si${s.id}" onclick="selectStep(${s.id})">
+      <div class="step-dot">${s.id + 1}</div>
+      <div class="step-item-body">
+        <h3>${s.title}${s.tag ? `<span class="step-tag">${s.tag}</span>` : ''}</h3>
+      </div>
+    </div>`).join('')
+}
+
+function selectStep(id) {
+  if (current !== null) {
+    document.getElementById('si' + current)?.classList.remove('active')
+    document.getElementById(steps[current].node)?.classList.remove('active')
+  }
+  current = id
+  const s = steps[id]
+  document.getElementById('si' + id)?.classList.add('active')
+  document.getElementById(s.node)?.classList.add('active')
+
+  // 箭头高亮
+  document.querySelectorAll('.sv-arrow').forEach(el => {
+    el.classList.remove('lit')
+    el.setAttribute('marker-end', 'url(#arr)')
+  })
+  document.querySelectorAll('.sv-label').forEach(el => el.classList.remove('lit'))
+  s.arrows.forEach(aid => {
+    const el = document.getElementById(aid)
+    if (el) { el.classList.add('lit'); el.setAttribute('marker-end', 'url(#arrLit)') }
+  })
+
+  // 详情面板
+  document.getElementById('detailBox').innerHTML =
+    `<h4>${s.title}${s.tag ? ` <small style="font-size:.65rem;opacity:.8">[${s.tag}]</small>` : ''}</h4>` +
+    `<pre>${s.desc}\n\n${s.code}</pre>`
+
+  // 进度
+  document.getElementById('progFill').style.width = ((id + 1) / steps.length * 100) + '%'
+  document.getElementById('stepCounter').textContent = `${id + 1} / ${steps.length}`
+}
+
+// 节点点击
+document.querySelectorAll('.node').forEach(n => {
+  n.addEventListener('click', () => selectStep(+n.dataset.id))
+})
+
+/* ═══════════════════════════════════════════════
+   3. 模拟登录：本地JS验证 + 模拟DB验证
+═══════════════════════════════════════════════ */
+// 模拟数据库
+const MOCK_DB = {
+  'admin': { password: '123456',  role: '管理员', id: 1 },
+  'user':  { password: 'password',role: '普通用户',id: 2 },
+  'guest': { password: 'guest123',role: '访客',   id: 3 },
+}
+const failCounts = {}  // 记录每个账号失败次数
+let simRunning = false
+
+// ── 实时验证 ──
+function liveValidUser() {
+  const v = document.getElementById('simUser').value
+  const el = document.getElementById('simUser')
+  const h  = document.getElementById('hintUser')
+  if (!v) { el.className = 'sf-input'; h.className = 'sf-hint'; h.textContent = ''; return null }
+  if (v.length < 3)  return setFieldErr(el, h, `账号至少3个字符（当前${v.length}）`)
+  if (v.length > 20) return setFieldErr(el, h, '账号最多20个字符')
+  if (!/^[a-zA-Z0-9_一-龥]+$/.test(v)) return setFieldErr(el, h, '只支持字母、数字、下划线、中文')
+  return setFieldOk(el, h, '✓ 格式正确')
+}
+
+function liveValidPass() {
+  const v = document.getElementById('simPass').value
+  const el = document.getElementById('simPass')
+  const h  = document.getElementById('hintPass')
+  if (!v) { el.className = 'sf-input'; h.className = 'sf-hint'; h.textContent = ''; return null }
+  if (v.length < 6) return setFieldErr(el, h, `密码太短（${v.length}位，需≥6位）`)
+  const s = pwdStrength(v)
+  return setFieldOk(el, h, `✓ 强度：${s}`)
+}
+
+function pwdStrength(p) {
+  let n = 0
+  if (p.length >= 8) n++
+  if (p.length >= 12) n++
+  if (/[A-Z]/.test(p)) n++
+  if (/[0-9]/.test(p)) n++
+  if (/[^a-zA-Z0-9]/.test(p)) n++
+  return n <= 1 ? '弱 🔴' : n <= 3 ? '中 🟡' : '强 🟢'
+}
+
+function setFieldErr(el, h, msg) { el.className = 'sf-input err'; h.className = 'sf-hint err'; h.textContent = msg; return false }
+function setFieldOk(el, h, msg)  { el.className = 'sf-input ok';  h.className = 'sf-hint ok';  h.textContent = msg; return true  }
+
+// ── 主模拟流程 ──
+async function simulate() {
+  if (simRunning) return
+  simRunning = true
+  document.getElementById('simBtn').disabled = true
+
+  const u = document.getElementById('simUser').value.trim()
+  const p = document.getElementById('simPass').value
+  clearLog()
+  resetPhases()
+
+  // ─ Phase 0: 前端 JS 验证 ─
+  setPhase(0, 'active')
+  addLog('① 前端JS验证...', 'info')
+  selectStep(3)
+  await d(350)
+
+  if (!u) { return simFail(0, '✗ 账号不能为空', false, 'ajsv_f','ljsv_f') }
+  const uOk = liveValidUser()
+  if (uOk === false) return simFail(0, '✗ 账号格式不合法', false, 'ajsv_f','ljsv_f')
+  if (!p) { return simFail(0, '✗ 密码不能为空', false, 'ajsv_f','ljsv_f') }
+  if (liveValidPass() === false) return simFail(0, '✗ 密码长度不足6位', false, 'ajsv_f','ljsv_f')
+
+  addLog('✓ 前端验证通过', 'ok')
+  setPhase(0, 'done')
+  await d(250)
+
+  // ─ Phase 1: HTTP 请求 ─
+  setPhase(1, 'active')
+  selectStep(4)
+  addLog(`② POST /api/login → { username: "${u}" }`, 'info')
+  await d(550)
+  addLog('   请求已发送，等待服务端响应...', 'db')
+  setPhase(1, 'done')
+  await d(200)
+
+  // ─ Phase 2: DB 查询 ─
+  setPhase(2, 'active')
+  selectStep(5)
+  addLog('③ SELECT * FROM users WHERE username = ?', 'db')
+  await d(650)
+
+  const rec = MOCK_DB[u]
+  if (!rec) {
+    addLog(`   ✗ 用户 "${u}" 不存在`, 'err')
+    setPhase(2, 'error')
+    addLog('↩  401: 用户名或密码错误', 'err')
+    hlArrows(['achk_f'])
+    incFail(u)
+    return done()
+  }
+  addLog(`   ✓ 找到用户: ${u}（${rec.role}）`, 'ok')
+  setPhase(2, 'done')
+  await d(250)
+
+  // ─ Phase 3: 密码校验 ─
+  setPhase(3, 'active')
+  selectStep(6)
+  addLog('④ bcrypt.compare(input, hash)...', 'db')
+  await d(600)
+
+  const locked = (failCounts[u] || 0) >= 3
+  if (locked) {
+    addLog('   🔒 账号已锁定（失败3次），请15分钟后重试', 'warn')
+    setPhase(3, 'error')
+    hlArrows(['achk_f'])
+    return done()
+  }
+
+  if (rec.password !== p) {
+    incFail(u)
+    const left = 3 - (failCounts[u] || 0)
+    addLog(`   ✗ 密码错误，剩余 ${left} 次机会`, 'err')
+    setPhase(3, 'error')
+    hlArrows(['achk_f'])
+    if ((failCounts[u] || 0) >= 3) addLog('   🔒 账号已被锁定！', 'warn')
+    return done()
+  }
+
+  failCounts[u] = 0
+  addLog('   ✓ 密码验证通过', 'ok')
+  setPhase(3, 'done')
+  await d(250)
+
+  // ─ 后续流程 ─
+  selectStep(7); addLog(`⑤ 生成 JWT → { userId:${rec.id}, role:"${rec.role}" }`, 'ok'); await d(350)
+  selectStep(8); addLog('⑥ Token → localStorage', 'ok'); await d(300)
+  selectStep(9); addLog(`🎉 登录成功！欢迎 ${u}（${rec.role}）`, 'ok');
+  done()
+}
+
+async function simFail(phase, msg, isDB, ...arrowIds) {
+  addLog(msg, 'err')
+  setPhase(phase, 'error')
+  if (arrowIds.length) {
+    hlArrows([arrowIds[0]])
+    const lbl = document.getElementById(arrowIds[1])
+    if (lbl) lbl.classList.add('lit')
+  }
+  if (isDB) incFail(document.getElementById('simUser').value.trim())
+  done()
+}
+
+function done() {
+  simRunning = false
+  document.getElementById('simBtn').disabled = false
+}
+
+function resetSim() {
+  simRunning = false
+  document.getElementById('simBtn').disabled = false
+  clearLog()
+  resetPhases()
+  ;['simUser','simPass'].forEach(id => {
+    const el = document.getElementById(id)
+    el.value = ''; el.className = 'sf-input'
+  })
+  ;['hintUser','hintPass'].forEach(id => {
+    const el = document.getElementById(id)
+    el.textContent = ''; el.className = 'sf-hint'
+  })
+  document.getElementById('progFill').style.width = '0%'
+  document.getElementById('failBadge').classList.remove('show')
+  document.querySelectorAll('.sv-arrow').forEach(el => {
+    el.classList.remove('lit')
+    el.setAttribute('marker-end', 'url(#arr)')
+  })
+  document.querySelectorAll('.sv-label').forEach(el => el.classList.remove('lit'))
+  if (current !== null) {
+    document.getElementById('si' + current)?.classList.remove('active')
+    document.getElementById(steps[current]?.node)?.classList.remove('active')
+    current = null
+  }
+  document.getElementById('stepCounter').textContent = '0 / 10'
+}
+
+function clearLog() {
+  document.getElementById('simLog').innerHTML = ''
+}
+function addLog(msg, type = '') {
+  const log = document.getElementById('simLog')
+  const el = document.createElement('div')
+  el.className = 'll ' + type
+  el.textContent = msg
+  log.appendChild(el)
+  log.scrollTop = log.scrollHeight
+}
+function resetPhases() {
+  ;[0,1,2,3].forEach(i => setPhase(i, ''))
+}
+function setPhase(i, state) {
+  document.getElementById('ph' + i).className = 'ph ' + state
+}
+function hlArrows(ids) {
+  document.querySelectorAll('.sv-arrow').forEach(el => {
+    el.classList.remove('lit')
+    el.setAttribute('marker-end', 'url(#arr)')
+  })
+  ids.forEach(id => {
+    const el = document.getElementById(id)
+    if (el) { el.classList.add('lit'); el.setAttribute('marker-end', 'url(#arrLit)') }
+  })
+}
+function incFail(u) {
+  if (!u) return
+  failCounts[u] = (failCounts[u] || 0) + 1
+  const b = document.getElementById('failBadge')
+  b.classList.add('show')
+  document.getElementById('failCount').textContent = failCounts[u]
+}
+function d(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+/* ═══════════════════════════════════════════════
+   4. 主题系统
+═══════════════════════════════════════════════ */
+const THEME_KEY = 'wxmp-theme'
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme)
+  document.getElementById('toggleIcon').textContent  = theme === 'dark' ? '🌙' : '☀️'
+  document.getElementById('toggleLabel').textContent = theme === 'dark' ? '暗色' : '亮色'
+  updateMarkers(theme)
+  // 通知同源其他页面
+  window.dispatchEvent(new CustomEvent('wxmp-theme-change', { detail: { theme } }))
+  // 通知 iframe 父级
+  try { window.parent !== window && window.parent.postMessage({ type: 'wxmp-theme-change', theme }, '*') } catch(_) {}
+}
+
+function toggleTheme() {
+  const next = (localStorage.getItem(THEME_KEY) || 'dark') === 'dark' ? 'light' : 'dark'
+  localStorage.setItem(THEME_KEY, next)
+  applyTheme(next)
+}
+
+function updateMarkers(theme) {
+  const isDark = theme === 'dark'
+  document.getElementById('arrPath').setAttribute('fill',    isDark ? '#475569' : '#94a3b8')
+  document.getElementById('arrLitPath').setAttribute('fill', isDark ? '#38bdf8' : '#0284c7')
+  document.getElementById('arrErrPath').setAttribute('fill', isDark ? '#f87171' : '#dc2626')
+}
+
+// 跨标签页同步
+window.addEventListener('storage', e => {
+  if (e.key === THEME_KEY && e.newValue) applyTheme(e.newValue)
+})
+// 接收父级 iframe 消息
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wxmp-theme-change' && e.data.theme) {
+    localStorage.setItem(THEME_KEY, e.data.theme)
+    applyTheme(e.data.theme)
+  }
+})
+
+/* ═══════════════════════════════════════════════
+   5. 初始化
+═══════════════════════════════════════════════ */
+renderSteps()
+applyTheme(localStorage.getItem(THEME_KEY) || 'dark')
+selectStep(0)
+</script>
+</body>
+</html>

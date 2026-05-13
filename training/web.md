@@ -12,6 +12,10 @@ sidebar_position: 1
 * <a href="https://bili.shany.cc/" target="_blank">04-ShanY视频解析</a>
 * <a href="https://mp.weixin.qq.com/" target="_blank">05-微信小程序注册地址</a>
 * <a href="https://www.iconfont.cn/" target="_blank">06-iconfont</a>
+* <a href="https://www.juhe.cn/" target="_blank">07-聚合数据</a>
+* <a href="/web/103-id锚点定位演示.html" target="_blank">08-id锚点定位演示</a>
+* <a href="/web/104-login-interactive.html" target="_blank">09-登录交互</a>
+* <a href="/web/105-databinding-interactive.html" target="_blank">10-动态数据绑定</a>
 
 
 

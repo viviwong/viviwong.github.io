@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态数据绑定 · 交互教学</title>
+<!-- 防止主题闪烁 -->
+<script>(function(){const t=localStorage.getItem('wxmp-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})()</script>
+<style>
+/* ═══ CSS 主题变量 ═══ */
+:root {
+  --bg:        #0d1117;
+  --bg2:       #161b22;
+  --bg3:       #0d1117;
+  --border:    #30363d;
+  --border2:   #21262d;
+  --text:      #e6edf3;
+  --text2:     #8b949e;
+  --text3:     #586069;
+  --blue:      #1f6feb;
+  --blue2:     #388bfd;
+  --blue3:     #58a6ff;
+  --green:     #3fb950;
+  --orange:    #f0883e;
+  --orange2:   #ffa657;
+  --cyan:      #38bdf8;
+  --purple:    #c084fc;
+  --red:       #f85149;
+  --code-bg:   #010409;
+  --code-fg:   #a5d6ff;
+  --code-val:  #a8ff78;
+  --code-str:  #ffa657;
+  --pre-bg:    #0d1117;
+  --input-bg:  #0d1117;
+  --card-inner:#0d1117;
+  --src-circle-bg: #161b22;
+}
+html[data-theme="light"] {
+  --bg:        #f6f8fa;
+  --bg2:       #ffffff;
+  --bg3:       #f0f2f5;
+  --border:    #d0d7de;
+  --border2:   #e1e4e8;
+  --text:      #1f2328;
+  --text2:     #57606a;
+  --text3:     #8c959f;
+  --blue:      #0969da;
+  --blue2:     #218bff;
+  --blue3:     #0969da;
+  --green:     #1a7f37;
+  --orange:    #bc4c00;
+  --orange2:   #953800;
+  --cyan:      #0284c7;
+  --purple:    #8250df;
+  --red:       #cf222e;
+  --code-bg:   #f6f8fa;
+  --code-fg:   #0550ae;
+  --code-val:  #116329;
+  --code-str:  #953800;
+  --pre-bg:    #f6f8fa;
+  --input-bg:  #ffffff;
+  --card-inner:#f6f8fa;
+  --src-circle-bg: #eaf0f6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.25s, color 0.25s;
+}
+
+/* ─── Header ─── */
+header {
+  padding: 12px 22px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 100;
+  transition: background 0.25s, border-color 0.25s;
+}
+header h1 { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+
+.tabs { display: flex; gap: 5px; }
+.tab {
+  padding: 5px 14px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--text2);
+  cursor: pointer; font-size: 0.78rem;
+  transition: all 0.16s;
+}
+.tab.active, .tab:hover { background: var(--blue); border-color: var(--blue); color: white; }
+
+/* ─── Theme Toggle ─── */
+.theme-toggle {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: pointer; font-size: 0.78rem; font-weight: 600;
+  transition: all 0.2s;
+  user-select: none;
+}
+.theme-toggle:hover { border-color: var(--blue); color: var(--blue); }
+.toggle-icon { font-size: 0.95rem; }
+
+/* ─── Scenes ─── */
+.scene { display: none; padding: 20px 24px; }
+.scene.active { display: block; }
+
+/* ─── 通用卡片 ─── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background 0.25s, border-color 0.25s;
+}
+.card-title {
+  padding: 10px 14px;
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase; letter-spacing: .08em;
+  background: var(--card-inner);
+  border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ─── 说明栏 ─── */
+.section-desc {
+  font-size: 0.8rem; color: var(--text2); line-height: 1.65;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border-radius: 8px;
+  border-left: 3px solid var(--blue);
+  transition: background 0.25s;
+}
+.hl  { color: var(--blue3); font-weight: 600; }
+code { color: var(--orange2); background: var(--bg3); padding: 1px 5px; border-radius: 3px; font-size: .9em; }
+
+/* ─── Scene 1: 单向绑定 ─── */
+.s1-grid { display: grid; grid-template-columns: 1fr auto 1fr; }
+.s1-col  { padding: 18px; }
+.s1-div  {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 16px 6px; gap: 8px;
+}
+.arr-v    { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.arr-shaft { width: 2px; height: 28px; background: linear-gradient(180deg, var(--blue), var(--blue3)); border-radius: 1px; }
+.arr-head  { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 9px solid var(--blue3); }
+.arr-lbl  { font-size: 0.62rem; color: var(--blue3); font-weight: 700; white-space: nowrap; }
+.arr-lbl.dim { color: var(--border); font-size: 0.58rem; }
+
+.src-box {
+  background: var(--card-inner);
+  border: 1px solid var(--border);
+  border-radius: 7px; padding: 12px;
+  transition: background 0.25s;
+}
+.src-key { font-size: 0.68rem; color: var(--text2); margin-bottom: 3px; }
+.src-val { font-size: 1rem; color: var(--blue3); font-weight: 700; font-family: monospace; }
+
+.dom-box {
+  background: var(--card-inner);
+  border: 1px dashed var(--border);
+  border-radius: 7px; padding: 12px;
+  transition: border-color 0.3s, background 0.25s;
+}
+.dom-box.flash { border-color: var(--blue3); box-shadow: 0 0 10px rgba(31,111,235,.25); }
+.dom-lbl  { font-size: 0.68rem; color: var(--text2); margin-bottom: 5px; }
+.dom-val  { font-size: 0.95rem; color: var(--text); }
+
+.ctrl-row { display: flex; gap: 7px; margin-top: 12px; flex-wrap: wrap; }
+.btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.77rem; font-weight: 600; transition: all 0.16s; }
+.btn-blue  { background: var(--blue); color: white; }
+.btn-blue:hover { background: var(--blue2); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+
+.log-box {
+  margin-top: 12px;
+  background: var(--card-inner);
+  border: 1px solid var(--border2);
+  border-radius: 5px; padding: 8px 10px;
+  font-size: 0.68rem; font-family: monospace;
+  color: var(--green); min-height: 44px; max-height: 72px; overflow-y: auto;
+  transition: background 0.25s;
+}
+.bdg-green  { background: rgba(63,185,80,.12); color: var(--green); font-size: 0.67rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+.bdg-orange { background: rgba(240,136,62,.12); color: var(--orange2); font-size: 0.67rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+
+/* ─── Scene 2: 双向绑定 ─── */
+.input-styled {
+  width: 100%; padding: 9px 11px;
+  border-radius: 7px; border: 1.5px solid var(--border);
+  background: var(--input-bg); color: var(--text);
+  font-size: 0.85rem; outline: none;
+  transition: border-color 0.2s, background 0.25s;
+}
+.input-styled:focus { border-color: var(--blue); }
+
+.data-mirror {
+  margin-top: 10px;
+  background: var(--card-inner); border: 1px solid var(--border);
+  border-radius: 7px; padding: 10px;
+  transition: background 0.25s;
+}
+.mir-key { font-size: 0.68rem; color: var(--text2); margin-bottom: 2px; }
+.mir-val { font-size: 0.92rem; color: var(--orange2); font-family: monospace; font-weight: 700; word-break: break-all; min-height: 20px; }
+
+pre.code-block {
+  background: var(--pre-bg);
+  border-radius: 6px; padding: 12px;
+  font-size: 0.7rem; color: var(--code-fg);
+  line-height: 1.75; white-space: pre-wrap;
+  font-family: 'Cascadia Code', 'Courier New', monospace;
+  border: 1px solid var(--border2);
+  transition: background 0.25s, color 0.25s;
+}
+
+/* ─── Scene 3: 响应式 ─── */
+.reactive-card {
+  background: var(--card-inner);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px;
+  text-align: center;
+  transition: box-shadow 0.3s, border-color 0.3s, background 0.25s;
+}
+.reactive-card.pulse { border-color: var(--orange); box-shadow: 0 0 14px rgba(240,136,62,.35); }
+.rc-icon  { font-size: 1.8rem; margin-bottom: 6px; }
+.rc-label { font-size: 0.72rem; color: var(--text2); margin-bottom: 5px; }
+.rc-value { font-size: 1.2rem; font-weight: 700; color: var(--blue3); font-family: monospace; }
+
+.src-circle {
+  width: 78px; height: 78px;
+  border-radius: 50%;
+  background: var(--src-circle-bg);
+  border: 2px solid var(--blue2);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.14s, box-shadow 0.2s, background 0.25s;
+}
+.src-circle:hover { transform: scale(1.06); box-shadow: 0 0 18px rgba(56,139,253,.35); }
+.sc-val { font-size: 1.35rem; font-weight: 700; color: var(--blue3); }
+.sc-lbl { font-size: 0.58rem; color: var(--text2); }
+
+/* ─── Scene 4: 综合演示 ─── */
+.demo-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.field-row { margin-bottom: 10px; }
+.field-label { font-size: 0.72rem; color: var(--text2); margin-bottom: 3px; }
+.field-input {
+  width: 100%; padding: 8px 11px;
+  border-radius: 6px; border: 1.5px solid var(--border);
+  background: var(--input-bg); color: var(--text);
+  font-size: 0.82rem; outline: none;
+  transition: border-color 0.2s, background 0.25s;
+}
+.field-input:focus { border-color: var(--blue); }
+select.field-input { cursor: pointer; }
+textarea.field-input { resize: vertical; }
+
+.preview-card {
+  background: var(--card-inner);
+  border-radius: 9px; padding: 16px;
+  border: 1px solid var(--border);
+  transition: border-color 0.3s, background 0.25s;
+}
+.preview-card.updated { border-color: var(--green); }
+.preview-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.35rem; margin-bottom: 9px;
+  transition: background 0.3s;
+}
+.preview-name { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 3px; min-height: 22px; }
+.preview-role { font-size: 0.77rem; color: var(--text2); margin-bottom: 7px; min-height: 17px; }
+.preview-bio  { font-size: 0.75rem; color: var(--text2); line-height: 1.5; min-height: 34px; }
+
+.json-view {
+  background: var(--card-inner);
+  border: 1px solid var(--border2); border-radius: 6px;
+  padding: 11px; font-family: monospace;
+  font-size: 0.7rem; line-height: 1.7;
+  margin-top: 10px; max-height: 130px; overflow-y: auto;
+  transition: background 0.25s;
+}
+.jk { color: var(--code-fg); }
+.jv { color: var(--code-val); }
+.js { color: var(--code-str); }
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:1.3rem">⚡</span>
+  <h1>动态数据绑定 · 交互教学</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">单向绑定</button>
+    <button class="tab" onclick="switchTab(1)">双向绑定</button>
+    <button class="tab" onclick="switchTab(2)">响应式原理</button>
+    <button class="tab" onclick="switchTab(3)">综合演示</button>
+  </div>
+  <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">
+    <span class="toggle-icon" id="toggleIcon">🌙</span>
+    <span id="toggleLabel">暗色</span>
+  </button>
+</header>
+
+<!-- ═══ Scene 1: 单向绑定 ═══ -->
+<div class="scene active" id="s1">
+  <p class="section-desc">
+    <span class="hl">单向绑定</span>：数据 → 视图。数据源变化会自动更新 DOM，但用户操作 DOM
+    <em>不会</em>反向修改数据。适合展示只读信息（用户名、状态等）。
+  </p>
+  <div class="card">
+    <div class="card-title">📊 单向数据流演示</div>
+    <div class="s1-grid">
+      <!-- 左：数据源 -->
+      <div class="s1-col">
+        <div style="font-size:.72rem;color:var(--text2);margin-bottom:9px;font-weight:600">DATA（数据层）</div>
+        <div class="src-box">
+          <div class="src-key">data.username</div>
+          <div class="src-val" id="srcUsername">"游客"</div>
+        </div>
+        <div class="src-box" style="margin-top:9px">
+          <div class="src-key">data.score</div>
+          <div class="src-val" id="srcScore">0</div>
+        </div>
+        <div class="ctrl-row">
+          <button class="btn btn-blue" onclick="setUser('Alice')">设为 Alice</button>
+          <button class="btn btn-blue" onclick="setUser('Bob')">设为 Bob</button>
+          <button class="btn btn-ghost" onclick="addScore()">+10 分</button>
+        </div>
+        <div class="log-box" id="logBox">// 操作日志</div>
+      </div>
+      <!-- 中：箭头 -->
+      <div class="s1-div">
+        <div class="arr-lbl">:value</div>
+        <div class="arr-v"><div class="arr-shaft"></div><div class="arr-head"></div></div>
+        <div class="arr-lbl dim">单向 →</div>
+        <div style="height:14px"></div>
+        <div class="arr-lbl">v-bind</div>
+        <div class="arr-v"><div class="arr-shaft"></div><div class="arr-head"></div></div>
+      </div>
+      <!-- 右：DOM -->
+      <div class="s1-col">
+        <div style="font-size:.72rem;color:var(--text2);margin-bottom:9px;font-weight:600">DOM（视图层）</div>
+        <div class="dom-box" id="domUsername">
+          <div class="dom-lbl">&lt;span :text="username"&gt;</div>
+          <div class="dom-val" id="renderUsername">游客</div>
+        </div>
+        <div class="dom-box" style="margin-top:9px" id="domScore">
+          <div class="dom-lbl">&lt;div :text="score"&gt;</div>
+          <div class="dom-val" id="renderScore" style="color:var(--orange);font-weight:700">0 分</div>
+        </div>
+        <div style="margin-top:12px;background:var(--card-inner);border-radius:7px;padding:10px;font-size:.72rem;color:var(--text2);line-height:1.6;border:1px solid var(--border2)">
+          💡 试着修改 DOM 内容——无法影响左侧数据。<br>
+          <span class="bdg-green">只读视图</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Scene 2: 双向绑定 ═══ -->
+<div class="scene" id="s2">
+  <p class="section-desc">
+    <span class="hl">双向绑定（v-model）</span>：数据 ↔ 视图同步。输入框内容改变时数据更新，数据变化时输入框也更新。
+    <code>v-model</code> = <code>:value</code> + <code>@input</code> 的语法糖。
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card">
+      <div class="card-title">⌨️ 视图层（Input）</div>
+      <div style="padding:14px">
+        <div class="field-row">
+          <div class="field-label">昵称 <span class="bdg-orange">v-model</span></div>
+          <input class="input-styled" id="twNick" placeholder="输入昵称…" oninput="twUpdate('nick',this.value)"/>
+        </div>
+        <div class="field-row">
+          <div class="field-label">邮箱 <span class="bdg-orange">v-model</span></div>
+          <input class="input-styled" id="twEmail" type="email" placeholder="输入邮箱…" oninput="twUpdate('email',this.value)"/>
+        </div>
+        <div class="field-row">
+          <div class="field-label">心情 <span class="bdg-orange">v-model</span></div>
+          <input class="input-styled" id="twMood" placeholder="此刻心情…" oninput="twUpdate('mood',this.value)"/>
+        </div>
+        <div class="ctrl-row">
+          <button class="btn btn-blue" onclick="twFill()">从数据注入</button>
+          <button class="btn btn-ghost" onclick="twClear()">清空</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💾 数据层（reactive）</div>
+      <div style="padding:14px">
+        <div class="data-mirror"><div class="mir-key">form.nick</div><div class="mir-val" id="mirNick">""</div></div>
+        <div class="data-mirror" style="margin-top:7px"><div class="mir-key">form.email</div><div class="mir-val" id="mirEmail">""</div></div>
+        <div class="data-mirror" style="margin-top:7px"><div class="mir-key">form.mood</div><div class="mir-val" id="mirMood">""</div></div>
+        <div style="margin-top:12px;font-size:.7rem;color:var(--text2);line-height:1.7">
+          🔄 数据实时同步<br>
+          点击「从数据注入」观察 <span class="hl">反向更新</span> 输入框
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 原理拆解 -->
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">🔬 v-model 原理拆解</div>
+    <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-size:.72rem;color:var(--text2);margin-bottom:7px">语法糖写法</div>
+        <pre class="code-block">&lt;input v-model="form.nick" /&gt;</pre>
+      </div>
+      <div>
+        <div style="font-size:.72rem;color:var(--text2);margin-bottom:7px">等价展开</div>
+        <pre class="code-block">&lt;input
+  :value="form.nick"
+  @input="form.nick =
+    $event.target.value"
+/&gt;</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Scene 3: 响应式原理 ═══ -->
+<div class="scene" id="s3">
+  <p class="section-desc">
+    <span class="hl">响应式原理</span>：Vue 3 使用 <code>Proxy</code> 拦截对象读写。当数据变化时，所有依赖该数据的组件自动重新渲染。
+    点击中心数据源，观察所有订阅组件同步更新。
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 170px 1fr;gap:14px;align-items:center">
+    <!-- 左侧组件 -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="reactive-card" id="rc0">
+        <div class="rc-icon">👤</div>
+        <div class="rc-label">UserCard 组件</div>
+        <div class="rc-value" id="rcv0">count: 0</div>
+      </div>
+      <div class="reactive-card" id="rc1">
+        <div class="rc-icon">📊</div>
+        <div class="rc-label">Chart 组件</div>
+        <div class="rc-value" id="rcv1">data: 0</div>
+      </div>
+    </div>
+    <!-- 中心数据源 -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div style="font-size:.68rem;color:var(--text2);font-weight:700;text-align:center">reactive()</div>
+      <div class="src-circle" id="srcCircle" onclick="reactiveUpdate()">
+        <div class="sc-val" id="scVal">0</div>
+        <div class="sc-lbl">点击 +1</div>
+      </div>
+      <div style="font-size:.62rem;color:var(--text3);text-align:center;line-height:1.5">Proxy 拦截<br>set 触发更新</div>
+    </div>
+    <!-- 右侧组件 -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="reactive-card" id="rc2">
+        <div class="rc-icon">🔔</div>
+        <div class="rc-label">Notification 组件</div>
+        <div class="rc-value" id="rcv2">msg: 0</div>
+      </div>
+      <div class="reactive-card" id="rc3">
+        <div class="rc-icon">🛒</div>
+        <div class="rc-label">Cart 组件</div>
+        <div class="rc-value" id="rcv3">items: 0</div>
+      </div>
+    </div>
+  </div>
+  <!-- 伪代码 -->
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">💡 Proxy 响应式伪代码</div>
+    <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <pre class="code-block">// Vue 3 reactive 核心原理
+function reactive(obj) {
+  return new Proxy(obj, {
+    get(target, key) {
+      track(target, key) // 收集依赖
+      return target[key]
+    },
+    set(target, key, val) {
+      target[key] = val
+      trigger(target, key) // 触发更新
+      return true
+    }
+  })
+}</pre>
+      <pre class="code-block">// 依赖收集 & 触发
+const deps = new Map()
+
+function track(target, key) {
+  // 记录"谁在使用这个数据"
+  deps.set(key, currentEffect)
+}
+
+function trigger(target, key) {
+  // 通知所有依赖方重新执行
+  const effect = deps.get(key)
+  effect?.() // 重新渲染组件
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Scene 4: 综合演示 ═══ -->
+<div class="scene" id="s4">
+  <p class="section-desc">
+    <span class="hl">综合演示</span>：填写左侧表单，右侧用户卡片和 JSON 数据实时同步更新。体验完整的数据绑定闭环。
+  </p>
+  <div class="demo-layout">
+    <!-- 表单 -->
+    <div class="card">
+      <div class="card-title">📝 编辑表单（双向绑定）</div>
+      <div style="padding:14px">
+        <div class="field-row">
+          <div class="field-label">用户名</div>
+          <input class="field-input" id="dName" placeholder="输入用户名…" oninput="dUpdate()"/>
+        </div>
+        <div class="field-row">
+          <div class="field-label">职位</div>
+          <select class="field-input" id="dRole" onchange="dUpdate()">
+            <option value="">-- 选择职位 --</option>
+            <option>前端工程师</option>
+            <option>后端工程师</option>
+            <option>全栈工程师</option>
+            <option>产品经理</option>
+            <option>UI 设计师</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field-label">头像颜色</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="colorPicker">
+            <div onclick="setColor('#1f6feb','🧑‍💻')" style="width:26px;height:26px;border-radius:50%;background:#1f6feb;cursor:pointer;border:2px solid transparent" class="co"></div>
+            <div onclick="setColor('#3fb950','🌱')" style="width:26px;height:26px;border-radius:50%;background:#3fb950;cursor:pointer;border:2px solid transparent" class="co"></div>
+            <div onclick="setColor('#f0883e','🎨')" style="width:26px;height:26px;border-radius:50%;background:#f0883e;cursor:pointer;border:2px solid transparent" class="co"></div>
+            <div onclick="setColor('#bc8cff','✨')" style="width:26px;height:26px;border-radius:50%;background:#bc8cff;cursor:pointer;border:2px solid transparent" class="co"></div>
+            <div onclick="setColor('#ff7b72','❤️')" style="width:26px;height:26px;border-radius:50%;background:#ff7b72;cursor:pointer;border:2px solid transparent" class="co"></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">个人简介</div>
+          <textarea class="field-input" id="dBio" rows="3" placeholder="介绍一下自己…" oninput="dUpdate()"></textarea>
+        </div>
+      </div>
+    </div>
+    <!-- 预览 + JSON -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="card-title">👁️ 实时预览（单向渲染）</div>
+        <div style="padding:14px">
+          <div class="preview-card" id="previewCard">
+            <div class="preview-avatar" id="prevAvatar" style="background:#1f6feb">🧑‍💻</div>
+            <div class="preview-name" id="prevName">（未填写）</div>
+            <div class="preview-role" id="prevRole">职位未设置</div>
+            <div class="preview-bio"  id="prevBio">暂无简介</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔍 响应式数据（JSON）</div>
+        <div style="padding:10px">
+          <div class="json-view" id="jsonView">
+<span class="jk">{</span>
+  <span class="jk">"name"</span>: <span class="jv">""</span>,
+  <span class="jk">"role"</span>: <span class="jv">""</span>,
+  <span class="jk">"bio"</span>:  <span class="jv">""</span>,
+  <span class="jk">"color"</span>: <span class="js">"#1f6feb"</span>
+<span class="jk">}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Scene 1: 单向绑定 ── */
+let logLines = []
+function log(msg) {
+  logLines.unshift('> ' + msg)
+  if (logLines.length > 6) logLines.pop()
+  document.getElementById('logBox').textContent = logLines.join('\n')
+}
+function setUser(name) {
+  document.getElementById('srcUsername').textContent = `"${name}"`
+  flash('domUsername')
+  document.getElementById('renderUsername').textContent = name
+  log(`data.username = "${name}" → DOM 更新`)
+}
+function addScore() {
+  const el = document.getElementById('srcScore')
+  const v = parseInt(el.textContent) + 10
+  el.textContent = v
+  flash('domScore')
+  document.getElementById('renderScore').textContent = v + ' 分'
+  log(`data.score += 10 → ${v} → DOM 更新`)
+}
+function flash(id) {
+  const el = document.getElementById(id)
+  el.classList.add('flash')
+  setTimeout(() => el.classList.remove('flash'), 600)
+}
+
+/* ── Scene 2: 双向绑定 ── */
+function twUpdate(key, val) {
+  const k = key.charAt(0).toUpperCase() + key.slice(1)
+  const el = document.getElementById('mir' + k)
+  if (el) el.textContent = val ? `"${val}"` : '""'
+}
+function twFill() {
+  const data = { nick: 'Vue Master', email: 'hello@vue.dev', mood: '写代码真快乐 🎉' }
+  Object.entries(data).forEach(([k, v]) => {
+    const K = k.charAt(0).toUpperCase() + k.slice(1)
+    document.getElementById('tw' + K).value = v
+    twUpdate(k, v)
+  })
+}
+function twClear() {
+  ;['Nick','Email','Mood'].forEach(K => {
+    document.getElementById('tw' + K).value = ''
+    twUpdate(K.toLowerCase(), '')
+  })
+}
+
+/* ── Scene 3: 响应式原理 ── */
+let reactCount = 0
+function reactiveUpdate() {
+  reactCount++
+  document.getElementById('scVal').textContent = reactCount
+  const circ = document.getElementById('srcCircle')
+  circ.style.boxShadow = '0 0 20px rgba(56,139,253,.6)'
+  setTimeout(() => { circ.style.boxShadow = '' }, 380)
+  const labels = ['count', 'data', 'msg', 'items']
+  ;[0,1,2,3].forEach((i, idx) => {
+    setTimeout(() => {
+      document.getElementById(`rcv${i}`).textContent = `${labels[i]}: ${reactCount}`
+      const card = document.getElementById(`rc${i}`)
+      card.classList.add('pulse')
+      setTimeout(() => card.classList.remove('pulse'), 600)
+    }, idx * 75)
+  })
+}
+
+/* ── Scene 4: 综合演示 ── */
+let dColor = '#1f6feb', dEmoji = '🧑‍💻'
+function setColor(c, e) { dColor = c; dEmoji = e; demoUpdate() }
+function dUpdate() { demoUpdate() }
+function demoUpdate() {
+  const name = document.getElementById('dName').value
+  const role = document.getElementById('dRole').value
+  const bio  = document.getElementById('dBio').value
+  document.getElementById('prevName').textContent = name || '（未填写）'
+  document.getElementById('prevRole').textContent = role || '职位未设置'
+  document.getElementById('prevBio').textContent  = bio  || '暂无简介'
+  const av = document.getElementById('prevAvatar')
+  av.style.background = dColor; av.textContent = dEmoji
+  const card = document.getElementById('previewCard')
+  card.classList.add('updated')
+  setTimeout(() => card.classList.remove('updated'), 380)
+  document.getElementById('jsonView').innerHTML =
+    `<span class="jk">{</span>
+  <span class="jk">"name"</span>:  <span class="jv">"${esc(name)}"</span>,
+  <span class="jk">"role"</span>:  <span class="jv">"${esc(role)}"</span>,
+  <span class="jk">"bio"</span>:   <span class="jv">"${esc(bio)}"</span>,
+  <span class="jk">"color"</span>: <span class="js">"${dColor}"</span>,
+  <span class="jk">"emoji"</span>: <span class="jv">"${dEmoji}"</span>
+<span class="jk">}</span>`
+}
+function esc(s) { return (s||'').replace(/"/g,'\\"').slice(0,40) }
+
+/* ── 标签页切换 ── */
+function switchTab(idx) {
+  document.querySelectorAll('.scene').forEach((el,i) => el.classList.toggle('active', i===idx))
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', i===idx))
+}
+
+/* ══════════════════════════════════════════
+   主题系统
+══════════════════════════════════════════ */
+const THEME_KEY = 'wxmp-theme'
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme)
+  document.getElementById('toggleIcon').textContent  = theme === 'dark' ? '🌙' : '☀️'
+  document.getElementById('toggleLabel').textContent = theme === 'dark' ? '暗色' : '亮色'
+  // 通知同源页面 & 父级 iframe
+  window.dispatchEvent(new CustomEvent('wxmp-theme-change', { detail: { theme } }))
+  try { window.parent !== window && window.parent.postMessage({ type: 'wxmp-theme-change', theme }, '*') } catch(_) {}
+}
+
+function toggleTheme() {
+  const next = (localStorage.getItem(THEME_KEY) || 'dark') === 'dark' ? 'light' : 'dark'
+  localStorage.setItem(THEME_KEY, next)
+  applyTheme(next)
+}
+
+// 跨标签页同步
+window.addEventListener('storage', e => {
+  if (e.key === THEME_KEY && e.newValue) applyTheme(e.newValue)
+})
+// 接收父级 iframe 消息
+window.addEventListener('message', e => {
+  if (e.data?.type === 'wxmp-theme-change' && e.data.theme) {
+    localStorage.setItem(THEME_KEY, e.data.theme)
+    applyTheme(e.data.theme)
+  }
+})
+
+/* ── 初始化 ── */
+applyTheme(localStorage.getItem(THEME_KEY) || 'dark')
+</script>
+</body>
+</html>
