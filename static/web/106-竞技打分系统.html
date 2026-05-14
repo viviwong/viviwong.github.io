@@ -508,10 +508,7 @@ tr:hover td{background:rgba(88,166,255,.04);}
           </div>
           <div class="form-group">
             <label class="form-label">设置新课程密码</label>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input class="input" id="courseNewPwd" type="password" placeholder="输入新密码后点击更新" style="flex:1;">
-              <button type="button" onclick="togglePwdVisible('courseNewPwd','eyeCoursePwd')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--sub);padding:4px;line-height:1;" title="显示/隐藏密码"><span id="eyeCoursePwd">🙈</span></button>
-            </div>
+            <input class="input" id="courseNewPwd" type="password" placeholder="输入新密码后点击更新">
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="updateCoursePwd()">🔄 更新课程密码</button>
@@ -1661,12 +1658,27 @@ function refreshCoursePwdStatus() {
   }
 }
 
+// 遮罩密码显示：点眼睛切换明文/星号
+function makeMaskedPwd(pwd, spanId, btnId) {
+  const masked = '•'.repeat(pwd.length);
+  return '<span id="' + spanId + '" style="font-weight:700;color:var(--primary);letter-spacing:2px;font-family:monospace;">' + masked + '</span>' +
+    '<button type="button" id="' + btnId + '" onclick="toggleMaskedPwd(\'' + spanId + '\',\'' + btnId + '\',\'' + encodeURIComponent(pwd) + '\')" ' +
+    'style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--sub);padding:0 4px;line-height:1;vertical-align:middle;" title="显示/隐藏密码">🙈</button>';
+}
+function toggleMaskedPwd(spanId, btnId, encodedPwd) {
+  const span = document.getElementById(spanId);
+  const btn = document.getElementById(btnId);
+  const pwd = decodeURIComponent(encodedPwd);
+  const isHidden = span.textContent.includes('•');
+  span.textContent = isHidden ? pwd : '•'.repeat(pwd.length);
+  btn.textContent = isHidden ? '👁' : '🙈';
+}
+
 async function updateCoursePwd() {
   const pwd = document.getElementById('courseNewPwd').value.trim();
   if (!pwd) { toast('请输入新密码', 'error'); return; }
   const hash = await sha256(pwd);
   localStorage.setItem(COURSE_PWD_KEY, hash);
-  // 清除所有已解锁状态，强制重新验证
   localStorage.removeItem(COURSE_UNLOCK_KEY);
   document.getElementById('courseNewPwd').value = '';
   refreshCoursePwdStatus();
@@ -1674,8 +1686,8 @@ async function updateCoursePwd() {
   result.style.display = 'block';
   result.innerHTML =
     '✅ <strong>课程密码已更新</strong><br>' +
-    '新密码：<strong style="color:var(--primary);">' + pwd + '</strong>（请告知就业班学员）<br>' +
-    '所有已解锁的浏览器将在下次访问时要求重新输入密码。';
+    '新密码：' + makeMaskedPwd(pwd, 'maskedNewPwd', 'eyeNewPwd') + ' （请告知就业班学员）<br>' +
+    '<span style="color:var(--sub);font-size:12px;">所有已解锁的浏览器将在下次访问时要求重新输入密码。</span>';
   toast('课程密码已更新', 'success');
 }
 
@@ -1686,7 +1698,10 @@ function resetCoursePwd() {
   refreshCoursePwdStatus();
   const result = document.getElementById('coursePwdResult');
   result.style.display = 'block';
-  result.innerHTML = '↩ <strong>已恢复默认密码（66386638）</strong><br>所有已解锁的浏览器将在下次访问时要求重新输入密码。';
+  result.innerHTML =
+    '↩ <strong>已恢复默认密码</strong><br>' +
+    '默认密码：' + makeMaskedPwd('66386638', 'maskedDefaultPwd', 'eyeDefaultPwd') + ' （请告知就业班学员）<br>' +
+    '<span style="color:var(--sub);font-size:12px;">所有已解锁的浏览器将在下次访问时要求重新输入密码。</span>';
   toast('已恢复默认密码', 'success');
 }
 
