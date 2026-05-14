@@ -1,616 +1,1744 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 生活助手 · 4 天实训交互教学（含沙盒工具）</title>
+<link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
+<title>AI 生活助手 · 5天实训交互教学文档</title>
 <style>
 :root{
-  --blue:#2563eb;--blue-light:#dbeafe;--green:#16a34a;--green-light:#dcfce7;
-  --orange:#ea580c;--orange-light:#ffedd5;--red:#dc2626;--red-light:#fee2e2;
-  --purple:#7c3aed;--purple-light:#ede9fe;--gray:#334155;--gray-light:#f1f5f9;
-  --bg:#f6f7fb;--card:#fff;--shadow:0 10px 30px rgba(15,23,42,.08);
+  --blue:#1976D2;--blue-light:#E3F2FD;--green:#388E3C;--green-light:#E8F5E9;
+  --orange:#F57C00;--orange-light:#FFF3E0;--red:#C62828;--red-light:#FFEBEE;
+  --purple:#6A1B9A;--purple-light:#F3E5F5;--gray:#455A64;--gray-light:#ECEFF1;
+  --bg:#F5F7FA;--white:#fff;--shadow:0 2px 12px rgba(0,0,0,.10);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Microsoft YaHei',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#0f172a;line-height:1.75}
-nav{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#312e81,#0ea5e9);color:#fff;display:flex;align-items:center;padding:0 16px;height:56px;box-shadow:0 8px 24px rgba(2,6,23,.25)}
-nav .logo{font-weight:800;margin-right:16px;white-space:nowrap;font-size:15px}
-nav .tabs{display:flex;gap:6px;overflow-x:auto;flex:1}
-nav .tabs button{background:transparent;border:none;color:rgba(255,255,255,.78);padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12px;white-space:nowrap}
-nav .tabs button.active,nav .tabs button:hover{background:rgba(255,255,255,.16);color:#fff}
-.container{max-width:1200px;margin:0 auto;padding:18px 14px 40px}
-.section{display:none;animation:fade .25s ease}
+body{font-family:'Microsoft YaHei',Arial,sans-serif;background:var(--bg);color:#263238;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#4527A0,#1565C0);color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+nav .logo{font-size:16px;font-weight:700;margin-right:20px;white-space:nowrap}
+nav .tabs{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav .tabs button{background:transparent;border:none;color:rgba(255,255,255,.7);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;transition:.2s}
+nav .tabs button.active,nav .tabs button:hover{background:rgba(255,255,255,.18);color:#fff}
+.container{max-width:1200px;margin:0 auto;padding:20px 14px}
+.section{display:none;animation:fadeIn .3s ease}
 .section.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:18px;margin:14px 0;border:1px solid rgba(148,163,184,.22)}
-.card h2{font-size:18px;color:#1e3a8a;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+.card h2{font-size:18px;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .card h3{font-size:15px;color:var(--gray);margin:14px 0 8px;font-weight:700}
-.hero{background:radial-gradient(120% 120% at 10% 10%,#eef2ff,#fff);border:1px solid rgba(99,102,241,.18);border-radius:16px;padding:22px 18px;margin:10px 0}
-.hero h1{font-size:22px;font-weight:900;color:#0f172a;margin-bottom:8px}
-.hero p{color:#475569;font-size:14px;max-width:900px}
-.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.hero{background:linear-gradient(135deg,#4527A0 0%,#1565C0 50%,#0288D1 100%);color:#fff;border-radius:16px;padding:36px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.88;max-width:700px}
+.hero .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hero .tag{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:12px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600}
 .badge.blue{background:var(--blue-light);color:var(--blue)}
 .badge.green{background:var(--green-light);color:var(--green)}
 .badge.orange{background:var(--orange-light);color:var(--orange)}
+.badge.red{background:var(--red-light);color:var(--red)}
 .badge.purple{background:var(--purple-light);color:var(--purple)}
-.tip{border-left:4px solid;border-radius:0 10px 10px 0;padding:10px 12px;margin:10px 0;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{background:var(--blue);color:#fff;padding:9px 10px;text-align:left}
+td{padding:8px 10px;border-bottom:1px solid #e8ecf0}
+tr:nth-child(even) td{background:#f7f9fc}
+tr:hover td{background:var(--blue-light)}
+pre{background:#1E2A3A;color:#E8F4FD;border-radius:10px;padding:16px;overflow-x:auto;font-size:12.5px;line-height:1.6;margin:10px 0;position:relative}
+pre .copy-btn{position:absolute;right:8px;top:8px;background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 9px;border-radius:5px;cursor:pointer;font-size:11px}
+pre .copy-btn:hover{background:rgba(255,255,255,.3)}
+code{background:#EEF2FF;color:#3730A3;padding:2px 6px;border-radius:4px;font-size:12.5px}
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:14px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-num{counter-increment:step;min-width:34px;height:34px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-num::before{content:counter(step)}
+.step-body{flex:1}
+.step-body h4{font-size:14px;font-weight:700;margin-bottom:5px;color:#1a237e}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:14px 0}
+.flow-node{background:var(--blue);color:#fff;padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;min-width:80px}
+.flow-node.green{background:var(--green)}
+.flow-node.orange{background:var(--orange)}
+.flow-node.purple{background:var(--purple)}
+.flow-node.red{background:var(--red)}
+.flow-node.gray{background:var(--gray)}
+.flow-arrow{padding:0 6px;color:#90A4AE;font-size:18px;font-weight:700}
+.tip{border-left:4px solid;border-radius:0 8px 8px 0;padding:11px 14px;margin:10px 0;font-size:13px}
 .tip.blue{border-color:var(--blue);background:var(--blue-light)}
+.tip.green{border-color:var(--green);background:var(--green-light)}
 .tip.orange{border-color:var(--orange);background:var(--orange-light)}
 .tip.red{border-color:var(--red);background:var(--red-light)}
-.tip strong{display:block;margin-bottom:4px}
-table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
-th{background:#1e293b;color:#fff;padding:9px 10px;text-align:left}
-td{padding:8px 10px;border-bottom:1px solid #e8edf3}
-tr:nth-child(even) td{background:#f8fafc}
-pre{background:#0b1220;color:#e2e8f0;border-radius:12px;padding:14px;overflow:auto;font-size:12.5px;line-height:1.55}
-code{background:#eef2ff;color:#312e81;padding:2px 6px;border-radius:4px;font-size:12.5px}
-.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
-.day-tab{padding:8px 14px;border:2px solid #2563eb;border-radius:10px;background:#fff;color:#2563eb;cursor:pointer;font-weight:800;font-size:13px}
-.day-tab.active{background:#2563eb;color:#fff}
-.day-pane{display:none}
-.day-pane.active{display:block}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}}
-label{display:block;font-size:12px;color:#475569;font-weight:700;margin:8px 0 4px}
-input,select,textarea{width:100%;padding:10px 10px;border-radius:10px;border:1px solid rgba(148,163,184,.55);background:#fff;font-size:13px}
-textarea{min-height:110px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.row > *{flex:1;min-width:220px}
-button.primary{background:linear-gradient(90deg,#6366f1,#0ea5e9);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:900;cursor:pointer}
-button.secondary{background:#fff;border:1px solid rgba(148,163,184,.55);padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}
-.pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#f1f5f9;font-size:12px;color:#0f172a;font-weight:700}
-.phone{width:min(420px,92vw);margin:0 auto;border-radius:26px;border:10px solid #0f172a;background:#0f172a;box-shadow:0 24px 60px rgba(2,6,23,.35);overflow:hidden}
-.phone .notch{height:14px;display:flex;align-items:center;justify-content:center}
-.phone .notch span{width:120px;height:6px;background:#334155;border-radius:999px}
-.phone .screen{height:640px;background:linear-gradient(180deg,#f8fafc,#eef2ff);padding:10px;overflow:auto}
-.mp-tabbar{display:flex;border-top:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.92)}
-.mp-tab{flex:1;text-align:center;padding:10px 6px;font-size:12px;color:#64748b;font-weight:800;cursor:pointer}
-.mp-tab.active{color:#4f46e5}
-.mp-page{display:none}
+.tip.purple{border-color:var(--purple);background:var(--purple-light)}
+.tip strong{display:block;margin-bottom:3px}
+.progress-bar{background:#e0e0e0;border-radius:10px;height:7px;margin:6px 0}
+.progress-bar .fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--green))}
+.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.day-tab{padding:8px 18px;border:2px solid var(--blue);border-radius:8px;background:#fff;color:var(--blue);cursor:pointer;font-weight:700;font-size:13px;transition:.2s}
+.day-tab.active,.day-tab:hover{background:var(--blue);color:#fff}
+.day-content{display:none}
+.day-content.active{display:block}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.mini-card{background:var(--white);border:1px solid #e0e0e0;border-radius:10px;padding:14px}
+.mini-card h4{font-size:13px;font-weight:700;margin-bottom:6px}
+.hl-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.hl-box{flex:1;min-width:150px;border-radius:10px;padding:12px 14px;border:1px solid transparent}
+.hl-box.blue{background:var(--blue-light);border-color:#90CAF9}
+.hl-box.green{background:var(--green-light);border-color:#A5D6A7}
+.hl-box.orange{background:var(--orange-light);border-color:#FFCC80}
+.hl-box.purple{background:var(--purple-light);border-color:#CE93D8}
+.hl-box h4{font-size:12px;font-weight:700;margin-bottom:3px}
+.hl-box p{font-size:12px;color:#555}
+/* Sandbox */
+label{display:block;font-size:12px;color:#455A64;font-weight:700;margin:8px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border-radius:8px;border:1px solid #cfd8dc;background:#fff;font-size:13px;font-family:inherit}
+textarea{min-height:100px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.row>*{flex:1;min-width:180px}
+button.primary{background:linear-gradient(90deg,#5C6BC0,#1976D2);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+button.secondary{background:#fff;border:1px solid #cfd8dc;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+button.primary:hover{opacity:.9}
+button.secondary:hover{background:#f5f7fa}
+.vendor-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.vendor-tab{padding:7px 14px;border-radius:8px;border:1.5px solid #cfd8dc;background:#fff;cursor:pointer;font-weight:700;font-size:12px;transition:.2s}
+.vendor-tab.active{border-color:var(--purple);color:var(--purple);background:var(--purple-light)}
+.chat-box{border:1px solid #e0e0e0;border-radius:10px;height:320px;overflow-y:auto;padding:12px;background:#f9fafb;display:flex;flex-direction:column;gap:10px}
+.bubble{max-width:88%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.bubble.user{margin-left:auto;background:linear-gradient(135deg,#5C6BC0,#1976D2);color:#fff;border-radius:12px 12px 3px 12px}
+.bubble.ai{margin-right:auto;background:#fff;border:1px solid #e0e0e0;color:#263238;border-radius:12px 12px 12px 3px}
+.bubble.system{margin:0 auto;background:#fff3e0;border:1px dashed #ffcc80;color:#e65100;font-size:11px;border-radius:8px;text-align:center}
+.meta-box{background:#1E2A3A;color:#aed6f1;border-radius:8px;padding:10px 12px;font-size:11.5px;font-family:monospace;margin-top:8px}
+.kv{display:grid;grid-template-columns:100px 1fr;gap:4px 10px;font-size:12px}
+.kv .k{color:#78909C;font-weight:700}
+.kv .v{color:#CFD8DC;word-break:break-all}
+/* Phone */
+.phone{width:min(340px,88vw);margin:0 auto;border-radius:28px;border:10px solid #1a1a2e;background:#1a1a2e;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.phone-notch{height:16px;display:flex;align-items:center;justify-content:center}
+.phone-notch span{width:110px;height:6px;background:#2d2d44;border-radius:999px}
+.phone-screen{background:#f5f7fa;overflow:hidden;position:relative;height:560px}
+.mp-page{display:none;padding:10px;overflow-y:auto;height:100%}
 .mp-page.active{display:block}
-.mp-card{background:#fff;border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin:10px 0}
-.mp-title{font-weight:900;font-size:16px;margin-bottom:6px}
-.mp-sub{color:#64748b;font-size:12px;line-height:1.55}
-.chat{display:flex;flex-direction:column;gap:10px}
-.bubble{max-width:92%;padding:10px 12px;border-radius:14px;font-size:13px;white-space:pre-wrap}
-.bubble.user{margin-left:auto;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
-.bubble.ai{margin-right:auto;background:#fff;border:1px solid rgba(148,163,184,.35);color:#0f172a}
-.meta{font-size:12px;color:#cbd5e1;background:#0b1220;border-radius:12px;padding:10px;border:1px solid rgba(148,163,184,.25)}
-.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;font-size:12px;margin-top:6px}
-.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-.tabs2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.tabs2 button{padding:8px 10px;border-radius:10px;border:1px solid rgba(148,163,184,.55);background:#fff;cursor:pointer;font-weight:800;font-size:12px}
-.tabs2 button.active{border-color:#2563eb;color:#1d4ed8;background:#eff6ff}
-.small{font-size:12px;color:#64748b}
-.hr{height:1px;background:rgba(148,163,184,.35);margin:12px 0}
+.mp-tabbar{display:flex;border-top:1px solid #e0e0e0;background:#fff}
+.mp-tab{flex:1;text-align:center;padding:8px 4px;font-size:11px;color:#78909C;cursor:pointer;font-weight:700;transition:.2s}
+.mp-tab.active{color:#5C6BC0}
+.mp-nav{background:linear-gradient(135deg,#4527A0,#1565C0);color:#fff;padding:10px 14px;font-size:15px;font-weight:700}
+.mp-card{background:#fff;border-radius:12px;padding:12px;margin:8px 0;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.mp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.mp-icon{background:#fff;border-radius:12px;padding:10px;text-align:center;font-size:11px;color:#455A64;box-shadow:0 1px 4px rgba(0,0,0,.08);cursor:pointer}
+.mp-icon .ico{font-size:22px;margin-bottom:4px}
+.chat-mp{display:flex;flex-direction:column;gap:8px;padding:6px 0}
+.mp-bubble-u{margin-left:auto;max-width:85%;background:#5C6BC0;color:#fff;padding:8px 10px;border-radius:10px 10px 3px 10px;font-size:12px}
+.mp-bubble-a{margin-right:auto;max-width:85%;background:#fff;border:1px solid #e0e0e0;padding:8px 10px;border-radius:10px 10px 10px 3px;font-size:12px}
+.mp-input-row{display:flex;gap:6px;padding:8px;background:#fff;border-top:1px solid #e8ecf0}
+.mp-input-row input{flex:1;border:1px solid #cfd8dc;border-radius:18px;padding:6px 12px;font-size:12px;outline:none}
+.mp-input-row button{background:#5C6BC0;color:#fff;border:none;padding:6px 12px;border-radius:18px;font-size:12px;cursor:pointer}
+.mp-setting{font-size:13px}
+.mp-setting-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.mp-setting-row:last-child{border-bottom:none}
+.mp-toggle{width:44px;height:24px;border-radius:12px;background:#cfd8dc;position:relative;cursor:pointer;transition:.3s}
+.mp-toggle.on{background:#5C6BC0}
+.mp-toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.mp-toggle.on::after{left:23px}
+.typing-dots span{display:inline-block;width:6px;height:6px;background:#aaa;border-radius:50%;margin:0 2px;animation:bounce .8s infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.hr{height:1px;background:#eceff1;margin:14px 0}
+.code-tabs{display:flex;gap:0;margin-bottom:-1px}
+.code-tab{padding:6px 14px;border-radius:6px 6px 0 0;border:1px solid #2d3a4e;border-bottom:none;background:#162032;color:#78909C;cursor:pointer;font-size:12px;font-weight:700}
+.code-tab.active{background:#1E2A3A;color:#64B5F6}
+.code-pane{display:none}
+.code-pane.active{display:block}
+.tag-green{display:inline-block;background:#e8f5e9;color:#388E3C;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700}
+.tag-blue{display:inline-block;background:#e3f2fd;color:#1565C0;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700}
+.tag-orange{display:inline-block;background:#fff3e0;color:#e65100;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700}
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo">🎓 AI生活助手实训</div>
+  <a href="https://sykdl.com/" target="_blank" style="display:flex;align-items:center;flex-shrink:0;padding-right:14px;margin-right:14px;border-right:1px solid rgba(255,255,255,.3);line-height:0;">
+    <img src="/img/logo.png" alt="叩丁狼" style="height:28px;width:auto;border-radius:4px;">
+  </a>
+  <div class="logo">🤖 AI生活助手实训</div>
   <div class="tabs">
-    <button class="active" onclick="showSection('overview',this)">总览</button>
-    <button onclick="showSection('days',this)">4天课程</button>
-    <button onclick="showSection('lab-llm',this)">大模型沙盒</button>
-    <button onclick="showSection('lab-http',this)">HTTP调试</button>
-    <button onclick="showSection('lab-mp',this)">小程序原型</button>
-    <button onclick="showSection('refs',this)">域名/接口</button>
+    <button class="active" onclick="showSection('overview',this)">🏠 总览</button>
+    <button onclick="showSection('plan',this)">📅 5天课程</button>
+    <button onclick="showSection('sandbox',this)">🧠 大模型沙盒</button>
+    <button onclick="showSection('http',this)">🌐 HTTP调试</button>
+    <button onclick="showSection('proto',this)">📱 小程序原型</button>
+    <button onclick="showSection('code',this)">💻 代码参考</button>
+    <button onclick="showSection('refs',this)">🔗 接口速查</button>
   </div>
 </nav>
 
+<!-- ==================== OVERVIEW ==================== -->
 <div id="section-overview" class="section active">
-  <div class="container">
-    <div class="hero">
-      <h1>微信小程序 × 聚合数据 × 多厂商大模型：AI 生活助手实训</h1>
-      <p>本页是「教学讲义 + 课堂沙盒」一体化单文件：包含 4 天主线的学习目标、课堂组织建议、与浏览器端可交互的工具（Key 仅存本机 localStorage）。第 5 天以小程序上传/体验版部署为主。</p>
-      <div class="badge-row">
-        <span class="badge blue">WXML / WXSS / JS</span>
-        <span class="badge green">wx.request</span>
-        <span class="badge orange">juhe.cn</span>
-        <span class="badge purple">OpenAI兼容</span>
+<div class="container">
+
+<div class="hero">
+  <h1>🤖 微信小程序 × 聚合数据 × 多厂商大模型：AI 生活助手实训</h1>
+  <p>本页是「教学讲义 + 课堂沙盒」一体化单文件。包含完整 5 天主线内容、可交互大模型调用沙盒（Key 仅存本机 localStorage）、HTTP 调试工具、微信小程序界面原型交互演示，以及完整代码示例。</p>
+  <div class="tags">
+    <span class="tag">📱 微信小程序</span>
+    <span class="tag">🔗 聚合数据 juhe</span>
+    <span class="tag">🤖 DeepSeek / 千问 / Kimi / 豆包</span>
+    <span class="tag">🧩 OpenAI 兼容 API</span>
+    <span class="tag">💾 wx.storage 本地缓存</span>
+    <span class="tag">🚀 VibeCoding AI辅助开发</span>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="card">
+    <h2>🎯 5天学习目标</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day1：项目启动 + 基础页面</h4><p style="font-size:12px;color:#666">开发工具 · 项目结构 · 首页静态布局</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day2：多页面 + tabBar + 布局</h4><p style="font-size:12px;color:#666">导航系统 · Flex布局 · rpx单位</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day3：网络请求 + 聚合数据</h4><p style="font-size:12px;color:#666">wx.request · juhe API · Mock兜底</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day4：多模型AI对话</h4><p style="font-size:12px;color:#666">OpenAI兼容 · 4厂商配置 · 对话展示</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day5：上线部署 + 答辩</h4><p style="font-size:12px;color:#666">合法域名 · 发布流程 · 演示答辩</p></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📦 技术栈全景</h2>
+    <table>
+      <tr><th>层次</th><th>技术</th></tr>
+      <tr><td>前端框架</td><td>微信小程序原生 WXML/WXSS/JS</td></tr>
+      <tr><td>网络层</td><td>wx.request + Promise封装</td></tr>
+      <tr><td>数据服务</td><td>聚合数据 juhe.cn（新闻/天气/笑话/星座）</td></tr>
+      <tr><td>AI 对话</td><td>DeepSeek / 阿里千问 / Kimi / 字节豆包</td></tr>
+      <tr><td>本地存储</td><td>wx.setStorageSync（Key不写死在代码）</td></tr>
+      <tr><td>AI辅助开发</td><td>VibeCoding / Cursor AI</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>📁 推荐目录结构</h2>
+    <pre style="margin:0;font-size:12px">ai-assistant/
+├── app.js          # 全局逻辑
+├── app.json        # 页面注册/tabBar
+├── app.wxss        # 全局样式
+├── utils/
+│   ├── request.js  # wx.request封装
+│   └── aiChat.js   # AI 对话工具函数
+├── pages/
+│   ├── home/       # 首页宫格
+│   ├── news/       # 新闻列表
+│   ├── joke/       # 笑话
+│   ├── weather/    # 天气
+│   ├── chat/       # AI 对话
+│   └── setting/    # 配置 Key
+└── images/         # 图标资源</pre>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🔄 系统数据流总览</h2>
+  <div style="overflow-x:auto;padding:10px 0">
+    <div class="flow" style="min-width:700px;justify-content:center;gap:0;flex-wrap:nowrap">
+      <div class="flow-node purple" style="min-width:100px">📱 小程序界面<br><small style="opacity:.8">WXML/WXSS/JS</small></div>
+      <div class="flow-arrow">⇄</div>
+      <div class="flow-node blue" style="min-width:100px">🔧 utils/<br><small style="opacity:.8">request.js</small></div>
+      <div class="flow-arrow">→</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="flow-node orange" style="min-width:120px">🔗 juhe.cn<br><small style="opacity:.8">新闻/天气/笑话</small></div>
+        <div class="flow-node green" style="min-width:120px">🤖 AI 厂商<br><small style="opacity:.8">OpenAI兼容API</small></div>
+      </div>
+      <div class="flow-arrow">↔</div>
+      <div class="flow-node gray" style="min-width:100px">💾 localStorage<br><small style="opacity:.8">Key安全存储</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="tip blue"><strong>💡 浏览器沙盒限制（课堂必讲）</strong>大模型厂商接口通常<strong>不允许浏览器跨域直连</strong>（CORS）。本页的沙盒工具会真实发起 fetch，若报 CORS，优先在小程序开发者工具 wx.request 中验证。这正好解释了小程序为何要配置「合法域名」。</div>
+  <div class="tip orange"><strong>🔐 API Key 安全规范</strong>Key 属于凭证：① 只存 wx.storage，不写死在源码里；② 提交前确认 .gitignore；③ 不推送到 GitHub/Gitee 公仓；④ 答辩结束后及时吊销演示用 Key。</div>
+</div>
+
+</div>
+</div>
+
+<!-- ==================== PLAN ==================== -->
+<div id="section-plan" class="section">
+<div class="container">
+
+<div class="hero" style="padding:24px 28px">
+  <h1>📅 5天课程计划（每天约1小时）</h1>
+  <p>每天包含教学目标、课堂流程建议、关键代码片段、验收标准。</p>
+</div>
+
+<div class="day-tabs">
+  <button class="day-tab active" onclick="showDay('d1',this)">Day 1</button>
+  <button class="day-tab" onclick="showDay('d2',this)">Day 2</button>
+  <button class="day-tab" onclick="showDay('d3',this)">Day 3</button>
+  <button class="day-tab" onclick="showDay('d4',this)">Day 4</button>
+  <button class="day-tab" onclick="showDay('d5',this)">Day 5</button>
+</div>
+
+<!-- DAY 1 -->
+<div id="day-d1" class="day-content active">
+  <div class="card">
+    <h2>Day 1：项目启动 + 小程序基础结构</h2>
+    <div class="badge-row">
+      <span class="badge blue">开发环境</span>
+      <span class="badge green">AppID配置</span>
+      <span class="badge orange">WXML/WXSS入门</span>
+      <span class="badge purple">首页静态布局</span>
+    </div>
+    <h3>教学目标</h3>
+    <p style="font-size:13px;color:#455A64">让所有学生在第一天结束时，手机上能用微信扫码预览到自己修改过的页面。建立「能跑 → 能改 → 能解释」的信心。</p>
+
+    <h3>课堂流程建议（60min）</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>安装 & 注册（10min）</h4>
+        <p style="font-size:13px;color:#666">微信开发者工具下载安装，注册小程序测试账号（无需企业认证），创建项目选「不使用云开发」。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>认识 4 个核心文件（10min）</h4>
+        <p style="font-size:13px;color:#666"><code>app.js</code> 全局逻辑 · <code>app.json</code> 注册页面/配置窗口 · <code>app.wxss</code> 全局样式 · <code>pages/index/index.wxml</code> 首页模板</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>动手：修改首页 + 真机预览（20min）</h4>
+        <p style="font-size:13px;color:#666">改标题颜色、加一行文字、换一张 image。然后点「预览」用手机扫码验证效果。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>讲解 data 绑定 + setData（15min）</h4>
+        <p style="font-size:13px;color:#666">在 .js 中定义 data，在 WXML 中用 <code>{'{{'}变量{'}}'}</code> 渲染，按钮触发 setData 更新视图。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>VibeCoding 体验（5min）</h4>
+        <p style="font-size:13px;color:#666">用 Cursor 或 Copilot 输入「帮我写一个微信小程序首页，宫格布局，6个入口」，观察 AI 生成 WXML。</p>
+      </div></div>
+    </div>
+
+    <h3>关键代码：app.json 页面注册</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>{
+  "pages": [
+    "pages/home/home",
+    "pages/news/news",
+    "pages/joke/joke",
+    "pages/weather/weather",
+    "pages/chat/chat",
+    "pages/setting/setting"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#4527A0",
+    "navigationBarTitleText": "AI 生活助手",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F7FA"
+  },
+  "tabBar": {
+    "color": "#78909C",
+    "selectedColor": "#4527A0",
+    "list": [
+      { "pagePath": "pages/home/home",    "text": "首页",   "iconPath": "images/home.png",    "selectedIconPath": "images/home-s.png" },
+      { "pagePath": "pages/chat/chat",    "text": "AI",     "iconPath": "images/ai.png",      "selectedIconPath": "images/ai-s.png" },
+      { "pagePath": "pages/setting/setting", "text": "我的", "iconPath": "images/me.png",   "selectedIconPath": "images/me-s.png" }
+    ]
+  }
+}</pre>
+
+    <h3>关键代码：首页宫格 WXML</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>&lt;!-- pages/home/home.wxml --&gt;
+&lt;view class="header"&gt;
+  &lt;text class="title"&gt;AI 生活助手&lt;/text&gt;
+  &lt;text class="sub"&gt;你的智能生活工具箱&lt;/text&gt;
+&lt;/view&gt;
+
+&lt;view class="grid"&gt;
+  &lt;view class="item" bindtap="goNews"&gt;
+    &lt;text class="icon"&gt;📰&lt;/text&gt;
+    &lt;text class="label"&gt;今日新闻&lt;/text&gt;
+  &lt;/view&gt;
+  &lt;view class="item" bindtap="goJoke"&gt;
+    &lt;text class="icon"&gt;😄&lt;/text&gt;
+    &lt;text class="label"&gt;每日笑话&lt;/text&gt;
+  &lt;/view&gt;
+  &lt;view class="item" bindtap="goWeather"&gt;
+    &lt;text class="icon"&gt;🌤️&lt;/text&gt;
+    &lt;text class="label"&gt;天气查询&lt;/text&gt;
+  &lt;/view&gt;
+  &lt;view class="item" bindtap="goConstellation"&gt;
+    &lt;text class="icon"&gt;⭐&lt;/text&gt;
+    &lt;text class="label"&gt;星座运势&lt;/text&gt;
+  &lt;/view&gt;
+  &lt;view class="item" bindtap="goChat"&gt;
+    &lt;text class="icon"&gt;🤖&lt;/text&gt;
+    &lt;text class="label"&gt;AI 助手&lt;/text&gt;
+  &lt;/view&gt;
+  &lt;view class="item" bindtap="goSetting"&gt;
+    &lt;text class="icon"&gt;⚙️&lt;/text&gt;
+    &lt;text class="label"&gt;配置中心&lt;/text&gt;
+  &lt;/view&gt;
+&lt;/view&gt;</pre>
+
+    <h3>验收标准</h3>
+    <div class="hl-row">
+      <div class="hl-box blue"><h4>✅ 能用手机扫码预览</h4><p>项目能在开发者工具模拟器正常运行，且真机预览通过</p></div>
+      <div class="hl-box green"><h4>✅ 能解释文件职责</h4><p>能说出 app.js / app.json / .wxml / .wxss / .js 各自的作用</p></div>
+      <div class="hl-box orange"><h4>✅ 能修改并看到效果</h4><p>改了标题/颜色/文字后，模拟器立即反映变化</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- DAY 2 -->
+<div id="day-d2" class="day-content">
+  <div class="card">
+    <h2>Day 2：多页面导航 + tabBar + 响应式布局</h2>
+    <div class="badge-row">
+      <span class="badge blue">页面栈</span>
+      <span class="badge green">tabBar</span>
+      <span class="badge orange">Flex布局</span>
+      <span class="badge purple">rpx单位</span>
+    </div>
+    <h3>教学目标</h3>
+    <p style="font-size:13px;color:#455A64">把「一个页面」扩展成「一个有结构的产品骨架」——能导航，能切 Tab，布局自适应屏幕宽度。</p>
+
+    <h3>课堂流程建议（60min）</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>页面导航两种方式（15min）</h4>
+        <p style="font-size:13px;color:#666"><code>wx.navigateTo</code>（有返回按钮，入栈）vs <code>wx.switchTab</code>（tabBar 页，不入栈）。讲清楚哪些页面用哪种。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>配置 tabBar（15min）</h4>
+        <p style="font-size:13px;color:#666">在 app.json 配置 3 个 Tab，准备 icon 图标（建议 AI 生成 40×40 PNG），讲解常见报错：路径不存在、图标尺寸过大。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>Flex + rpx 布局（20min）</h4>
+        <p style="font-size:13px;color:#666">rpx 是小程序专用单位：750rpx = 屏幕宽度。用 display:flex 做宫格，保证在不同机型自适应。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>页面间传参（10min）</h4>
+        <p style="font-size:13px;color:#666"><code>wx.navigateTo({'{'}url:'/pages/detail/detail?id=123&name=xx'{'}'})</code>，目标页在 onLoad(options) 里拿参数。</p>
+      </div></div>
+    </div>
+
+    <h3>关键代码：导航 + 传参</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// pages/home/home.js
+Page({
+  goNews() {
+    wx.navigateTo({ url: '/pages/news/news?type=top' })
+  },
+  goChat() {
+    wx.switchTab({ url: '/pages/chat/chat' })  // tabBar 页必须用 switchTab
+  }
+})
+
+// pages/news/news.js  - 接收参数
+Page({
+  data: { type: 'top', list: [] },
+  onLoad(options) {
+    const type = options.type || 'top'
+    this.setData({ type })
+    this.loadNews(type)
+  },
+  loadNews(type) {
+    // Day3 填充网络请求
+    wx.showLoading({ title: '加载中' })
+    // ...
+  }
+})</pre>
+
+    <h3>关键代码：宫格布局 WXSS</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">/* pages/home/home.wxss */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20rpx;
+  gap: 20rpx;
+}
+.item {
+  width: calc(33.33% - 14rpx);
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,.08);
+}
+.icon { font-size: 52rpx; margin-bottom: 12rpx; }
+.label { font-size: 26rpx; color: #455A64; font-weight: bold; }</pre>
+
+    <div class="tip blue"><strong>📐 rpx 换算记忆法</strong>设计稿 750px 等比 = 750rpx。你手机实际像素宽 × (750/设计稿宽) = rpx值。简单记：Figma/UI图按750px设计，量到多少px就写多少rpx。</div>
+    <div class="tip orange"><strong>⚠️ tabBar 图标常见错误</strong>① 图片不是 PNG → 改格式 ② 图片 > 40KB → 压缩 ③ pagePath 路径写了 .html 后缀 → 删掉 ④ tabBar 页用了 navigateTo → 改 switchTab</div>
+  </div>
+</div>
+
+<!-- DAY 3 -->
+<div id="day-d3" class="day-content">
+  <div class="card">
+    <h2>Day 3：网络请求 + 聚合数据服务 + Mock兜底</h2>
+    <div class="badge-row">
+      <span class="badge blue">wx.request</span>
+      <span class="badge green">juhe API</span>
+      <span class="badge orange">Promise封装</span>
+      <span class="badge purple">Mock数据</span>
+    </div>
+    <h3>教学目标</h3>
+    <p style="font-size:13px;color:#455A64">让学生理解：接口是产品的心脏，但课堂要有「不断电」的备份方案（mock 数据）。掌握封装 request 的工程思维。</p>
+
+    <h3>课堂主线（60min）</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>封装 wx.request 为 Promise（15min）</h4>
+        <p style="font-size:13px;color:#666">抽出 utils/request.js，统一处理 loading、错误提示、超时，让业务代码只关心数据。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>申请 juhe 接口 Key，接入新闻列表（20min）</h4>
+        <p style="font-size:13px;color:#666">juhe.cn 注册 → 申请「今日头条新闻」免费接口 → 在设置页保存 Key → 新闻页调用展示。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>Mock 数据备份方案（10min）</h4>
+        <p style="font-size:13px;color:#666">当 Key 申请未通过或网络异常时，从本地 JSON 文件读取 mock 数据，保证课堂演示不卡壳。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>星座/笑话页面（15min）</h4>
+        <p style="font-size:13px;color:#666">picker 选择星座 → 请求运势接口 → 展示多字段。笑话列表 → 每日随机一条。</p>
+      </div></div>
+    </div>
+
+    <h3>关键代码：utils/request.js</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// utils/request.js
+const BASE_JUHE = 'https://v.juhe.cn'
+
+function request(url, method = 'GET', data = {}) {
+  return new Promise((resolve, reject) => {
+    wx.showNavigationBarLoading()
+    wx.request({
+      url,
+      method,
+      data,
+      timeout: 10000,
+      success(res) {
+        wx.hideNavigationBarLoading()
+        if (res.statusCode === 200) {
+          resolve(res.data)
+        } else {
+          reject(new Error('HTTP ' + res.statusCode))
+        }
+      },
+      fail(err) {
+        wx.hideNavigationBarLoading()
+        wx.showToast({ title: '网络异常', icon: 'error' })
+        reject(err)
+      }
+    })
+  })
+}
+
+// 新闻接口封装
+function getNews(type = 'top', key) {
+  if (!key) return Promise.resolve(MOCK_NEWS)   // 无 Key 走 mock
+  return request(`${BASE_JUHE}/toutiao/index?type=${type}&key=${key}`)
+    .catch(() => MOCK_NEWS)                      // 接口失败也走 mock
+}
+
+// 笑话接口封装
+function getJoke(key) {
+  if (!key) return Promise.resolve(MOCK_JOKE)
+  return request(`${BASE_JUHE}/joke/content/list.php?sort=rand&page=1&pagesize=1&key=${key}`)
+    .catch(() => MOCK_JOKE)
+}
+
+// Mock 数据
+const MOCK_NEWS = {
+  reason: 'mock',
+  result: {
+    data: [
+      { title: '【演示】今日科技头条：AI大模型持续演进', category: '科技', date: '2025-05-14', url: 'https://example.com' },
+      { title: '【演示】全球气候峰会：各国承诺碳中和目标', category: '国际', date: '2025-05-14', url: 'https://example.com' },
+      { title: '【演示】本地餐饮业恢复强劲，夜经济持续升温', category: '本地', date: '2025-05-14', url: 'https://example.com' }
+    ]
+  }
+}
+
+const MOCK_JOKE = {
+  reason: 'mock',
+  result: {
+    data: [{ content: '演示笑话：程序员最喜欢的运动是什么？—— 跑（bug）步！' }]
+  }
+}
+
+module.exports = { request, getNews, getJoke }</pre>
+
+    <h3>关键代码：新闻页调用</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/news/news.js
+const { getNews } = require('../../utils/request')
+
+Page({
+  data: { list: [], loading: true },
+  onLoad() {
+    const key = wx.getStorageSync('juhe_key') || ''
+    getNews('top', key).then(res => {
+      const list = (res.result && res.result.data) || []
+      this.setData({ list, loading: false })
+    })
+  },
+  goDetail(e) {
+    const url = encodeURIComponent(e.currentTarget.dataset.url)
+    wx.navigateTo({ url: `/pages/webview/webview?url=${url}` })
+  }
+})</pre>
+
+    <div class="tip red"><strong>🚨 教师演示建议</strong>课堂先演示「无 Key → mock 数据」，再演示「填入 Key → 真实接口」。避免一半学生卡在「juhe 审核中」无法继续。</div>
+    <div class="tip blue"><strong>🌐 合法域名提前配置</strong>小程序发布前需在「微信公众平台 → 开发设置 → 服务器域名」添加：<code>v.juhe.cn</code>。开发阶段可勾选「不校验合法域名」跳过。</div>
+  </div>
+</div>
+
+<!-- DAY 4 -->
+<div id="day-d4" class="day-content">
+  <div class="card">
+    <h2>Day 4：多厂商大模型 AI 对话集成</h2>
+    <div class="badge-row">
+      <span class="badge blue">OpenAI兼容</span>
+      <span class="badge green">DeepSeek / 千问 / Kimi / 豆包</span>
+      <span class="badge orange">对话历史</span>
+      <span class="badge purple">Token展示</span>
+    </div>
+    <h3>教学目标</h3>
+    <p style="font-size:13px;color:#455A64">理解 OpenAI 兼容接口的统一格式，实现可复用的 AI 调用工具函数，在小程序中完整展示「配置 Key → 发送消息 → 查看模型信息」全流程。</p>
+
+    <h3>课堂主线（60min）</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>OpenAI 兼容格式讲解（10min）</h4>
+        <p style="font-size:13px;color:#666">POST /v1/chat/completions，body：{ model, messages:[{role,content}], temperature }，response：choices[0].message.content + usage。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>4厂商 Endpoint 对比 + 豆包特殊说明（10min）</h4>
+        <p style="font-size:13px;color:#666">豆包 model 填 ep-xxxx（Endpoint ID，非模型名），其余3个填模型名字符串即可。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>封装 utils/aiChat.js（15min）</h4>
+        <p style="font-size:13px;color:#666">通用 chat() 函数，传入 provider / messages → 返回 { text, usage, duration }。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>对话页实现（20min）</h4>
+        <p style="font-size:13px;color:#666">消息列表渲染 + 输入框 + 发送 + loading 气泡 + 本次调用信息展开卡片。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>配置页实现（5min）</h4>
+        <p style="font-size:13px;color:#666">picker 选厂商 → 输入 Key → 输入 model → wx.setStorageSync 保存。</p>
+      </div></div>
+    </div>
+
+    <h3>4大厂商 API 对比</h3>
+    <table>
+      <tr><th>厂商</th><th>Endpoint</th><th>model 示例</th><th>官网</th></tr>
+      <tr><td><span class="tag-blue">DeepSeek</span></td><td><code>https://api.deepseek.com/v1/chat/completions</code></td><td><code>deepseek-chat</code></td><td>platform.deepseek.com</td></tr>
+      <tr><td><span class="tag-green">阿里千问</span></td><td><code>https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions</code></td><td><code>qwen-turbo</code><br><code>qwen-plus</code></td><td>dashscope.console.aliyun.com</td></tr>
+      <tr><td><span class="tag-orange">Kimi</span></td><td><code>https://api.moonshot.cn/v1/chat/completions</code></td><td><code>moonshot-v1-8k</code></td><td>platform.moonshot.cn</td></tr>
+      <tr><td><span class="tag-blue">字节豆包</span></td><td><code>https://ark.cn-beijing.volces.com/api/v3/chat/completions</code></td><td><code>ep-xxxxxxxx</code>（Endpoint ID）</td><td>console.volcengine.com/ark</td></tr>
+    </table>
+
+    <h3>关键代码：utils/aiChat.js</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// utils/aiChat.js
+const PROVIDERS = {
+  deepseek: { url: 'https://api.deepseek.com/v1/chat/completions', defaultModel: 'deepseek-chat' },
+  qwen:     { url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', defaultModel: 'qwen-turbo' },
+  moonshot: { url: 'https://api.moonshot.cn/v1/chat/completions', defaultModel: 'moonshot-v1-8k' },
+  doubao:   { url: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions', defaultModel: '' }
+}
+
+function chat(provider, apiKey, model, messages, systemPrompt = '你是一个智能助手，回答简洁清晰。') {
+  const cfg = PROVIDERS[provider]
+  if (!cfg) return Promise.reject(new Error('未知厂商'))
+
+  const t0 = Date.now()
+  const allMessages = [
+    { role: 'system', content: systemPrompt },
+    ...messages
+  ]
+
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: cfg.url,
+      method: 'POST',
+      timeout: 30000,
+      header: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      data: {
+        model: model || cfg.defaultModel,
+        messages: allMessages,
+        temperature: 0.7
+      },
+      success(res) {
+        const duration = Date.now() - t0
+        if (res.statusCode === 200 && res.data.choices) {
+          resolve({
+            text: res.data.choices[0].message.content,
+            usage: res.data.usage || {},
+            duration,
+            model: res.data.model || model,
+            status: res.statusCode
+          })
+        } else {
+          reject({
+            status: res.statusCode,
+            msg: (res.data && res.data.error && res.data.error.message) || JSON.stringify(res.data)
+          })
+        }
+      },
+      fail(err) {
+        reject({ status: -1, msg: err.errMsg || '网络异常' })
+      }
+    })
+  })
+}
+
+function loadConfig() {
+  return {
+    provider: wx.getStorageSync('ai_provider') || 'deepseek',
+    key: wx.getStorageSync('ai_key') || '',
+    model: wx.getStorageSync('ai_model') || ''
+  }
+}
+
+function saveConfig(provider, key, model) {
+  wx.setStorageSync('ai_provider', provider)
+  wx.setStorageSync('ai_key', key)
+  wx.setStorageSync('ai_model', model)
+}
+
+module.exports = { chat, loadConfig, saveConfig, PROVIDERS }</pre>
+
+    <h3>关键代码：对话页 JS</h3>
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/chat/chat.js
+const { chat, loadConfig } = require('../../utils/aiChat')
+
+Page({
+  data: {
+    messages: [],       // 对话历史 [{role:'user'|'assistant', content}]
+    inputText: '',
+    sending: false,
+    lastMeta: null      // 最后一次调用信息
+  },
+  onLoad() {
+    const cfg = loadConfig()
+    this.setData({ cfg })
+  },
+  onInput(e) {
+    this.setData({ inputText: e.detail.value })
+  },
+  async send() {
+    const text = this.data.inputText.trim()
+    if (!text || this.data.sending) return
+
+    const cfg = loadConfig()
+    if (!cfg.key) {
+      wx.showModal({ title: '提示', content: '请先在「我的」页面配置 API Key', showCancel: false })
+      return
+    }
+
+    // 加入用户消息
+    const messages = [...this.data.messages, { role: 'user', content: text }]
+    this.setData({ messages, inputText: '', sending: true })
+
+    try {
+      const res = await chat(cfg.provider, cfg.key, cfg.model, messages)
+      // 加入 AI 回复
+      const updated = [...messages, { role: 'assistant', content: res.text }]
+      this.setData({
+        messages: updated,
+        sending: false,
+        lastMeta: {
+          provider: cfg.provider,
+          model: res.model,
+          duration: res.duration + 'ms',
+          promptTokens: res.usage.prompt_tokens || '-',
+          completionTokens: res.usage.completion_tokens || '-',
+          totalTokens: res.usage.total_tokens || '-'
+        }
+      })
+    } catch(err) {
+      const updated = [...messages, { role: 'assistant', content: `[错误 ${err.status}] ${err.msg}` }]
+      this.setData({ messages: updated, sending: false })
+    }
+  },
+  clearHistory() {
+    wx.showModal({
+      title: '确认', content: '清空对话历史？',
+      success: (res) => { if(res.confirm) this.setData({ messages: [], lastMeta: null }) }
+    })
+  }
+})</pre>
+
+    <div class="tip blue"><strong>📊 课堂演示脚本（5分钟）</strong>我的 → 选厂商（DeepSeek）→ 粘贴 Key → 保存 → AI页输入「用3句话介绍你自己」→ 发送 → 展开「本次调用信息」看 token 用量和耗时。</div>
+  </div>
+</div>
+
+<!-- DAY 5 -->
+<div id="day-d5" class="day-content">
+  <div class="card">
+    <h2>Day 5：上线部署 + 答辩演示</h2>
+    <div class="badge-row">
+      <span class="badge blue">合法域名配置</span>
+      <span class="badge green">代码审查</span>
+      <span class="badge orange">上传发布</span>
+      <span class="badge purple">答辩演示</span>
+    </div>
+    <h3>上午：最终检查清单</h3>
+    <table>
+      <tr><th>检查项</th><th>方法</th><th>说明</th></tr>
+      <tr><td>✅ tabBar 可正常切换</td><td>模拟器点击</td><td>3个Tab都能到达</td></tr>
+      <tr><td>✅ 所有页面路径存在</td><td>app.json核对</td><td>无404页面</td></tr>
+      <tr><td>✅ 网络请求有loading提示</td><td>真机测试</td><td>避免空白等待</td></tr>
+      <tr><td>✅ 无Key时有友好提示</td><td>清空storage测试</td><td>提示去配置页填Key</td></tr>
+      <tr><td>✅ Key不写死在代码里</td><td>全局搜索sk-/ep-</td><td>用wx.getStorageSync读取</td></tr>
+      <tr><td>✅ API Key已清理（演示用）</td><td>查看storage</td><td>提交代码前必做</td></tr>
+    </table>
+
+    <h3>下午：合法域名配置 + 上传</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>微信公众平台配置</h4>
+        <p style="font-size:13px;color:#666">登录 <code>mp.weixin.qq.com</code> → 开发 → 开发管理 → 服务器域名，添加：<code>v.juhe.cn</code> <code>api.deepseek.com</code> <code>api.moonshot.cn</code> <code>dashscope.aliyuncs.com</code> <code>ark.cn-beijing.volces.com</code></p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>开发者工具上传</h4>
+        <p style="font-size:13px;color:#666">点「上传」→ 填写版本号（如 1.0.0）和版本说明 → 提交。登录公众平台 → 版本管理 → 将版本设为体验版。</p>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <h4>体验版扫码测试</h4>
+        <p style="font-size:13px;color:#666">管理员扫体验版二维码，验证合法域名模式下所有接口正常（不勾选「不校验合法域名」）。</p>
+      </div></div>
+    </div>
+
+    <h3>答辩演示路径（建议3-5分钟）</h3>
+    <div class="hl-row">
+      <div class="hl-box blue"><h4>① 展示首页</h4><p>宫格布局，说明每个入口的功能</p></div>
+      <div class="hl-box green"><h4>② 演示新闻列表</h4><p>进入新闻页，展示真实juhe数据</p></div>
+      <div class="hl-box orange"><h4>③ 演示AI对话</h4><p>发送一条消息，展示模型信息卡片</p></div>
+      <div class="hl-box purple"><h4>④ 讲解一段核心代码</h4><p>推荐：utils/aiChat.js 的chat()函数</p></div>
+    </div>
+
+    <div class="tip green"><strong>✨ 加分展示</strong>① 切换不同 AI 厂商对比回复 ② 展示 token 用量与费用估算 ③ 演示断网时 mock 数据兜底 ④ 展示 Key 安全存储方案</div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- ==================== SANDBOX ==================== -->
+<div id="section-sandbox" class="section">
+<div class="container">
+<div class="card">
+  <h2>🧠 大模型沙盒（Key 仅存浏览器 localStorage，不上传服务器）</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:14px">选择厂商 → 填写 Key 和模型名 → 保存到本机 → 在对话框测试。支持多轮对话，展示模型信息和 token 用量。</p>
+  <div class="tip orange" style="margin-bottom:16px"><strong>⚠️ CORS 说明</strong>若浏览器报跨域错误，是正常的（AI厂商限制了非小程序直连）。请改在微信开发者工具的 wx.request 里验证，或开启「不校验合法域名」模式。这本身就是课堂讲解点。</div>
+
+  <div class="vendor-tabs" id="vendorTabs">
+    <button class="vendor-tab active" data-v="deepseek">🔵 DeepSeek</button>
+    <button class="vendor-tab" data-v="qwen">🟢 阿里千问</button>
+    <button class="vendor-tab" data-v="moonshot">🟠 Kimi</button>
+    <button class="vendor-tab" data-v="doubao">🟣 字节豆包</button>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <label>API Key（Bearer Token）</label>
+      <input type="password" id="sbKey" autocomplete="off" placeholder="粘贴 Key 后点「保存到本机」" />
+
+      <label>模型名 / Endpoint ID（豆包填 ep-xxxx）</label>
+      <input id="sbModel" placeholder="如 deepseek-chat / qwen-turbo / moonshot-v1-8k / ep-xxxx" />
+
+      <label>API Endpoint（可修改）</label>
+      <input id="sbUrl" style="font-family:monospace;font-size:12px" />
+
+      <div class="row">
+        <button class="primary" onclick="sbSave()">💾 保存到本机</button>
+        <button class="secondary" onclick="sbLoad()">📖 读取已保存</button>
+        <button class="secondary" onclick="sbClearHistory()">🗑️ 清空对话</button>
+      </div>
+    </div>
+    <div>
+      <label>系统提示词（system）</label>
+      <input id="sbSystem" value="你是课堂助教，回答简洁，每次不超过200字。" />
+
+      <label>发送消息</label>
+      <textarea id="sbPrompt" style="min-height:80px">用 5 行以内解释：小程序为什么要配置「合法域名」？</textarea>
+      <div class="row">
+        <button class="primary" onclick="sbSend()">🚀 发送</button>
+        <button class="secondary" onclick="sbClearOut()">清空输出</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px">
+    <label>对话记录</label>
+    <div id="sbChat" class="chat-box"></div>
+    <div id="sbMeta" class="meta-box" style="display:none">
+      <div style="color:#64B5F6;font-weight:700;margin-bottom:6px">本次调用信息</div>
+      <div id="sbMetaKv" class="kv"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== HTTP ==================== -->
+<div id="section-http" class="section">
+<div class="container">
+<div class="card">
+  <h2>🌐 HTTP 调试工具（GET / POST + JSON格式化）</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:14px">课堂演示 juhe 接口、公开测试接口，或调试自建后端转发服务。浏览器可能遇到 CORS，这正好解释「小程序为何要配合法域名」。</p>
+
+  <div class="grid-2">
+    <div>
+      <label>URL</label>
+      <input id="httpUrl" style="font-family:monospace;font-size:12px" value="https://jsonplaceholder.typicode.com/posts/1" />
+
+      <label>Method</label>
+      <select id="httpMethod"><option>GET</option><option>POST</option></select>
+
+      <label>Headers（JSON，可选）</label>
+      <textarea id="httpHeaders" style="min-height:70px">{}</textarea>
+
+      <label>Body（JSON，POST 时填写）</label>
+      <textarea id="httpBody" style="min-height:70px">{}</textarea>
+
+      <div class="row" style="margin-top:10px;flex-wrap:wrap">
+        <button class="primary" onclick="httpSend()">发送请求</button>
+        <button class="secondary" onclick="httpFill('juhe_news')">填入 juhe 新闻</button>
+        <button class="secondary" onclick="httpFill('juhe_joke')">填入 juhe 笑话</button>
+        <button class="secondary" onclick="httpFill('echo')">填入 JSONPlaceholder</button>
+      </div>
+    </div>
+    <div>
+      <label>响应（格式化 JSON）</label>
+      <pre id="httpOut" style="min-height:340px;margin:0;font-size:12px">{}</pre>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== PROTO ==================== -->
+<div id="section-proto" class="section">
+<div class="container">
+<div class="card">
+  <h2>📱 微信小程序界面原型（可交互演示）</h2>
+  <p style="font-size:13px;color:#666;margin-bottom:16px">用于课堂讲解信息架构：底部 Tab 导航、首页宫格入口、AI 对话、配置中心。点击底部 Tab 切换页面，AI 对话框可模拟发送消息。</p>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+    <div class="phone" style="flex-shrink:0">
+      <div class="phone-notch"><span></span></div>
+      <div class="phone-screen">
+        <!-- 首页 -->
+        <div id="mp-home" class="mp-page active">
+          <div class="mp-nav">AI 生活助手</div>
+          <div style="padding:10px">
+            <div style="background:linear-gradient(135deg,#4527A0,#1565C0);color:#fff;border-radius:12px;padding:14px;margin-bottom:10px">
+              <div style="font-size:14px;font-weight:700">你好 👋</div>
+              <div style="font-size:12px;opacity:.85;margin-top:4px">今天是 <span id="mp-date"></span></div>
+            </div>
+            <div class="mp-grid">
+              <div class="mp-icon" onclick="mpGo('news')"><div class="ico">📰</div>今日新闻</div>
+              <div class="mp-icon" onclick="mpGo('joke')"><div class="ico">😄</div>每日笑话</div>
+              <div class="mp-icon" onclick="mpGo('weather')"><div class="ico">🌤️</div>天气查询</div>
+              <div class="mp-icon" onclick="mpGo('constellation')"><div class="ico">⭐</div>星座运势</div>
+              <div class="mp-icon" onclick="switchMpTab('chat',document.querySelector('.mp-tab[data-p=chat]'))"><div class="ico">🤖</div>AI 助手</div>
+              <div class="mp-icon" onclick="switchMpTab('setting',document.querySelector('.mp-tab[data-p=setting]'))"><div class="ico">⚙️</div>配置中心</div>
+            </div>
+            <div class="mp-card">
+              <div style="font-size:12px;font-weight:700;margin-bottom:6px">📌 今日一句</div>
+              <div style="font-size:11px;color:#455A64">「把需求拆成页面，把接口拆成函数，把问题拆成步骤。」</div>
+            </div>
+          </div>
+        </div>
+        <!-- AI 对话 -->
+        <div id="mp-chat" class="mp-page">
+          <div class="mp-nav">🤖 AI 助手</div>
+          <div style="height:calc(100% - 88px);overflow-y:auto;padding:10px">
+            <div id="mp-chat-msg" class="chat-mp">
+              <div class="mp-bubble-a">你好！我是 AI 助手，有什么可以帮你？</div>
+            </div>
+          </div>
+          <div class="mp-input-row">
+            <input id="mp-chat-input" placeholder="输入消息…" onkeydown="if(event.key==='Enter')mpSend()" />
+            <button onclick="mpSend()">发送</button>
+          </div>
+        </div>
+        <!-- 我的/设置 -->
+        <div id="mp-setting" class="mp-page">
+          <div class="mp-nav">⚙️ 配置中心</div>
+          <div style="padding:10px">
+            <div class="mp-card">
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px">聚合数据 Key</div>
+              <div style="font-size:12px;color:#455A64;background:#f5f7fa;border-radius:8px;padding:8px;font-family:monospace">juhe_key = ••••••••</div>
+            </div>
+            <div class="mp-card">
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px">大模型配置</div>
+              <div class="mp-setting">
+                <div class="mp-setting-row"><span style="font-size:12px">当前厂商</span><span style="font-size:12px;color:#5C6BC0">DeepSeek</span></div>
+                <div class="mp-setting-row"><span style="font-size:12px">API Key</span><span style="font-size:12px;color:#455A64;font-family:monospace">sk-••••</span></div>
+                <div class="mp-setting-row"><span style="font-size:12px">模型</span><span style="font-size:12px;color:#455A64">deepseek-chat</span></div>
+                <div class="mp-setting-row"><span style="font-size:12px">已保存</span><div class="mp-toggle on" onclick="this.classList.toggle('on')"></div></div>
+              </div>
+            </div>
+            <div class="mp-card" style="background:#e8f5e9;border:1px solid #a5d6a7">
+              <div style="font-size:12px;color:#2e7d32">✅ Key 仅存本地 wx.storage，不发送到第三方服务器</div>
+            </div>
+          </div>
+        </div>
+        <!-- 新闻页 -->
+        <div id="mp-news" class="mp-page">
+          <div class="mp-nav" style="display:flex;align-items:center;gap:8px"><span onclick="mpBack()" style="cursor:pointer">‹</span>今日新闻</div>
+          <div style="padding:10px">
+            <div class="mp-card"><div style="font-size:12px;font-weight:700">AI大模型持续演进，国产模型竞争白热化</div><div style="font-size:11px;color:#78909C;margin-top:4px">科技 · 2025-05-14</div></div>
+            <div class="mp-card"><div style="font-size:12px;font-weight:700">全球气候峰会：各国承诺新一轮碳中和目标</div><div style="font-size:11px;color:#78909C;margin-top:4px">国际 · 2025-05-14</div></div>
+            <div class="mp-card"><div style="font-size:12px;font-weight:700">本地夜经济持续升温，餐饮收入创新高</div><div style="font-size:11px;color:#78909C;margin-top:4px">本地 · 2025-05-14</div></div>
+            <div class="mp-card" style="text-align:center;color:#78909C;font-size:11px">以上为 mock 数据演示</div>
+          </div>
+        </div>
+      </div>
+      <div class="mp-tabbar">
+        <div class="mp-tab active" data-p="home" onclick="switchMpTab('home',this)">🏠 首页</div>
+        <div class="mp-tab" data-p="chat" onclick="switchMpTab('chat',this)">🤖 AI</div>
+        <div class="mp-tab" data-p="setting" onclick="switchMpTab('setting',this)">⚙️ 我的</div>
       </div>
     </div>
 
-    <div class="grid2">
-      <div class="card">
-        <h2>🎯 学生要带走的能力</h2>
-        <ul style="padding-left:18px;color:#475569;font-size:13px">
-          <li>把需求拆成页面：首页入口、列表、详情、配置、对话。</li>
-          <li>理解 GET/POST、Header、JSON、错误兜底与 mock。</li>
-          <li>理解「合法域名」与浏览器 CORS 的差异。</li>
-          <li>能把 Key 放到本地缓存：不写死在源码里。</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h2>🧭 推荐目录（本次已生成）</h2>
+    <div style="flex:1;min-width:260px">
+      <div class="card" style="margin:0 0 14px">
+        <h2>📐 页面结构说明</h2>
         <table>
-          <tr><th>目录</th><th>用途</th></tr>
-          <tr><td><code>WXMP-new2</code></td><td>完整终稿示例（可直接当演示项目）</td></tr>
-          <tr><td><code>day3-code</code></td><td>第3天授课：发现页 + juhe + 电商 JSON + mock</td></tr>
-          <tr><td><code>day4-code</code></td><td>第4天授课：在终稿结构上强化「多模型 AI」</td></tr>
-          <tr><td><code>try3</code></td><td>你原先的第3天草稿（可对比迁移点）</td></tr>
+          <tr><th>页面</th><th>路径</th><th>核心技术</th></tr>
+          <tr><td>首页宫格</td><td>pages/home</td><td>Flex Grid + navigateTo</td></tr>
+          <tr><td>新闻列表</td><td>pages/news</td><td>wx.request + scroll-view</td></tr>
+          <tr><td>AI 对话</td><td>pages/chat</td><td>aiChat.js + 消息列表</td></tr>
+          <tr><td>配置中心</td><td>pages/setting</td><td>wx.setStorageSync</td></tr>
+          <tr><td>WebView</td><td>pages/webview</td><td>web-view 组件</td></tr>
         </table>
       </div>
-    </div>
-
-    <div class="tip blue">
-      <strong>安全与合规（课堂必须讲清）</strong>
-      API Key 属于凭证：本页与小程序示例都只用本地存储演示流程。作业提交前提醒学生清理 Key、不要把真实 Key 推到 GitHub/Gitee 公仓。
-    </div>
-
-    <div class="tip orange">
-      <strong>浏览器沙盒的限制（不讲会踩坑）</strong>
-      大模型厂商接口通常不允许浏览器随意跨域调用。本页会真实发起 <code>fetch</code>：若失败，请优先在「小程序真机/开发者工具」里用 <code>wx.request</code> 验证；或教研室提供同域后端转发。
-    </div>
-  </div>
-</div>
-
-<div id="section-days" class="section">
-  <div class="container">
-    <div class="hero">
-      <h1>4 天课程内容（第 5 天部署 1 小时）</h1>
-      <p>结构参考 <code>03-5daysIOT2.html</code> 的「导航 + 卡片 + 表格 + 步骤」交互讲义风格；内容对齐你仓库中的《AI生活助手4天实训教学任务》与课堂实际节奏（每天约 1 小时）。</p>
-    </div>
-
-    <div class="day-tabs">
-      <button class="day-tab active" type="button" onclick="showDay('d1',this)">Day1</button>
-      <button class="day-tab" type="button" onclick="showDay('d2',this)">Day2</button>
-      <button class="day-tab" type="button" onclick="showDay('d3',this)">Day3</button>
-      <button class="day-tab" type="button" onclick="showDay('d4',this)">Day4</button>
-      <button class="day-tab" type="button" onclick="showDay('d5',this)">Day5</button>
-    </div>
-
-    <div id="day-d1" class="day-pane active">
-      <div class="card">
-        <h2>Day1：项目启动与小程序基础</h2>
-        <h3>教学目标</h3>
-        <p class="small">建立「能跑起来 → 能改一点 → 能解释结构」的信心。</p>
-        <h3>课堂流程（60min 建议）</h3>
-        <ol style="padding-left:18px;color:#475569;font-size:13px">
-          <li>10min：小程序生态与开发者工具；AppID / 测试号 / 预览。</li>
-          <li>15min：<code>app.json</code> 页面注册、窗口配置、目录结构。</li>
-          <li>20min：开屏/欢迎页 + 首页静态布局（view/text/image）。</li>
-          <li>15min：改标题/改颜色/改文案，真机预览与排错。</li>
-        </ol>
-        <h3>验收点</h3>
-        <ul style="padding-left:18px;color:#475569;font-size:13px">
-          <li>能说明 <code>app.js / app.json / app.wxss</code> 的职责。</li>
-          <li>能解释：小程序启动第一个页面由 <code>pages</code> 数组顺序决定。</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="day-d2" class="day-pane">
-      <div class="card">
-        <h2>Day2：多页面、tabBar、布局与交互</h2>
-        <h3>教学目标</h3>
-        <p class="small">把「一个页面」扩展成「一个小产品骨架」。</p>
-        <h3>课堂流程（60min 建议）</h3>
-        <ol style="padding-left:18px;color:#475569;font-size:13px">
-          <li>15min：<code>navigateTo</code> vs <code>switchTab</code>；页面栈概念。</li>
-          <li>20min：配置 tabBar（图标尺寸、选中态、常见报错）。</li>
-          <li>25min：Flex 卡片布局 + rpx；做一个「功能入口宫格」首页。</li>
-        </ol>
-        <h3>验收点</h3>
-        <ul style="padding-left:18px;color:#475569;font-size:13px">
-          <li>至少 5 个页面可跳转；tabBar 可切换。</li>
-          <li>模拟器里文字不溢出、按钮可点、热区合理。</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="day-d3" class="day-pane">
-      <div class="card">
-        <h2>Day3：网络请求 + juhe 生活服务 + 兜底 mock</h2>
-        <h3>教学目标</h3>
-        <p class="small">让学生理解：接口是产品的心脏，但课堂要有「不断电」的备份方案。</p>
-        <h3>课堂主线（对齐 <code>day3-code</code>）</h3>
-        <ol style="padding-left:18px;color:#475569;font-size:13px">
-          <li><strong>封装请求</strong>：<code>utils/request.js</code> 统一成功/失败处理。</li>
-          <li><strong>聚合数据</strong>：新闻头条、笑话列表；解释 <code>error_code</code> 与字段映射。</li>
-          <li><strong>星座</strong>：<code>picker</code> + 展示多字段；说明 http/https 与域名限制可能导致回退 mock。</li>
-          <li><strong>电商 JSON</strong>：解析复杂嵌套（cards/datasource），对应 <code>pages/shop/shop</code>。</li>
-          <li><strong>WebView</strong>：列表跳详情，传参 <code>?url=encodeURIComponent</code>。</li>
-        </ol>
-        <div class="tip red">
-          <strong>教师演示建议</strong>
-          课堂上先演示「无 Key → mock」，再演示「有 Key → 真数据」。避免一半学生卡在申请 Key。
+      <div class="card" style="margin:0">
+        <h2>🧭 导航规则</h2>
+        <div class="tip blue" style="margin:0 0 10px">
+          <strong>wx.switchTab</strong>
+          只能跳转 tabBar 页（首页/AI/我的）。tabBar 不入栈，没有「返回」按钮。
         </div>
-      </div>
-    </div>
-
-    <div id="day-d4" class="day-pane">
-      <div class="card">
-        <h2>Day4：多模型配置 + AI 对话 + 模型信息展示</h2>
-        <h3>教学目标</h3>
-        <p class="small">把「聊天」做成可验收的工程能力：配置、请求、观测、复盘。</p>
-        <h3>课堂主线（对齐 <code>day4-code</code> / <code>WXMP-new2</code>）</h3>
-        <ol style="padding-left:18px;color:#475569;font-size:13px">
-          <li>OpenAI 兼容格式：<code>model / messages / temperature</code>。</li>
-          <li>四厂商：字节豆包（火山方舟）、阿里千问（DashScope 兼容模式）、Kimi（Moonshot）、DeepSeek。</li>
-          <li>本地缓存：<code>wx.setStorageSync</code> 保存 Key 与模型名（豆包为 Endpoint ID）。</li>
-          <li>对话页展示：HTTP 状态码、耗时、Token usage、原始响应摘要。</li>
-        </ol>
-        <h3>课堂演示脚本（5 分钟）</h3>
-        <p class="small">我的 → 选厂商 → 粘贴 Key → 保存 → AI 页快捷提问 → 展开「本次调用信息」。</p>
-      </div>
-    </div>
-
-    <div id="day-d5" class="day-pane">
-      <div class="card">
-        <h2>Day5：小程序部署与答辩（以 1 小时为上限）</h2>
-        <h3>上午/下午可拆分</h3>
-        <ul style="padding-left:18px;color:#475569;font-size:13px">
-          <li>检查：tabBar、页面路径、关键按钮、空态/错误提示。</li>
-          <li>域名：按「域名/接口」分区配置 request 合法域名、webview 业务域名。</li>
-          <li>上传：开发版本 + 版本说明；体验成员扫码。</li>
-          <li>答辩：3~5 分钟演示路径 + 1 段核心代码讲解（建议 <code>utils/aiChat.js</code>）。</li>
-        </ul>
-        <div class="tip blue">
-          <strong>部署提醒</strong>
-          真机预览可在开发阶段勾选「不校验合法域名」；答辩前至少演示一次「按正式规则配置域名」的流程。
+        <div class="tip green" style="margin:0">
+          <strong>wx.navigateTo</strong>
+          跳转非 tabBar 页（新闻/详情/笑话）。会入栈，左上角有返回箭头。
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<div id="section-lab-llm" class="section">
-  <div class="container">
-    <div class="card">
-      <h2>🧠 大模型沙盒（Key 仅存浏览器 localStorage）</h2>
-      <p class="small">选择厂商 → 填写 Key/模型 → 发送。下方展示「模型信息 + usage + 原始摘要」。若浏览器报 CORS，请用本页「HTTP调试」验证网络与 JSON，再回到小程序侧验证。</p>
-      <div class="hr"></div>
-
-      <div class="tabs2" id="llmVendorTabs">
-        <button type="button" class="active" data-v="deepseek">DeepSeek</button>
-        <button type="button" data-v="qwen">阿里千问</button>
-        <button type="button" data-v="moonshot">Kimi</button>
-        <button type="button" data-v="doubao">字节豆包</button>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>API Key（Bearer）</label>
-          <input id="llmKey" autocomplete="off" placeholder="粘贴 Key（不会上传到我方服务器；仅在浏览器直连厂商）" />
-
-          <label>模型 / Endpoint</label>
-          <input id="llmModel" placeholder="例如 deepseek-chat / qwen-turbo / moonshot-v1-8k / ep-xxxx" />
-
-          <label>Endpoint（可改）</label>
-          <input id="llmUrl" class="mono" />
-          <div class="row" style="margin-top:10px">
-            <button class="primary" type="button" onclick="llmSave()">保存到本机</button>
-            <button class="secondary" type="button" onclick="llmLoad()">读取本机</button>
-          </div>
-        </div>
-        <div>
-          <label>用户消息</label>
-          <textarea id="llmPrompt">用 6 行以内说明：为什么课堂项目不要把 API Key 写死在代码里？</textarea>
-          <div class="row" style="margin-top:10px">
-            <button class="primary" type="button" onclick="llmSend()">发送测试</button>
-            <button class="secondary" type="button" onclick="llmClearOut()">清空输出</button>
-          </div>
-          <p class="small" style="margin-top:10px">提示：豆包方舟需要把模型名填成 <span class="mono">ep-...</span> Endpoint ID（与控制台一致）。</p>
-        </div>
-      </div>
-
-      <div id="llmOut" class="meta" style="margin-top:12px;display:none"></div>
-    </div>
-  </div>
+</div>
 </div>
 
-<div id="section-lab-http" class="section">
-  <div class="container">
-    <div class="card">
-      <h2>🌐 HTTP 调试：GET / POST + JSON 格式化</h2>
-      <p class="small">用于课堂演示 juhe、公开测试接口、或你们自建转发服务。浏览器同样可能遇到 CORS；这正好用于解释「为什么小程序也要配合法域名」。</p>
-      <div class="hr"></div>
+<!-- ==================== CODE ==================== -->
+<div id="section-code" class="section">
+<div class="container">
+<div class="card">
+  <h2>💻 完整代码参考</h2>
+  <div class="code-tabs" id="codeTabs">
+    <button class="code-tab active" onclick="showCodeTab('ct-aiChat',this)">aiChat.js</button>
+    <button class="code-tab" onclick="showCodeTab('ct-request',this)">request.js</button>
+    <button class="code-tab" onclick="showCodeTab('ct-chatWxml',this)">chat.wxml</button>
+    <button class="code-tab" onclick="showCodeTab('ct-chatJs',this)">chat.js</button>
+    <button class="code-tab" onclick="showCodeTab('ct-settingJs',this)">setting.js</button>
+  </div>
 
-      <div class="grid2">
-        <div>
-          <label>URL</label>
-          <input id="httpUrl" class="mono" value="https://v.juhe.cn/toutiao/index?type=top&amp;key=YOUR_JUHE_KEY" />
+  <div id="ct-aiChat" class="code-pane active">
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// utils/aiChat.js  — 完整版
+const PROVIDERS = {
+  deepseek: {
+    label: 'DeepSeek',
+    url: 'https://api.deepseek.com/v1/chat/completions',
+    defaultModel: 'deepseek-chat'
+  },
+  qwen: {
+    label: '阿里千问',
+    url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    defaultModel: 'qwen-turbo'
+  },
+  moonshot: {
+    label: 'Kimi',
+    url: 'https://api.moonshot.cn/v1/chat/completions',
+    defaultModel: 'moonshot-v1-8k'
+  },
+  doubao: {
+    label: '字节豆包',
+    url: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+    defaultModel: ''  // 必须填 ep-xxxx，无默认值
+  }
+}
 
-          <label>Method</label>
-          <select id="httpMethod">
-            <option>GET</option>
-            <option>POST</option>
-          </select>
+/**
+ * 发送 AI 对话请求
+ * @param {string} provider  - 厂商 key（deepseek/qwen/moonshot/doubao）
+ * @param {string} apiKey    - API Key
+ * @param {string} model     - 模型名或 Endpoint ID
+ * @param {Array}  messages  - 历史消息 [{role:'user'|'assistant', content:'...'}]
+ * @param {string} systemPrompt - 系统提示词
+ * @returns Promise<{text, usage, duration, model, status}>
+ */
+function chat(provider, apiKey, model, messages, systemPrompt) {
+  const cfg = PROVIDERS[provider]
+  if (!cfg) return Promise.reject({ status: -1, msg: '未知厂商: ' + provider })
+  if (!apiKey) return Promise.reject({ status: -1, msg: '未配置 API Key' })
 
-          <label>Headers（JSON，可选）</label>
-          <textarea id="httpHeaders">{}</textarea>
+  systemPrompt = systemPrompt || '你是一个智能生活助手，回答简洁清晰，使用中文。'
+  const t0 = Date.now()
+  const allMessages = [
+    { role: 'system', content: systemPrompt },
+    ...messages.slice(-20)    // 最多保留最近20条，避免超 token
+  ]
 
-          <label>Body（JSON，POST 用）</label>
-          <textarea id="httpBody">{}</textarea>
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: cfg.url,
+      method: 'POST',
+      timeout: 30000,
+      header: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      data: {
+        model: model || cfg.defaultModel,
+        messages: allMessages,
+        temperature: 0.7,
+        max_tokens: 1000
+      },
+      success(res) {
+        const duration = Date.now() - t0
+        if (res.statusCode === 200 && res.data && res.data.choices) {
+          resolve({
+            text: res.data.choices[0].message.content || '',
+            usage: res.data.usage || {},
+            duration,
+            model: res.data.model || (model || cfg.defaultModel),
+            status: 200
+          })
+        } else {
+          const errMsg = res.data && res.data.error
+            ? res.data.error.message
+            : JSON.stringify(res.data).slice(0, 200)
+          reject({ status: res.statusCode, msg: errMsg })
+        }
+      },
+      fail(err) {
+        reject({ status: -1, msg: err.errMsg || '网络请求失败' })
+      }
+    })
+  })
+}
 
-          <div class="row" style="margin-top:10px">
-            <button class="primary" type="button" onclick="httpSend()">发送</button>
-            <button class="secondary" type="button" onclick="httpFillJuhe()">填入 juhe 头条模板</button>
-            <button class="secondary" type="button" onclick="httpFillEcho()">填入 echo 模板（JSONPlaceholder）</button>
-          </div>
-        </div>
-        <div>
-          <label>响应（格式化 JSON）</label>
-          <pre id="httpOut" style="min-height:360px">{}</pre>
-        </div>
-      </div>
-    </div>
+function loadConfig() {
+  return {
+    provider: wx.getStorageSync('ai_provider') || 'deepseek',
+    key: wx.getStorageSync('ai_key') || '',
+    model: wx.getStorageSync('ai_model') || ''
+  }
+}
+
+function saveConfig(provider, key, model) {
+  wx.setStorageSync('ai_provider', provider)
+  wx.setStorageSync('ai_key', key)
+  wx.setStorageSync('ai_model', model)
+}
+
+module.exports = { chat, loadConfig, saveConfig, PROVIDERS }</pre>
+  </div>
+
+  <div id="ct-request" class="code-pane">
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// utils/request.js  — Promise 封装 wx.request
+const JUHE_BASE = 'https://v.juhe.cn'
+
+function request(url, method, data, options) {
+  method = method || 'GET'
+  data = data || {}
+  options = options || {}
+
+  return new Promise((resolve, reject) => {
+    if (options.showLoading !== false) {
+      wx.showNavigationBarLoading()
+    }
+    wx.request({
+      url, method, data,
+      timeout: options.timeout || 10000,
+      success(res) {
+        wx.hideNavigationBarLoading()
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data)
+        } else {
+          reject(new Error('HTTP ' + res.statusCode))
+        }
+      },
+      fail(err) {
+        wx.hideNavigationBarLoading()
+        if (options.silent !== true) {
+          wx.showToast({ title: '网络异常，请重试', icon: 'error', duration: 2000 })
+        }
+        reject(err)
+      }
+    })
+  })
+}
+
+// --- juhe 接口封装 ---
+
+const MOCK = {
+  news: {
+    error_code: 0, result: {
+      data: [
+        { title: 'AI大模型竞争白热化', category: '科技', date: '2025-05-14', url: 'https://example.com' },
+        { title: '全球气候峰会新进展', category: '国际', date: '2025-05-14', url: 'https://example.com' }
+      ]
+    }
+  },
+  joke: {
+    error_code: 0, result: {
+      data: [{ content: '程序员最喜欢的运动是什么？跑（bug）步！' }]
+    }
+  }
+}
+
+function getNews(type, key) {
+  if (!key) return Promise.resolve(MOCK.news)
+  return request(`${JUHE_BASE}/toutiao/index?type=${type || 'top'}&key=${key}`)
+    .catch(() => MOCK.news)
+}
+
+function getJoke(key) {
+  if (!key) return Promise.resolve(MOCK.joke)
+  return request(`${JUHE_BASE}/joke/content/list.php?sort=rand&page=1&pagesize=3&key=${key}`)
+    .catch(() => MOCK.joke)
+}
+
+function getWeather(city, key) {
+  if (!key || !city) return Promise.reject(new Error('缺少city或key'))
+  return request(`${JUHE_BASE}/weather/index?city=${encodeURIComponent(city)}&dtype=json&format=2&key=${key}`)
+}
+
+module.exports = { request, getNews, getJoke, getWeather }</pre>
+  </div>
+
+  <div id="ct-chatWxml" class="code-pane">
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">&lt;!-- pages/chat/chat.wxml --&gt;
+&lt;view class="page"&gt;
+
+  &lt;!-- 消息列表 --&gt;
+  &lt;scroll-view class="msg-list" scroll-y scroll-into-view="{{scrollTo}}" scroll-with-animation&gt;
+    &lt;view wx:for="{{messages}}" wx:key="index" class="msg-wrap"&gt;
+      &lt;view class="bubble {{item.role}}"&gt;{{item.content}}&lt;/view&gt;
+    &lt;/view&gt;
+    &lt;!-- loading 气泡 --&gt;
+    &lt;view wx:if="{{sending}}" class="msg-wrap"&gt;
+      &lt;view class="bubble assistant loading"&gt;
+        &lt;text&gt;思考中 &lt;/text&gt;
+        &lt;view class="dots"&gt;&lt;view/&gt;&lt;view/&gt;&lt;view/&gt;&lt;/view&gt;
+      &lt;/view&gt;
+    &lt;/view&gt;
+    &lt;view id="bottom"&gt;&lt;/view&gt;
+  &lt;/scroll-view&gt;
+
+  &lt;!-- 调用信息（可展开） --&gt;
+  &lt;view wx:if="{{lastMeta}}" class="meta-bar" bindtap="toggleMeta"&gt;
+    &lt;text&gt;{{metaOpen ? '▲' : '▼'}} 本次调用：{{lastMeta.model}} · {{lastMeta.duration}} · {{lastMeta.totalTokens}} tokens&lt;/text&gt;
+  &lt;/view&gt;
+  &lt;view wx:if="{{lastMeta &amp;&amp; metaOpen}}" class="meta-detail"&gt;
+    &lt;view&gt;厂商：{{lastMeta.provider}}&lt;/view&gt;
+    &lt;view&gt;模型：{{lastMeta.model}}&lt;/view&gt;
+    &lt;view&gt;耗时：{{lastMeta.duration}}&lt;/view&gt;
+    &lt;view&gt;提示词 tokens：{{lastMeta.promptTokens}}&lt;/view&gt;
+    &lt;view&gt;回复 tokens：{{lastMeta.completionTokens}}&lt;/view&gt;
+  &lt;/view&gt;
+
+  &lt;!-- 输入框 --&gt;
+  &lt;view class="input-bar"&gt;
+    &lt;textarea
+      class="input"
+      value="{{inputText}}"
+      bindinput="onInput"
+      placeholder="输入消息，Enter 换行，点发送…"
+      auto-height
+      maxlength="2000"
+    /&gt;
+    &lt;button class="send-btn" bindtap="send" disabled="{{sending}}"&gt;发送&lt;/button&gt;
+    &lt;button class="clear-btn" bindtap="clearHistory"&gt;清空&lt;/button&gt;
+  &lt;/view&gt;
+&lt;/view&gt;</pre>
+  </div>
+
+  <div id="ct-chatJs" class="code-pane">
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/chat/chat.js
+const { chat, loadConfig } = require('../../utils/aiChat')
+
+Page({
+  data: {
+    messages: [],
+    inputText: '',
+    sending: false,
+    lastMeta: null,
+    metaOpen: false,
+    scrollTo: ''
+  },
+
+  onLoad() {
+    const cfg = loadConfig()
+    if (!cfg.key) {
+      wx.showModal({
+        title: '还没配置 Key',
+        content: '请先去「我的」页面配置 AI 厂商和 API Key',
+        showCancel: false,
+        success: () => wx.switchTab({ url: '/pages/setting/setting' })
+      })
+    }
+  },
+
+  onInput(e) {
+    this.setData({ inputText: e.detail.value })
+  },
+
+  toggleMeta() {
+    this.setData({ metaOpen: !this.data.metaOpen })
+  },
+
+  async send() {
+    const text = this.data.inputText.trim()
+    if (!text || this.data.sending) return
+
+    const cfg = loadConfig()
+    if (!cfg.key) {
+      wx.showToast({ title: '请先配置 API Key', icon: 'none' })
+      return
+    }
+
+    const messages = [
+      ...this.data.messages,
+      { role: 'user', content: text }
+    ]
+    this.setData({ messages, inputText: '', sending: true, scrollTo: 'bottom' })
+
+    try {
+      const res = await chat(cfg.provider, cfg.key, cfg.model, messages)
+      const updated = [...messages, { role: 'assistant', content: res.text }]
+      this.setData({
+        messages: updated,
+        sending: false,
+        scrollTo: 'bottom',
+        lastMeta: {
+          provider: cfg.provider,
+          model: res.model,
+          duration: res.duration + 'ms',
+          promptTokens: res.usage.prompt_tokens ?? '-',
+          completionTokens: res.usage.completion_tokens ?? '-',
+          totalTokens: res.usage.total_tokens ?? '-'
+        }
+      })
+    } catch(err) {
+      const errText = `[错误 ${err.status}] ${err.msg}`
+      const updated = [...messages, { role: 'assistant', content: errText }]
+      this.setData({ messages: updated, sending: false })
+      wx.showToast({ title: err.msg.slice(0, 20), icon: 'none' })
+    }
+  },
+
+  clearHistory() {
+    wx.showModal({
+      title: '确认清空', content: '清空后无法恢复',
+      success: res => {
+        if (res.confirm) this.setData({ messages: [], lastMeta: null, metaOpen: false })
+      }
+    })
+  }
+})</pre>
+  </div>
+
+  <div id="ct-settingJs" class="code-pane">
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/setting/setting.js
+const { saveConfig, loadConfig, PROVIDERS } = require('../../utils/aiChat')
+
+Page({
+  data: {
+    providerList: [],
+    providerIndex: 0,
+    apiKey: '',
+    model: '',
+    juheKey: '',
+    saved: false
+  },
+
+  onLoad() {
+    const providerList = Object.entries(PROVIDERS).map(([k, v]) => v.label)
+    const cfg = loadConfig()
+    const providerIndex = Object.keys(PROVIDERS).indexOf(cfg.provider)
+
+    this.setData({
+      providerList,
+      providerIndex: providerIndex >= 0 ? providerIndex : 0,
+      apiKey: cfg.key,
+      model: cfg.model,
+      juheKey: wx.getStorageSync('juhe_key') || ''
+    })
+    this._providerKeys = Object.keys(PROVIDERS)
+  },
+
+  onProviderChange(e) {
+    const idx = e.detail.value
+    const key = this._providerKeys[idx]
+    const defaultModel = PROVIDERS[key].defaultModel
+    this.setData({ providerIndex: idx, model: defaultModel })
+  },
+
+  onKeyInput(e)   { this.setData({ apiKey: e.detail.value }) },
+  onModelInput(e) { this.setData({ model: e.detail.value }) },
+  onJuheInput(e)  { this.setData({ juheKey: e.detail.value }) },
+
+  save() {
+    const provider = this._providerKeys[this.data.providerIndex]
+    saveConfig(provider, this.data.apiKey, this.data.model)
+    wx.setStorageSync('juhe_key', this.data.juheKey)
+    this.setData({ saved: true })
+    wx.showToast({ title: '已保存到本机', icon: 'success' })
+    setTimeout(() => this.setData({ saved: false }), 3000)
+  },
+
+  clearAll() {
+    wx.showModal({
+      title: '确认清除', content: '清除所有已保存的 Key？',
+      success: res => {
+        if (!res.confirm) return
+        wx.clearStorageSync()
+        this.setData({ apiKey: '', model: '', juheKey: '' })
+        wx.showToast({ title: '已清除', icon: 'success' })
+      }
+    })
+  }
+})</pre>
   </div>
 </div>
-
-<div id="section-lab-mp" class="section">
-  <div class="container">
-    <div class="card">
-      <h2>📱 小程序「原型级」交互演示（非真机，仅 UI 结构）</h2>
-      <p class="small">用于课堂讲解信息架构：底部 Tab、首页入口、AI 对话、我的配置。点击底部 Tab 切换。</p>
-      <div class="phone" style="margin-top:12px">
-        <div class="notch"><span></span></div>
-        <div class="screen">
-          <div id="mp-page-home" class="mp-page active">
-            <div class="mp-title">首页</div>
-            <div class="mp-sub">宫格入口：新闻 / 笑话 / 星座 / 电商 JSON / AI / 我的。</div>
-            <div class="mp-card"><b>今日一句</b><div class="mp-sub">把「能跑」升级成「好用」：加载态、错误提示、空态。</div></div>
-          </div>
-          <div id="mp-page-ai" class="mp-page">
-            <div class="mp-title">AI</div>
-            <div class="chat">
-              <div class="bubble user">帮我生成一个「校园生活」小程序功能清单。</div>
-              <div class="bubble ai">可以：课表提醒、食堂热量、社团活动、二手书、失物招领…（课堂演示：真实回复来自后端/模型）</div>
-            </div>
-            <div class="mp-card mono" style="font-size:12px;color:#334155">
-              模型信息：provider / model / status / duration / tokens…
-            </div>
-          </div>
-          <div id="mp-page-me" class="mp-page">
-            <div class="mp-title">我的</div>
-            <div class="mp-card">聚合数据 Key：<span class="mono">******</span></div>
-            <div class="mp-card">大模型：豆包/千问/Kimi/DeepSeek + API Key 本地保存</div>
-          </div>
-        </div>
-        <div class="mp-tabbar">
-          <div class="mp-tab active" onclick="mpTab('home',this)">首页</div>
-          <div class="mp-tab" onclick="mpTab('ai',this)">AI</div>
-          <div class="mp-tab" onclick="mpTab('me',this)">我的</div>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 </div>
 
+<!-- ==================== REFS ==================== -->
 <div id="section-refs" class="section">
-  <div class="container">
-    <div class="card">
-      <h2>🔗 合法域名与接口备忘</h2>
-      <table>
-        <tr><th>用途</th><th>典型域名/host</th><th>备注</th></tr>
-        <tr><td>聚合数据</td><td class="mono">v.juhe.cn</td><td>具体路径以控制台申请接口为准</td></tr>
-        <tr><td>DeepSeek</td><td class="mono">api.deepseek.com</td><td>OpenAI 兼容 <code>/v1/chat/completions</code></td></tr>
-        <tr><td>Moonshot</td><td class="mono">api.moonshot.cn</td><td>OpenAI 兼容</td></tr>
-        <tr><td>DashScope</td><td class="mono">dashscope.aliyuncs.com</td><td>兼容模式 <code>/compatible-mode/v1/chat/completions</code></td></tr>
-        <tr><td>火山方舟</td><td class="mono">ark.cn-beijing.volces.com</td><td><code>/api/v3/chat/completions</code></td></tr>
-        <tr><td>电商示例</td><td class="mono">openapi.vmall.com</td><td>课堂解析 JSON 结构用</td></tr>
-      </table>
-      <div class="tip orange">
-        <strong>juhe 示例（GET）</strong>
-        <div class="mono" style="margin-top:6px">https://v.juhe.cn/toutiao/index?type=top&amp;key=你的Key</div>
-      </div>
-    </div>
+<div class="container">
+<div class="card">
+  <h2>🔗 接口速查 & 合法域名列表</h2>
+
+  <h3>需要在微信公众平台配置的合法域名</h3>
+  <table>
+    <tr><th>用途</th><th>域名（加入 request 合法域名）</th><th>备注</th></tr>
+    <tr><td>聚合数据新闻/笑话/天气</td><td><code>v.juhe.cn</code></td><td>需 juhe.cn 账号申请接口 Key</td></tr>
+    <tr><td>DeepSeek</td><td><code>api.deepseek.com</code></td><td>OpenAI 兼容，<code>/v1/chat/completions</code></td></tr>
+    <tr><td>阿里千问 DashScope</td><td><code>dashscope.aliyuncs.com</code></td><td>兼容模式路径：<code>/compatible-mode/v1/chat/completions</code></td></tr>
+    <tr><td>Kimi Moonshot</td><td><code>api.moonshot.cn</code></td><td>OpenAI 兼容，<code>/v1/chat/completions</code></td></tr>
+    <tr><td>字节豆包火山方舟</td><td><code>ark.cn-beijing.volces.com</code></td><td><code>/api/v3/chat/completions</code>，model 填 ep-xxxx</td></tr>
+  </table>
+
+  <h3 style="margin-top:20px">juhe 常用接口</h3>
+  <table>
+    <tr><th>接口</th><th>URL</th><th>参数</th></tr>
+    <tr><td>今日头条新闻</td><td><code>https://v.juhe.cn/toutiao/index</code></td><td>type=top&key=YOUR_KEY</td></tr>
+    <tr><td>笑话大全</td><td><code>https://v.juhe.cn/joke/content/list.php</code></td><td>sort=rand&page=1&pagesize=5&key=YOUR_KEY</td></tr>
+    <tr><td>天气查询</td><td><code>https://v.juhe.cn/weather/index</code></td><td>city=北京&dtype=json&format=2&key=YOUR_KEY</td></tr>
+    <tr><td>星座运势</td><td><code>https://web.juhe.cn/constellation/getAll</code></td><td>consName=白羊座&key=YOUR_KEY</td></tr>
+  </table>
+
+  <h3 style="margin-top:20px">公共测试接口（无需 Key）</h3>
+  <table>
+    <tr><th>用途</th><th>URL</th></tr>
+    <tr><td>文章列表（GET）</td><td><code>https://jsonplaceholder.typicode.com/posts</code></td></tr>
+    <tr><td>单条记录（GET）</td><td><code>https://jsonplaceholder.typicode.com/posts/1</code></td></tr>
+    <tr><td>创建记录（POST）</td><td><code>https://jsonplaceholder.typicode.com/posts</code></td></tr>
+  </table>
+
+  <div class="tip orange" style="margin-top:14px">
+    <strong>📋 juhe Key 申请流程</strong>
+    注册 juhe.cn → 进入控制台 → 数据中心 → 申请所需接口（大部分每天500次免费）→ 复制 AppKey → 在小程序配置页粘贴保存。
   </div>
+  <div class="tip purple">
+    <strong>💰 AI 接口费用参考（2025年）</strong>
+    DeepSeek chat：¥1/百万tokens（极低成本，推荐课堂使用）；千问 turbo：¥0.3/百万tokens；Kimi moonshot-v1-8k：¥12/百万tokens；豆包：按 Endpoint 计费。
+  </div>
+</div>
+</div>
 </div>
 
 <script>
 (function(){
-  const PRESETS = {
-    deepseek:{label:'DeepSeek',url:'https://api.deepseek.com/v1/chat/completions',model:'deepseek-chat'},
-    qwen:{label:'阿里千问',url:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',model:'qwen-turbo'},
-    moonshot:{label:'Kimi',url:'https://api.moonshot.cn/v1/chat/completions',model:'moonshot-v1-8k'},
-    doubao:{label:'字节豆包',url:'https://ark.cn-beijing.volces.com/api/v3/chat/completions',model:'请填 ep-xxxx（Endpoint ID）'}
-  }
-  let vendor = 'deepseek'
-
-  window.showSection = function(id, btn){
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'))
-    document.querySelectorAll('nav .tabs button').forEach(b=>b.classList.remove('active'))
+  // ---- Section / Day navigation ----
+  window.showSection = function(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+    document.querySelectorAll('nav .tabs button').forEach(b => b.classList.remove('active'))
     const el = document.getElementById('section-' + id)
-    if(el) el.classList.add('active')
-    if(btn) btn.classList.add('active')
+    if (el) el.classList.add('active')
+    if (btn) btn.classList.add('active')
   }
 
-  window.showDay = function(day, btn){
-    document.querySelectorAll('.day-pane').forEach(p=>p.classList.remove('active'))
-    document.querySelectorAll('.day-tab').forEach(b=>b.classList.remove('active'))
-    const pane = document.getElementById('day-' + day)
-    if(pane) pane.classList.add('active')
-    if(btn) btn.classList.add('active')
+  window.showDay = function(day, btn) {
+    document.querySelectorAll('.day-content').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'))
+    const el = document.getElementById('day-' + day)
+    if (el) el.classList.add('active')
+    if (btn) btn.classList.add('active')
   }
 
-  window.mpTab = function(page, el){
-    document.querySelectorAll('.mp-tab').forEach(t=>t.classList.remove('active'))
-    document.querySelectorAll('.mp-page').forEach(p=>p.classList.remove('active'))
-    el.classList.add('active')
-    const map = {home:'mp-page-home', ai:'mp-page-ai', me:'mp-page-me'}
-    const node = document.getElementById(map[page])
-    if(node) node.classList.add('active')
+  window.showCodeTab = function(id, btn) {
+    document.querySelectorAll('.code-pane').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.code-tab').forEach(b => b.classList.remove('active'))
+    const el = document.getElementById(id)
+    if (el) el.classList.add('active')
+    if (btn) btn.classList.add('active')
   }
 
-  function pretty(obj){
-    try{return JSON.stringify(typeof obj==='string'?JSON.parse(obj):obj,null,2)}catch(e){return String(obj)}
+  window.copyCode = function(btn) {
+    const pre = btn.parentElement
+    const text = pre.innerText.replace(/^复制\n/, '')
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '已复制'
+      setTimeout(() => { btn.textContent = '复制' }, 2000)
+    }).catch(() => {
+      btn.textContent = '失败'
+      setTimeout(() => { btn.textContent = '复制' }, 2000)
+    })
   }
 
-  // LLM tabs
-  document.querySelectorAll('#llmVendorTabs button').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-      document.querySelectorAll('#llmVendorTabs button').forEach(b=>b.classList.remove('active'))
+  // ---- Sandbox ----
+  const PRESETS = {
+    deepseek: { label:'DeepSeek', url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat' },
+    qwen:     { label:'阿里千问', url:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', model:'qwen-turbo' },
+    moonshot: { label:'Kimi',    url:'https://api.moonshot.cn/v1/chat/completions', model:'moonshot-v1-8k' },
+    doubao:   { label:'字节豆包', url:'https://ark.cn-beijing.volces.com/api/v3/chat/completions', model:'' }
+  }
+  let sbVendor = 'deepseek'
+  let sbHistory = []  // [{role,content}]
+
+  // Vendor tabs
+  document.querySelectorAll('#vendorTabs .vendor-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#vendorTabs .vendor-tab').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
-      vendor = btn.getAttribute('data-v')
-      const p = PRESETS[vendor]
-      document.getElementById('llmUrl').value = localStorage.getItem('llm_url_'+vendor) || p.url
-      document.getElementById('llmModel').value = localStorage.getItem('llm_model_'+vendor) || p.model
-      document.getElementById('llmKey').value = localStorage.getItem('llm_key_'+vendor) || ''
+      sbVendor = btn.getAttribute('data-v')
+      const p = PRESETS[sbVendor]
+      document.getElementById('sbUrl').value = localStorage.getItem('sb_url_'+sbVendor) || p.url
+      document.getElementById('sbModel').value = localStorage.getItem('sb_model_'+sbVendor) || p.model
+      document.getElementById('sbKey').value = localStorage.getItem('sb_key_'+sbVendor) || ''
     })
   })
 
-  function llmApplyPreset() {
-    const urlEl = document.getElementById('llmUrl')
-    if (!urlEl.value.trim()) urlEl.value = PRESETS[vendor].url
-    const modelEl = document.getElementById('llmModel')
-    if (!modelEl.value.trim()) modelEl.value = PRESETS[vendor].model
+  window.sbSave = function() {
+    localStorage.setItem('sb_key_'+sbVendor, document.getElementById('sbKey').value.trim())
+    localStorage.setItem('sb_model_'+sbVendor, document.getElementById('sbModel').value.trim())
+    localStorage.setItem('sb_url_'+sbVendor, document.getElementById('sbUrl').value.trim())
+    alert('已保存到浏览器 localStorage（按厂商分键）')
   }
+  window.sbLoad = function() {
+    const p = PRESETS[sbVendor]
+    document.getElementById('sbKey').value = localStorage.getItem('sb_key_'+sbVendor) || ''
+    document.getElementById('sbModel').value = localStorage.getItem('sb_model_'+sbVendor) || p.model
+    document.getElementById('sbUrl').value = localStorage.getItem('sb_url_'+sbVendor) || p.url
+  }
+  window.sbClearHistory = function() {
+    sbHistory = []
+    document.getElementById('sbChat').innerHTML = ''
+    const meta = document.getElementById('sbMeta')
+    meta.style.display = 'none'
+  }
+  window.sbClearOut = window.sbClearHistory
 
-  window.llmSave = function(){
-    const key = document.getElementById('llmKey').value.trim()
-    const model = document.getElementById('llmModel').value.trim()
-    const url = document.getElementById('llmUrl').value.trim()
-    localStorage.setItem('llm_key_'+vendor, key)
-    localStorage.setItem('llm_model_'+vendor, model)
-    localStorage.setItem('llm_url_'+vendor, url)
-    alert('已保存到浏览器 localStorage（按厂商分键）。')
-  }
-  window.llmLoad = function(){
-    document.getElementById('llmKey').value = localStorage.getItem('llm_key_'+vendor) || ''
-    document.getElementById('llmModel').value = localStorage.getItem('llm_model_'+vendor) || PRESETS[vendor].model
-    document.getElementById('llmUrl').value = localStorage.getItem('llm_url_'+vendor) || PRESETS[vendor].url
-  }
-  window.llmClearOut = function(){
-    const o = document.getElementById('llmOut')
-    o.style.display='none'
-    o.textContent=''
-  }
-
-  window.llmSend = async function(){
-    llmApplyPreset()
-    const apiKey = document.getElementById('llmKey').value.trim()
-    const model = document.getElementById('llmModel').value.trim()
-    const url = document.getElementById('llmUrl').value.trim()
-    const prompt = document.getElementById('llmPrompt').value.trim()
-    const out = document.getElementById('llmOut')
-    out.style.display='block'
-    if(!apiKey || !model || !url || !prompt){
-      out.textContent = pretty({error:'请填写 key / model / url / prompt'})
-      return
+  function sbAppend(role, content) {
+    const box = document.getElementById('sbChat')
+    const div = document.createElement('div')
+    div.className = 'bubble ' + role
+    if (role === 'system') {
+      div.className = 'bubble system'
     }
+    div.textContent = content
+    box.appendChild(div)
+    box.scrollTop = box.scrollHeight
+    return div
+  }
+
+  window.sbSend = async function() {
+    const key = document.getElementById('sbKey').value.trim()
+    const model = document.getElementById('sbModel').value.trim() || PRESETS[sbVendor].model
+    const url = document.getElementById('sbUrl').value.trim() || PRESETS[sbVendor].url
+    const prompt = document.getElementById('sbPrompt').value.trim()
+    const system = document.getElementById('sbSystem').value.trim()
+
+    if (!prompt) { alert('请输入消息'); return }
+    if (!key) { alert('请填写 API Key（点「保存到本机」可记住）'); return }
+
+    // Add user bubble
+    sbHistory.push({ role: 'user', content: prompt })
+    sbAppend('user', prompt)
+    document.getElementById('sbPrompt').value = ''
+
+    // Typing indicator
+    const typingDiv = sbAppend('ai', '')
+    typingDiv.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>'
+
     const t0 = performance.now()
-    let status = -1
-    let text = ''
-    let usage = null
-    let raw = ''
-    try{
-      const res = await fetch(url,{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer ' + apiKey
+    let statusCode = -1
+    let usageObj = null
+
+    try {
+      const allMessages = [
+        { role: 'system', content: system },
+        ...sbHistory
+      ]
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + key
         },
-        body: JSON.stringify({
-          model,
-          temperature: 0.6,
-          messages:[{role:'system',content:'你是课堂助教，回答简洁。'},{role:'user',content:prompt}]
-        })
+        body: JSON.stringify({ model, messages: allMessages, temperature: 0.7 })
       })
-      status = res.status
+      statusCode = res.status
       const data = await res.json()
-      raw = JSON.stringify(data).slice(0, 2400)
-      usage = data.usage || null
-      const c0 = data.choices && data.choices[0]
-      text = (c0 && c0.message && c0.message.content) ? c0.message.content : raw
-    }catch(err){
-      text = 'fetch 失败（常见原因：CORS、DNS、公司网络拦截、Key 无效）。\n错误信息：' + (err && err.message ? err.message : String(err))
+      const ms = Math.round(performance.now() - t0)
+
+      if (data.choices && data.choices[0]) {
+        const reply = data.choices[0].message.content
+        sbHistory.push({ role: 'assistant', content: reply })
+        typingDiv.textContent = reply
+        typingDiv.className = 'bubble ai'
+        usageObj = data.usage
+
+        // Show meta
+        const meta = document.getElementById('sbMeta')
+        const kv = document.getElementById('sbMetaKv')
+        meta.style.display = 'block'
+        const rows = [
+          ['厂商', PRESETS[sbVendor].label],
+          ['模型', data.model || model],
+          ['HTTP', String(statusCode)],
+          ['耗时(ms)', String(ms)],
+          ['prompt tokens', String((data.usage||{}).prompt_tokens||'-')],
+          ['completion tokens', String((data.usage||{}).completion_tokens||'-')],
+          ['total tokens', String((data.usage||{}).total_tokens||'-')],
+        ]
+        kv.innerHTML = rows.map(([k,v]) =>
+          `<div class="k">${k}</div><div class="v">${v}</div>`
+        ).join('')
+      } else {
+        const errMsg = (data.error && data.error.message) || JSON.stringify(data).slice(0,300)
+        typingDiv.textContent = '[错误 ' + statusCode + '] ' + errMsg
+        typingDiv.className = 'bubble ai'
+        sbHistory.pop()
+      }
+    } catch(err) {
+      typingDiv.textContent = 'fetch 失败（常见原因：CORS / 网络 / Key 无效）\n' + (err.message || String(err))
+      typingDiv.className = 'bubble ai'
+      sbHistory.pop()
     }
-    const ms = Math.round(performance.now() - t0)
-    out.innerHTML = ''
-    const meta = document.createElement('div')
-    const rows = [
-      ['厂商', PRESETS[vendor].label],
-      ['Endpoint', url],
-      ['Model', model],
-      ['HTTP', String(status)],
-      ['耗时(ms)', String(ms)],
-      ['usage', usage ? pretty(usage) : '（无）'],
-    ]
-    const title = document.createElement('div')
-    title.textContent = '本次调用信息'
-    title.style.fontWeight = '900'
-    title.style.marginBottom = '8px'
-    title.style.color = '#fff'
-    meta.appendChild(title)
-    const grid = document.createElement('div')
-    grid.className = 'kv'
-    rows.forEach(([k, v]) => {
-      const kk = document.createElement('div')
-      kk.textContent = k
-      kk.style.color = '#94a3b8'
-      kk.style.fontWeight = '800'
-      const vv = document.createElement('div')
-      vv.textContent = String(v)
-      vv.className = 'mono'
-      vv.style.color = '#e2e8f0'
-      vv.style.wordBreak = 'break-all'
-      grid.appendChild(kk)
-      grid.appendChild(vv)
-    })
-    meta.appendChild(grid)
-    const pre = document.createElement('pre')
-    pre.style.marginTop = '10px'
-    pre.style.whiteSpace = 'pre-wrap'
-    pre.style.wordBreak = 'break-word'
-    pre.textContent = '模型输出：\n' + text + '\n\n原始JSON摘要：\n' + (raw || text)
-    out.appendChild(meta)
-    out.appendChild(pre)
   }
 
-  window.httpFillJuhe = function(){
-    document.getElementById('httpMethod').value = 'GET'
-    document.getElementById('httpHeaders').value = '{}'
-    document.getElementById('httpBody').value = '{}'
-    document.getElementById('httpUrl').value = 'https://v.juhe.cn/toutiao/index?type=top&key=YOUR_JUHE_KEY'
+  // ---- HTTP debugger ----
+  const HTTP_TPLS = {
+    juhe_news: { url:'https://v.juhe.cn/toutiao/index?type=top&key=YOUR_JUHE_KEY', method:'GET', headers:'{}', body:'{}' },
+    juhe_joke: { url:'https://v.juhe.cn/joke/content/list.php?sort=rand&page=1&pagesize=3&key=YOUR_JUHE_KEY', method:'GET', headers:'{}', body:'{}' },
+    echo:      { url:'https://jsonplaceholder.typicode.com/posts/1', method:'GET', headers:'{}', body:'{}' }
   }
-  window.httpFillEcho = function(){
-    document.getElementById('httpMethod').value = 'GET'
-    document.getElementById('httpUrl').value = 'https://jsonplaceholder.typicode.com/todos/1'
-    document.getElementById('httpHeaders').value = '{}'
-    document.getElementById('httpBody').value = '{}'
+  window.httpFill = function(tpl) {
+    const t = HTTP_TPLS[tpl]
+    if (!t) return
+    document.getElementById('httpUrl').value = t.url
+    document.getElementById('httpMethod').value = t.method
+    document.getElementById('httpHeaders').value = t.headers
+    document.getElementById('httpBody').value = t.body
   }
 
-  window.httpSend = async function(){
+  window.httpSend = async function() {
     const url = document.getElementById('httpUrl').value.trim()
     const method = document.getElementById('httpMethod').value
-    let headers = {}
-    let body = {}
-    try{ headers = JSON.parse(document.getElementById('httpHeaders').value || '{}') }catch(e){ alert('Headers 不是合法 JSON'); return }
-    try{ body = JSON.parse(document.getElementById('httpBody').value || '{}') }catch(e){ alert('Body 不是合法 JSON'); return }
     const out = document.getElementById('httpOut')
+    let headers = {}, body = {}
+    try { headers = JSON.parse(document.getElementById('httpHeaders').value || '{}') } catch(e) { alert('Headers 不是合法 JSON'); return }
+    try { body = JSON.parse(document.getElementById('httpBody').value || '{}') } catch(e) { alert('Body 不是合法 JSON'); return }
     out.textContent = '请求中...'
     const t0 = performance.now()
-    try{
-      const res = await fetch(url,{
+    try {
+      const res = await fetch(url, {
         method,
         headers,
         body: method === 'POST' ? JSON.stringify(body) : undefined
       })
       const ms = Math.round(performance.now()-t0)
-      const ct = res.headers.get('content-type') || ''
       const txt = await res.text()
       let parsed = txt
-      try{ parsed = JSON.parse(txt) }catch(e){}
-      out.textContent = pretty({
-        ok: res.ok,
-        status: res.status,
-        contentType: ct,
-        durationMs: ms,
-        body: parsed
-      })
-    }catch(err){
-      out.textContent = pretty({error:String(err && err.message || err), hint:'若控制台提示 CORS，可改用小程序 wx.request 或同域后端转发。'})
+      try { parsed = JSON.parse(txt) } catch(e) {}
+      out.textContent = JSON.stringify({ ok: res.ok, status: res.status, durationMs: ms, body: parsed }, null, 2)
+    } catch(err) {
+      out.textContent = JSON.stringify({ error: String(err.message||err), hint: '若控制台提示 CORS，可改用小程序 wx.request 或同域后端转发。' }, null, 2)
     }
   }
 
-  // init llm defaults
-  vendor = 'deepseek'
-  document.querySelector('#llmVendorTabs button[data-v="deepseek"]').click()
+  // ---- Mini-program prototype ----
+  window.switchMpTab = function(page, tabEl) {
+    document.querySelectorAll('.mp-page').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.mp-tab').forEach(t => t.classList.remove('active'))
+    const pageEl = document.getElementById('mp-' + page)
+    if (pageEl) pageEl.classList.add('active')
+    if (tabEl) tabEl.classList.add('active')
+  }
+
+  window.mpGo = function(page) {
+    // non-tab pages just show their page element
+    document.querySelectorAll('.mp-page').forEach(p => p.classList.remove('active'))
+    const el = document.getElementById('mp-' + page)
+    if (el) el.classList.add('active')
+    document.querySelectorAll('.mp-tab').forEach(t => t.classList.remove('active'))
+  }
+
+  window.mpBack = function() {
+    switchMpTab('home', document.querySelector('.mp-tab[data-p="home"]'))
+  }
+
+  const MP_REPLIES = [
+    '好的，我来帮你分析一下这个问题。',
+    '这是一个很好的问题！简单来说：小程序通过 wx.request 发起网络请求，服务端验证 appid 和合法域名以确保安全。',
+    '根据你的描述，建议可以这样实现：先在 utils/request.js 封装统一的请求函数，再在页面中调用。',
+    '对于这个需求，推荐使用 wx.setStorageSync 在本地保存 Key，避免写死在代码里。',
+    '你说得对，OpenAI 兼容格式的接口都使用 /v1/chat/completions，只需要改 Endpoint 和 model 就能切换厂商。'
+  ]
+  let mpReplyIdx = 0
+
+  window.mpSend = function() {
+    const input = document.getElementById('mp-chat-input')
+    const text = input.value.trim()
+    if (!text) return
+    input.value = ''
+
+    const box = document.getElementById('mp-chat-msg')
+    // User bubble
+    const ub = document.createElement('div')
+    ub.className = 'mp-bubble-u'
+    ub.textContent = text
+    box.appendChild(ub)
+
+    // AI reply after delay
+    setTimeout(() => {
+      const ab = document.createElement('div')
+      ab.className = 'mp-bubble-a'
+      ab.textContent = MP_REPLIES[mpReplyIdx % MP_REPLIES.length]
+      mpReplyIdx++
+      box.appendChild(ab)
+      box.scrollTop = box.scrollHeight
+    }, 800)
+    box.scrollTop = box.scrollHeight
+  }
+
+  // Set date
+  const d = new Date()
+  const dateEl = document.getElementById('mp-date')
+  if (dateEl) dateEl.textContent = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+
+  // Init sandbox defaults
+  document.querySelector('#vendorTabs .vendor-tab[data-v="deepseek"]').click()
 })()
 </script>
 </body>

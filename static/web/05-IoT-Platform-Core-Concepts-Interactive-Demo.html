@@ -444,6 +444,10 @@ hr.div { border: none; border-top: 1px solid var(--border2); transition: border-
 </head>
 <body>
 
+<a href="https://sykdl.com/" target="_blank" style="position:fixed;top:12px;left:14px;z-index:9999;display:flex;align-items:center;line-height:0;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:8px;padding:5px 10px;border:1px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.2);">
+  <img src="/img/logo.png" alt="叩丁狼" style="height:26px;width:auto;border-radius:3px;">
+</a>
+
 <!-- ── 主题切换按钮（默认亮色，显示切换到暗色） ── -->
 <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">
   <span class="t-icon" id="toggleIcon">🌙</span>
@@ -855,13 +859,25 @@ function updateSVGTheme(theme) {
   set('svgRolePlat', 'fill', light ? '#4338ca' : '#667eea');
 }
 
-/* 初始化：读取 localStorage */
+/* 初始化：读取 localStorage，未设置时跟随系统 prefers-color-scheme */
 (function() {
-  var saved = localStorage.getItem('iot-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('toggleIcon').textContent  = saved === 'light' ? '🌙' : '☀️';
-  document.getElementById('toggleLabel').textContent = saved === 'light' ? '暗色' : '亮色';
-  updateSVGTheme(saved);
+  var saved = localStorage.getItem('iot-theme');
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('toggleIcon').textContent  = theme === 'light' ? '🌙' : '☀️';
+  document.getElementById('toggleLabel').textContent = theme === 'light' ? '暗色' : '亮色';
+  updateSVGTheme(theme);
+  // 监听系统主题变化（仅在未手动设置时生效）
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (!localStorage.getItem('iot-theme')) {
+      var t = e.matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+      document.getElementById('toggleIcon').textContent  = t === 'light' ? '🌙' : '☀️';
+      document.getElementById('toggleLabel').textContent = t === 'light' ? '暗色' : '亮色';
+      updateSVGTheme(t);
+    }
+  });
 })();
 
 /* ============================================================

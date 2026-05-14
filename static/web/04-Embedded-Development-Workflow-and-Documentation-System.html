@@ -478,6 +478,10 @@
 </head>
 <body>
 
+<a href="https://sykdl.com/" target="_blank" style="position:fixed;top:12px;left:14px;z-index:9999;display:flex;align-items:center;line-height:0;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:8px;padding:5px 10px;border:1px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.2);">
+  <img src="/img/logo.png" alt="叩丁狼" style="height:26px;width:auto;border-radius:3px;">
+</a>
+
 <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">
   <span class="toggle-icon" id="toggleIcon">☀️</span>
   <span id="toggleLabel">亮色</span>
@@ -1024,14 +1028,23 @@
 </div>
 
 <script>
-  // 主题切换逻辑
+  // 主题切换逻辑（跟随系统 prefers-color-scheme，手动切换后记忆）
   (function() {
     var saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.getElementById('toggleIcon').textContent  = '🌙';
-      document.getElementById('toggleLabel').textContent = '暗色';
-    }
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = saved || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('toggleIcon').textContent  = theme === 'dark' ? '☀️' : '🌙';
+    document.getElementById('toggleLabel').textContent = theme === 'dark' ? '亮色' : '暗色';
+    // 监听系统主题变化（仅在未手动设置时生效）
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (!localStorage.getItem('theme')) {
+        var t = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.getElementById('toggleIcon').textContent  = t === 'dark' ? '☀️' : '🌙';
+        document.getElementById('toggleLabel').textContent = t === 'dark' ? '亮色' : '暗色';
+      }
+    });
   })();
 
   function toggleTheme() {

@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>竞技打分系统</title>
+<link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
+<style>
+/* ══ THEME VARIABLES ══ */
+:root {
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#e6edf3;--sub:#8b949e;--primary:#2575fc;--green:#2ea043;
+  --gold:#FFD700;--silver:#C0C0C0;--bronze:#CD7F32;
+  --red:#f85149;--yellow:#f0c040;--shadow:0 2px 12px rgba(0,0,0,.35);
+  --input-bg:#0d1117;
+}
+[data-theme="light"] {
+  --bg:#f6f8fa;--bg2:#ffffff;--bg3:#f1f3f5;--border:#d0d7de;
+  --text:#1f2328;--sub:#636c76;--primary:#0969da;--green:#1a7f37;
+  --gold:#b87a00;--silver:#6e7781;--bronze:#7d4e1e;
+  --red:#d1242f;--yellow:#9a6700;--shadow:0 2px 12px rgba(0,0,0,.10);
+  --input-bg:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s;}
+
+/* ══ Header ══ */
+.header{background:linear-gradient(135deg,#0d1117 0%,#1a2744 100%);border-bottom:1px solid var(--border);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;gap:8px;overflow:hidden;}
+[data-theme="light"] .header{background:linear-gradient(135deg,#1565C0 0%,#1976D2 100%);}
+.header-title{font-size:18px;font-weight:700;background:linear-gradient(90deg,#58a6ff,#2575fc);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+[data-theme="light"] .header-title{background:linear-gradient(90deg,#fff,#e3f2fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.header-sub{font-size:11px;color:var(--sub);margin-top:2px;}
+[data-theme="light"] .header-sub{color:rgba(255,255,255,.75);}
+.header-right{display:flex;align-items:center;gap:10px;}
+.theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;
+  border-radius:8px;padding:6px 12px;cursor:pointer;font-size:16px;transition:all .2s;line-height:1;white-space:nowrap;}
+.theme-btn:hover{background:rgba(255,255,255,.28);}
+[data-theme="light"] .theme-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);color:#fff;}
+
+/* ══ Session banner ══ */
+.session-bar{display:none;background:linear-gradient(90deg,#b91c1c,#dc2626);color:#fff;
+  padding:10px 20px;text-align:center;font-size:14px;font-weight:600;
+  align-items:center;justify-content:center;gap:12px;}
+.session-bar.active{display:flex;}
+.session-bar.expired{background:linear-gradient(90deg,#1a7f37,#2ea043);}
+.countdown-ring{font-size:22px;font-weight:900;font-family:monospace;min-width:40px;text-align:center;}
+.countdown-ring.urgent{animation:pulse .5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ══ Tabs ══ */
+.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;}
+.tab{padding:14px 18px;cursor:pointer;font-size:13px;font-weight:600;color:var(--sub);
+  border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:#58a6ff;border-bottom-color:#58a6ff;}
+[data-theme="light"] .tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.page{display:none;padding:20px;max-width:1400px;margin:0 auto;}
+.page.active{display:block;}
+
+/* ══ Cards ══ */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title .icon{font-size:17px;}
+
+/* ══ Grid ══ */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* ══ Scoreboard ══ */
+.scoreboard{display:grid;grid-template-columns:1fr 360px;gap:18px;}
+@media(max-width:1000px){.scoreboard{grid-template-columns:1fr;}}
+.rank-list{display:flex;flex-direction:column;gap:9px;}
+.rank-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;transition:all .3s;}
+.rank-item:nth-child(1){border-color:var(--gold);}
+.rank-item:nth-child(2){border-color:var(--silver);}
+.rank-item:nth-child(3){border-color:var(--bronze);}
+.rank-medal{font-size:26px;flex-shrink:0;width:40px;text-align:center;}
+.rank-num{font-size:22px;font-weight:700;color:var(--sub);width:40px;text-align:center;}
+.rank-info{flex:1;min-width:0;}
+.rank-name{font-size:15px;font-weight:600;margin-bottom:3px;}
+.rank-detail{font-size:11px;color:var(--sub);}
+.rank-score{font-size:26px;font-weight:700;flex-shrink:0;}
+.rank-score.gold{color:var(--gold);}
+.rank-score.silver{color:var(--silver);}
+.rank-score.bronze{color:var(--bronze);}
+.rank-score.normal{color:#58a6ff;}
+.rank-bar{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#2575fc,#58a6ff);transition:width .5s;}
+.no-data{text-align:center;padding:50px 20px;color:var(--sub);font-size:13px;}
+.no-data .emoji{font-size:42px;margin-bottom:10px;}
+
+/* ══ Stats ══ */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.stat-num{font-size:22px;font-weight:700;}
+.stat-lbl{font-size:11px;color:var(--sub);margin-top:2px;}
+
+/* ══ Judge ══ */
+.judge-login-wrap{max-width:400px;margin:50px auto;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;color:var(--sub);margin-bottom:5px;display:block;}
+.input{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;
+  padding:9px 12px;color:var(--text);font-size:13px;transition:border .2s;}
+.input:focus{outline:none;border-color:#58a6ff;}
+.input::placeholder{color:var(--sub);}
+select.input option{background:var(--bg3);}
+.btn{padding:9px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-primary{background:#2575fc;color:#fff;}
+.btn-primary:hover{background:#1a63e8;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{opacity:.88;}
+.btn-danger{background:#b91c1c;color:#fff;}
+.btn-danger:hover{background:#991b1b;}
+.btn-warning{background:#9e6a03;color:#fff;}
+.btn-warning:hover{background:#854f0b;}
+.btn-default{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+.btn-default:hover{background:var(--border);}
+.btn-info{background:#1d6fa4;color:#fff;}
+.btn-info:hover{background:#1a5f8e;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-full{width:100%;}
+
+/* ══ Countdown on judge page ══ */
+.session-notice{background:linear-gradient(135deg,#7f1d1d,#b91c1c);border:1px solid #dc2626;
+  border-radius:10px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.session-notice.done{background:linear-gradient(135deg,#14532d,#16a34a);border-color:#22c55e;}
+.session-notice.warning{background:linear-gradient(135deg,#78350f,#d97706);border-color:#f59e0b;}
+.sn-title{font-size:14px;font-weight:700;color:#fff;}
+.sn-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:3px;}
+.sn-countdown{font-size:36px;font-weight:900;color:#fff;font-family:monospace;min-width:52px;text-align:center;}
+
+/* ══ Score input ══ */
+.program-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px;}
+.prog-card{background:var(--bg3);border:2px solid var(--border);border-radius:8px;
+  padding:12px;cursor:pointer;transition:all .2s;text-align:center;}
+.prog-card:hover{border-color:#58a6ff;}
+.prog-card.selected{border-color:#2575fc;background:var(--bg2);}
+.prog-card.scored{border-color:var(--green);}
+.prog-card.current-session{border-color:#dc2626;animation:borderPulse 1.5s infinite;}
+@keyframes borderPulse{0%,100%{border-color:#dc2626;}50%{border-color:#f87171;}}
+.prog-card .prog-name{font-size:13px;font-weight:600;margin-bottom:5px;}
+.prog-card .prog-status{font-size:11px;color:var(--sub);}
+.prog-card.scored .prog-status{color:#56d364;}
+.score-input-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.score-slider{width:100%;margin:14px 0;accent-color:#2575fc;}
+.score-display{font-size:52px;font-weight:700;text-align:center;color:#58a6ff;font-family:monospace;letter-spacing:2px;}
+.score-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.score-btn{padding:7px 13px;border-radius:5px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text);cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;}
+.score-btn:hover{background:#2575fc;border-color:#2575fc;color:#fff;}
+.judge-header{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.judge-name-tag{font-size:15px;font-weight:700;}
+.judge-id-tag{font-size:11px;color:var(--sub);}
+
+/* ══ Admin ══ */
+.admin-tabs{display:flex;gap:3px;margin-bottom:18px;background:var(--bg3);padding:4px;border-radius:8px;width:fit-content;flex-wrap:wrap;}
+.admin-tab{padding:7px 16px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;color:var(--sub);transition:all .2s;white-space:nowrap;}
+.admin-tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.admin-page{display:none;}
+.admin-page.active{display:block;}
+
+/* ══ Table ══ */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--bg3);color:var(--sub);font-weight:700;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(88,166,255,.04);}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600;}
+.badge-green{background:#0d2318;color:#56d364;border:1px solid #2ea043;}
+.badge-red{background:#2d1f1f;color:#f85149;border:1px solid #b91c1c;}
+.badge-blue{background:#1a2744;color:#58a6ff;border:1px solid #1d6fa4;}
+.badge-yellow{background:#2d2000;color:#f0c040;border:1px solid #9e6a03;}
+.badge-gray{background:var(--bg3);color:var(--sub);border:1px solid var(--border);}
+[data-theme="light"] .badge-green{background:#dcfce7;color:#166534;}
+[data-theme="light"] .badge-red{background:#fee2e2;color:#991b1b;}
+[data-theme="light"] .badge-blue{background:#dbeafe;color:#1e40af;}
+[data-theme="light"] .badge-yellow{background:#fef3c7;color:#92400e;}
+
+/* ══ Modal ══ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;
+  width:520px;max-width:96vw;max-height:92vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{cursor:pointer;color:var(--sub);font-size:20px;line-height:1;}
+.modal-close:hover{color:var(--text);}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+
+/* ══ Toast ══ */
+.toast{position:fixed;top:20px;right:20px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;padding:11px 16px;font-size:13px;z-index:9999;max-width:380px;
+  transform:translateX(120%);transition:transform .3s;box-shadow:var(--shadow);}
+.toast.show{transform:translateX(0);}
+.toast.success{border-color:var(--green);color:#56d364;}
+[data-theme="light"] .toast.success{color:#166534;}
+.toast.error{border-color:var(--red);color:var(--red);}
+.toast.info{border-color:#1d6fa4;color:#58a6ff;}
+[data-theme="light"] .toast.info{color:#1e40af;}
+
+/* ══ Progress bar ══ */
+.prog-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:5px;}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2575fc,#58a6ff);transition:width .5s;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* ══ Score detail ══ */
+.score-detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;}
+.score-chip{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px;text-align:center;font-size:12px;}
+.score-chip.excluded{opacity:.38;}
+.score-chip.trimmed-hi{border-color:#f85149;opacity:.55;}
+.score-chip.trimmed-lo{border-color:#9e6a03;opacity:.55;}
+.score-chip.auto-score{border-color:#9e6a03;border-style:dashed;}
+.score-chip .sj-name{color:var(--sub);margin-bottom:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.score-chip .sj-score{font-size:17px;font-weight:700;color:#58a6ff;}
+
+/* ══ Judge search box ══ */
+.search-box{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;
+  padding:8px 12px;color:var(--text);font-size:13px;margin-bottom:10px;}
+.search-box:focus{outline:none;border-color:#58a6ff;}
+.exclude-list{max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+.exclude-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);
+  border:1px solid var(--border);border-radius:7px;padding:9px 12px;}
+.exclude-item.excluded{border-color:var(--red);background:rgba(248,81,73,.07);}
+.ei-name{font-size:13px;font-weight:600;}
+.ei-note{font-size:11px;color:var(--sub);}
+.toggle-exclude{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.te-on{background:var(--red);color:#fff;}
+.te-off{background:var(--bg2);color:var(--text);border:1px solid var(--border);}
+.te-off:hover{background:var(--red);color:#fff;}
+
+/* ══ Misc ══ */
+.flex-between{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.text-sub{font-size:12px;color:var(--sub);}
+.text-blue{color:#58a6ff;}[data-theme="light"] .text-blue{color:var(--primary);}
+.mt4{margin-top:4px;}.mt8{margin-top:8px;}.mt12{margin-top:12px;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div style="display:flex;align-items:center;gap:0;min-width:0;flex-shrink:1;">
+    <a href="https://sykdl.com/" target="_blank" style="display:flex;align-items:center;flex-shrink:0;padding-right:14px;margin-right:14px;border-right:1px solid rgba(255,255,255,.25);line-height:0;">
+      <img src="/img/logo.png" alt="叩丁狼" style="height:28px;width:auto;border-radius:4px;">
+    </a>
+    <div style="min-width:0;">
+      <div class="header-title" id="compTitle">🏆 竞技打分系统</div>
+      <div class="header-sub">实时打分 · 智能排名 · 去最高最低求均分</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="headerSessionStatus" style="font-size:12px;color:rgba(255,255,255,.7);"></div>
+    <button class="theme-btn" id="themeToggle" onclick="THEME.toggle()" title="切换亮/暗色">🌙</button>
+  </div>
+</div>
+
+<!-- Session banner -->
+<div class="session-bar" id="sessionBar">
+  <span id="sessionBarText">正在打分中</span>
+  <span class="countdown-ring" id="sessionBarCount">60</span>
+  <span id="sessionBarProg"></span>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab active" onclick="showPage('board',this)">🏆 实时大屏</div>
+  <div class="tab" onclick="showPage('judge',this)">✍️ 评委打分</div>
+  <div class="tab" onclick="showPage('admin',this)">⚙️ 管理后台</div>
+</div>
+
+<!-- ════════ PAGE: 大屏 ════════ -->
+<div id="page-board" class="page active">
+  <div class="scoreboard">
+    <div>
+      <div class="flex-between" style="margin-bottom:14px;">
+        <div style="font-size:16px;font-weight:700;">📊 实时排名</div>
+        <div class="text-sub" id="lastUpdate">--</div>
+      </div>
+      <div class="rank-list" id="rankList">
+        <div class="no-data"><div class="emoji">🎭</div>暂无节目数据，请先在管理后台添加节目</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title"><span class="icon">📈</span>统计概览</div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-num" id="statPrograms">0</div><div class="stat-lbl">参赛节目</div></div>
+          <div class="stat-card"><div class="stat-num" id="statJudges">0</div><div class="stat-lbl">有效评委</div></div>
+          <div class="stat-card"><div class="stat-num" id="statScores">0</div><div class="stat-lbl">已提交打分</div></div>
+          <div class="stat-card"><div class="stat-num" id="statComplete">0%</div><div class="stat-lbl">完成度</div></div>
+        </div>
+        <div class="text-sub" style="font-size:11px;padding:4px 0;">📌 均分规则：去掉最高分+最低分，其余求平均（≥3人时生效）</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🔍</span>各节目打分明细</div>
+        <div id="scoreDetails"><div style="color:var(--sub);font-size:13px;text-align:center;padding:20px;">暂无数据</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ PAGE: 评委打分 ════════ -->
+<div id="page-judge" class="page">
+  <div id="judgeLoginSection">
+    <div class="judge-login-wrap">
+      <div class="card">
+        <div class="card-title" style="justify-content:center;font-size:16px;">✍️ 评委登录</div>
+        <div class="text-sub" style="text-align:center;margin-bottom:16px;">请输入您的姓名登录，首次登录自动注册</div>
+        <div class="form-group">
+          <label class="form-label">您的姓名</label>
+          <input class="input" id="judgeLoginName" placeholder="请输入真实姓名" maxlength="20" onkeydown="if(event.key==='Enter')judgeLogin()">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="judgeLogin()">登 录 / 注 册</button>
+        <div class="text-sub" style="text-align:center;margin-top:10px;">系统支持最多 100 位评委同时参与</div>
+      </div>
+    </div>
+  </div>
+  <div id="judgeScoringSection" style="display:none;">
+    <div class="judge-header">
+      <div>
+        <div class="judge-name-tag" id="curJudgeName">评委姓名</div>
+        <div class="judge-id-tag" id="curJudgeId">ID: --</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-default btn-sm" onclick="judgeLogout()">退出登录</button>
+      </div>
+    </div>
+    <!-- Session notice -->
+    <div id="judgeSessionNotice" style="display:none;"></div>
+    <div class="grid2">
+      <div>
+        <div class="card-title"><span class="icon">🎭</span>选择打分节目</div>
+        <div class="program-grid" id="judgeProgramGrid"></div>
+      </div>
+      <div>
+        <div id="scoreInputArea">
+          <div style="text-align:center;padding:40px;color:var(--sub);">
+            <div style="font-size:30px;margin-bottom:10px;">👈</div>
+            请先在左侧选择节目
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="card-title"><span class="icon">📋</span>我的打分记录</div>
+      <div id="myScoreList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ PAGE: 管理后台 ════════ -->
+<div id="page-admin" class="page">
+  <div id="adminLoginSection">
+    <div class="judge-login-wrap">
+      <div class="card">
+        <div class="card-title" style="justify-content:center;font-size:16px;">🔐 管理员登录</div>
+        <div class="form-group">
+          <label class="form-label">管理员密码</label>
+          <input class="input" id="adminPwdInput" type="password" placeholder="请输入管理员密码" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="adminLogin()">登 录</button>
+        <div class="text-sub" style="text-align:center;margin-top:10px;">可在设置中修改管理员密码</div>
+      </div>
+    </div>
+  </div>
+  <div id="adminPanel" style="display:none;">
+    <div class="flex-between" style="margin-bottom:18px;">
+      <div style="font-size:16px;font-weight:700;">⚙️ 管理后台</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-info btn-sm" onclick="adminJoinScoring()" title="以管理员身份参与打分">📝 参与打分</button>
+        <button class="btn btn-default btn-sm" onclick="adminLogout()">退出管理</button>
+      </div>
+    </div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="showAdminTab('programs',this)">🎭 节目管理</div>
+      <div class="admin-tab" onclick="showAdminTab('judges',this)">👥 评委管理</div>
+      <div class="admin-tab" onclick="showAdminTab('scores',this)">📊 打分详情</div>
+      <div class="admin-tab" onclick="showAdminTab('export',this)">📤 导出/重置</div>
+      <div class="admin-tab" onclick="showAdminTab('settings',this)">🔧 系统设置</div>
+    </div>
+
+    <!-- Programs -->
+    <div id="admin-programs" class="admin-page active">
+      <div class="card">
+        <div class="card-title flex-between">
+          <span><span class="icon">🎭</span>节目列表</span>
+          <button class="btn btn-success btn-sm" onclick="openProgramModal()">+ 添加节目</button>
+        </div>
+        <!-- Active session display -->
+        <div id="adminSessionInfo" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>节目名称</th><th>描述</th><th>均分（去最高最低）</th><th>参与人数</th><th>操作</th></tr></thead>
+            <tbody id="programTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Judges -->
+    <div id="admin-judges" class="admin-page">
+      <div class="card">
+        <div class="card-title flex-between">
+          <span><span class="icon">👥</span>评委库（共 <span id="judgeCount">0</span> 人）</span>
+          <button class="btn btn-success btn-sm" onclick="openJudgeModal()">+ 添加评委</button>
+        </div>
+        <div class="text-sub" style="margin-bottom:10px;">💡 被全局排除的评委打分不计入任何统计；也可在节目管理中针对单个节目设置不参与评委</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>姓名</th><th>备注</th><th>注册时间</th><th>状态</th><th>已打分节目</th><th>操作</th></tr></thead>
+            <tbody id="judgeTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scores -->
+    <div id="admin-scores" class="admin-page">
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span>所有打分记录</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>节目</th><th>评委</th><th>分数</th><th>类型</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+            <tbody id="allScoreTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div id="admin-export" class="admin-page">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title"><span class="icon">📤</span>导出数据</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-success btn-full" onclick="exportRanking()">🏆 导出排名结果 (CSV)</button>
+            <button class="btn btn-primary btn-full" onclick="exportAllScores()">📊 导出全部打分 (CSV)</button>
+            <button class="btn btn-default btn-full" onclick="exportJSON()">💾 备份所有数据 (JSON)</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">🗑️</span>数据重置</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-warning btn-full" onclick="clearScores()">🧹 清除所有打分记录</button>
+            <button class="btn btn-danger btn-full" onclick="clearPrograms()">🗑️ 清除所有节目</button>
+            <button class="btn btn-danger btn-full" onclick="clearJudges()">🗑️ 清除所有评委</button>
+            <button class="btn btn-danger btn-full" onclick="clearAll()">⚠️ 清除全部数据</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="admin-settings" class="admin-page">
+      <div class="card">
+        <div class="card-title"><span class="icon">🔧</span>系统设置</div>
+        <div style="max-width:480px;">
+          <div class="form-group">
+            <label class="form-label">比赛名称</label>
+            <input class="input" id="settingCompName" placeholder="例如：2025年度才艺大赛">
+          </div>
+          <div class="form-group">
+            <label class="form-label">打分范围（满分建议设100）</label>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <input class="input" id="settingMinScore" type="number" placeholder="最低分(默认0)" style="flex:1;">
+              <span style="color:var(--sub);">—</span>
+              <input class="input" id="settingMaxScore" type="number" placeholder="最高分(默认100)" style="flex:1;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">打分时长（秒，默认60秒）</label>
+            <input class="input" id="settingDuration" type="number" placeholder="默认60秒" min="10" max="600">
+          </div>
+          <div class="form-group">
+            <label class="form-label">超时默认分数（未打分自动计入，默认60分）</label>
+            <input class="input" id="settingDefaultScore" type="number" placeholder="默认60" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">管理员姓名（参与打分时使用）</label>
+            <input class="input" id="settingAdminName" placeholder="例如：主持人">
+          </div>
+          <div class="form-group">
+            <label class="form-label">修改管理员密码</label>
+            <input class="input" id="settingNewPwd" type="password" placeholder="留空则不修改">
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODALS ════════ -->
+<!-- Program Modal -->
+<div class="modal-overlay" id="programModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="programModalTitle">添加节目</span>
+      <span class="modal-close" onclick="closeModal('programModal')">✕</span>
+    </div>
+    <input type="hidden" id="editProgramId">
+    <div class="form-group">
+      <label class="form-label">节目名称 *</label>
+      <input class="input" id="programName" placeholder="请输入节目名称" maxlength="50">
+    </div>
+    <div class="form-group">
+      <label class="form-label">节目描述（选填）</label>
+      <input class="input" id="programDesc" placeholder="表演者、节目类型等" maxlength="100">
+    </div>
+    <div class="form-group">
+      <label class="form-label">出场顺序</label>
+      <input class="input" id="programOrder" type="number" placeholder="数字越小越靠前">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeModal('programModal')">取消</button>
+      <button class="btn btn-success" onclick="saveProgram()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Judge Modal -->
+<div class="modal-overlay" id="judgeModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="judgeModalTitle">添加评委</span>
+      <span class="modal-close" onclick="closeModal('judgeModal')">✕</span>
+    </div>
+    <input type="hidden" id="editJudgeId">
+    <div class="form-group">
+      <label class="form-label">评委姓名 *</label>
+      <input class="input" id="judgeName" placeholder="请输入评委姓名" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label class="form-label">备注（选填）</label>
+      <input class="input" id="judgeNote" placeholder="单位、职称等" maxlength="50">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeModal('judgeModal')">取消</button>
+      <button class="btn btn-success" onclick="saveJudge()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Per-program Exclude Modal -->
+<div class="modal-overlay" id="excludeModal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-title">
+      <span>🚫 设置本节目不参与评委 — <span id="excludeModalProgName" style="color:#58a6ff;"></span></span>
+      <span class="modal-close" onclick="closeModal('excludeModal')">✕</span>
+    </div>
+    <input type="hidden" id="excludeProgId">
+    <div class="text-sub" style="margin-bottom:10px;">勾选后，该评委不参与本节目打分，其分数不计入统计。其余未勾选评委均可参与。</div>
+    <input class="search-box" id="excludeSearch" placeholder="🔍 搜索评委姓名…" oninput="filterExcludeList()" />
+    <div class="exclude-list" id="excludeList"></div>
+    <div class="modal-footer">
+      <div class="text-sub" id="excludeCount" style="margin-right:auto;align-self:center;"></div>
+      <button class="btn btn-default" onclick="closeModal('excludeModal')">取消</button>
+      <button class="btn btn-success" onclick="saveExcludes()">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<!-- Session expired report modal -->
+<div class="modal-overlay" id="expiredModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span>⏰ 打分时间结束报告</span>
+      <span class="modal-close" onclick="closeModal('expiredModal')">✕</span>
+    </div>
+    <div id="expiredReport"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('expiredModal')">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ════════════════════════
+// THEME
+// ════════════════════════
+const THEME = {
+  init() {
+    const stored = localStorage.getItem('sc_theme');
+    // If user has manually set, use that; otherwise follow system
+    if (stored) {
+      this.apply(stored);
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.apply(prefersDark ? 'dark' : 'light');
+    }
+    // Watch system preference changes (only applies when no manual override)
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('sc_theme')) {
+        this.apply(e.matches ? 'dark' : 'light', false);
+      }
+    });
+  },
+  apply(theme, save) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (save !== false) localStorage.setItem('sc_theme', theme);
+  },
+  toggle() {
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    this.apply(next, true);
+  },
+  reset() {
+    // Remove manual override → follow system again
+    localStorage.removeItem('sc_theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.apply(prefersDark ? 'dark' : 'light', false);
+  }
+};
+
+// ════════════════════════
+// DATA LAYER
+// ════════════════════════
+const DB = {
+  getPrograms: () => JSON.parse(localStorage.getItem('sc_programs') || '[]'),
+  savePrograms: d => localStorage.setItem('sc_programs', JSON.stringify(d)),
+  getJudges: () => JSON.parse(localStorage.getItem('sc_judges') || '[]'),
+  saveJudges: d => localStorage.setItem('sc_judges', JSON.stringify(d)),
+  getScores: () => JSON.parse(localStorage.getItem('sc_scores') || '[]'),
+  saveScores: d => localStorage.setItem('sc_scores', JSON.stringify(d)),
+  getSettings: () => JSON.parse(localStorage.getItem('sc_settings') || '{"adminPwd":"vivi123","maxScore":100,"minScore":0,"compName":"竞技打分系统","duration":60,"defaultScore":60,"adminName":"管理员"}'),
+  saveSettings: d => localStorage.setItem('sc_settings', JSON.stringify(d)),
+};
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+function now() { return new Date().toLocaleString('zh-CN'); }
+
+// ════════════════════════
+// SESSION MANAGEMENT
+// ════════════════════════
+const SESSION = {
+  KEY: 'sc_session',
+  _timer: null,
+
+  open(programId) {
+    const settings = DB.getSettings();
+    const duration = (parseInt(settings.duration) || 60) * 1000;
+    const defaultScore = parseFloat(settings.defaultScore) || 60;
+    const session = { programId, openedAt: Date.now(), duration, defaultScore, status: 'active' };
+    localStorage.setItem(this.KEY, JSON.stringify(session));
+    const prog = DB.getPrograms().find(p => p.id === programId);
+    toast('▶ 已为《' + (prog ? prog.name : '') + '》开启打分，倒计时 ' + (duration/1000) + ' 秒！', 'success');
+    this._startTimer();
+    this._updateUI();
+  },
+
+  closeManually() {
+    const s = this.get();
+    if (!s) return;
+    s.status = 'closed';
+    s.closedAt = Date.now();
+    localStorage.setItem(this.KEY, JSON.stringify(s));
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    this._updateUI();
+    toast('打分已手动结束', 'info');
+    if (adminLoggedIn) renderProgramTable();
+  },
+
+  get() {
+    return JSON.parse(localStorage.getItem(this.KEY) || 'null');
+  },
+
+  getActive() {
+    const s = this.get();
+    if (!s || s.status !== 'active') return null;
+    const elapsed = Date.now() - s.openedAt;
+    if (elapsed >= s.duration) return null;
+    return { ...s, remaining: Math.ceil((s.duration - elapsed) / 1000) };
+  },
+
+  isExpired() {
+    const s = this.get();
+    if (!s || s.status !== 'active') return false;
+    return Date.now() - s.openedAt >= s.duration;
+  },
+
+  _startTimer() {
+    if (this._timer) clearInterval(this._timer);
+    this._timer = setInterval(() => {
+      if (this.isExpired()) {
+        clearInterval(this._timer); this._timer = null;
+        this._handleExpiry();
+      } else {
+        this._updateUI();
+        // Update judge countdown if on judge page
+        if (currentJudge) updateJudgeCountdown();
+      }
+    }, 1000);
+  },
+
+  resume() {
+    // Called on page load to resume any active session
+    const s = this.get();
+    if (s && s.status === 'active') {
+      if (this.isExpired()) {
+        this._handleExpiry();
+      } else {
+        this._startTimer();
+      }
+    }
+    this._updateUI();
+  },
+
+  _handleExpiry() {
+    const s = this.get();
+    if (!s) return;
+    const program = DB.getPrograms().find(p => p.id === s.programId);
+    if (!program) return;
+
+    const perExclude = program.excludedJudges || [];
+    const allJudges = DB.getJudges().filter(j => !j.excluded && !perExclude.includes(j.id));
+    const scores = DB.getScores();
+    const notScored = [];
+
+    allJudges.forEach(j => {
+      const scored = scores.find(sc => sc.programId === s.programId && sc.judgeId === j.id);
+      if (!scored) {
+        notScored.push(j.name);
+        scores.push({ id: uid(), judgeId: j.id, programId: s.programId, score: s.defaultScore, time: now(), auto: true });
+      }
+    });
+    DB.saveScores(scores);
+
+    s.status = 'expired';
+    s.closedAt = Date.now();
+    s.notScored = notScored;
+    localStorage.setItem(this.KEY, JSON.stringify(s));
+
+    this._updateUI();
+
+    // Show report
+    const reportEl = document.getElementById('expiredReport');
+    if (reportEl) {
+      if (notScored.length > 0) {
+        reportEl.innerHTML = `
+          <div style="background:rgba(185,28,28,.12);border:1px solid #b91c1c;border-radius:8px;padding:12px;margin-bottom:12px;">
+            <div style="font-weight:700;color:#f87171;margin-bottom:6px;">⚠️ 以下 ${notScored.length} 位评委未在规定时间内打分，已自动计入 ${s.defaultScore} 分：</div>
+            <div style="font-size:13px;color:var(--text);">${notScored.join('、')}</div>
+          </div>
+          <div style="font-size:13px;color:var(--sub);">节目：《${program.name}》&emsp;参与评委：${allJudges.length} 人</div>`;
+        openModal('expiredModal');
+      } else {
+        reportEl.innerHTML = `<div style="color:#56d364;font-size:14px;text-align:center;padding:16px;">✅ 所有评委均已在规定时间内完成打分！</div>`;
+        openModal('expiredModal');
+      }
+    }
+
+    renderBoard();
+    if (adminLoggedIn) renderProgramTable();
+    if (currentJudge) renderJudgeScoring();
+  },
+
+  _updateUI() {
+    const active = this.getActive();
+    const bar = document.getElementById('sessionBar');
+    const barText = document.getElementById('sessionBarText');
+    const barCount = document.getElementById('sessionBarCount');
+    const barProg = document.getElementById('sessionBarProg');
+    const adminInfo = document.getElementById('adminSessionInfo');
+    const headerStatus = document.getElementById('headerSessionStatus');
+
+    if (active) {
+      const prog = DB.getPrograms().find(p => p.id === active.programId);
+      const progName = prog ? prog.name : '未知节目';
+      const r = active.remaining;
+      bar.className = 'session-bar active' + (r <= 10 ? '' : '');
+      barText.textContent = '▶ 正在为《' + progName + '》打分';
+      barCount.textContent = r + 's';
+      barCount.className = 'countdown-ring' + (r <= 10 ? ' urgent' : '');
+      barProg.textContent = '';
+      headerStatus.textContent = '⏱ ' + r + 's';
+
+      if (adminInfo) {
+        adminInfo.style.display = 'block';
+        adminInfo.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div><span style="font-weight:700;color:#58a6ff;">▶ 打分中：《${progName}》</span><span class="text-sub" style="margin-left:10px;">剩余 ${r} 秒</span></div>
+          <button class="btn btn-danger btn-sm" onclick="SESSION.closeManually()">⏹ 结束打分</button>
+        </div>`;
+      }
+    } else {
+      bar.className = 'session-bar';
+      headerStatus.textContent = '';
+      if (adminInfo) adminInfo.style.display = 'none';
+    }
+  }
+};
+
+// ════════════════════════
+// SCORE CALCULATION
+// ════════════════════════
+function calcScore(programId) {
+  const program = DB.getPrograms().find(p => p.id === programId);
+  const perExclude = (program && program.excludedJudges) || [];
+  const eligibleJudges = DB.getJudges().filter(j => !j.excluded && !perExclude.includes(j.id));
+
+  const allScores = DB.getScores().filter(s => s.programId === programId);
+  const validScores = allScores.filter(s => eligibleJudges.find(j => j.id === s.judgeId));
+
+  if (validScores.length === 0) {
+    return { avg: null, count: 0, scores: validScores, eligibleCount: eligibleJudges.length, trimmed: false };
+  }
+
+  if (validScores.length < 3) {
+    // Not enough to trim — just average
+    const total = validScores.reduce((s, x) => s + x.score, 0);
+    return {
+      avg: parseFloat((total / validScores.length).toFixed(1)),
+      count: validScores.length,
+      scores: validScores,
+      eligibleCount: eligibleJudges.length,
+      trimmed: false,
+      note: '（人数不足3，未去最高最低）'
+    };
+  }
+
+  const sorted = [...validScores].sort((a, b) => a.score - b.score);
+  const lowestId = sorted[0].judgeId;
+  const highestId = sorted[sorted.length - 1].judgeId;
+  const trimmed = sorted.slice(1, sorted.length - 1);
+  const total = trimmed.reduce((s, x) => s + x.score, 0);
+  const avg = parseFloat((total / trimmed.length).toFixed(1));
+
+  return {
+    avg,
+    count: trimmed.length,
+    scores: validScores,
+    eligibleCount: eligibleJudges.length,
+    trimmed: true,
+    lowestId,
+    highestId,
+    lowestScore: sorted[0].score,
+    highestScore: sorted[sorted.length - 1].score,
+    note: `（已去最高 ${sorted[sorted.length - 1].score} 分、最低 ${sorted[0].score} 分）`
+  };
+}
+
+function getRanking() {
+  return DB.getPrograms()
+    .sort((a, b) => (a.order || 99) - (b.order || 99))
+    .map(p => ({ ...p, result: calcScore(p.id) }))
+    .sort((a, b) => {
+      if (a.result.avg === null && b.result.avg === null) return 0;
+      if (a.result.avg === null) return 1;
+      if (b.result.avg === null) return -1;
+      return b.result.avg - a.result.avg;
+    });
+}
+
+// ════════════════════════
+// UI HELPERS
+// ════════════════════════
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'board') renderBoard();
+  if (id === 'judge' && currentJudge) renderJudgeScoring();
+  if (id === 'admin' && adminLoggedIn) renderAdmin();
+}
+
+function showAdminTab(id, el) {
+  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('admin-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'programs') renderProgramTable();
+  if (id === 'judges') renderJudgeTable();
+  if (id === 'scores') renderAllScores();
+  if (id === 'settings') loadSettings();
+}
+
+function toast(msg, type = 'info', duration = 3000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ════════════════════════
+// SCOREBOARD
+// ════════════════════════
+function renderBoard() {
+  const ranking = getRanking();
+  const settings = DB.getSettings();
+  const maxScore = settings.maxScore || 100;
+  const judges = DB.getJudges();
+  const activeJudges = judges.filter(j => !j.excluded);
+  const allScores = DB.getScores();
+  const totalPossible = ranking.length * activeJudges.length;
+  const totalDone = allScores.filter(s => activeJudges.find(j => j.id === s.judgeId)).length;
+
+  if (settings.compName) {
+    document.getElementById('compTitle').textContent = '🏆 ' + settings.compName;
+  }
+
+  document.getElementById('statPrograms').textContent = ranking.length;
+  document.getElementById('statJudges').textContent = activeJudges.length;
+  document.getElementById('statScores').textContent = totalDone;
+  document.getElementById('statComplete').textContent = totalPossible > 0 ? Math.round(totalDone / totalPossible * 100) + '%' : '0%';
+  document.getElementById('lastUpdate').textContent = '更新: ' + new Date().toLocaleTimeString('zh-CN');
+
+  const rankEl = document.getElementById('rankList');
+  if (ranking.length === 0) {
+    rankEl.innerHTML = '<div class="no-data"><div class="emoji">🎭</div>暂无节目数据</div>';
+  } else {
+    const medals = ['🥇', '🥈', '🥉'];
+    rankEl.innerHTML = ranking.map((p, i) => {
+      const res = p.result;
+      const scoreClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'normal';
+      const barW = res.avg !== null ? Math.round((res.avg / maxScore) * 100) : 0;
+      return `
+      <div class="rank-item">
+        ${i < 3 ? `<div class="rank-medal">${medals[i]}</div>` : `<div class="rank-num">${i + 1}</div>`}
+        <div class="rank-info">
+          <div class="rank-name">${p.name}</div>
+          <div class="rank-detail">${p.description || ''}&emsp;${res.count}/${res.eligibleCount} 人有效打分${res.trimmed ? ' · 已去最高最低' : ''}</div>
+        </div>
+        <div class="rank-score ${scoreClass}">${res.avg !== null ? res.avg : '--'}</div>
+        <div class="rank-bar" style="width:${barW}%"></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Score details
+  const detailEl = document.getElementById('scoreDetails');
+  if (ranking.length === 0) {
+    detailEl.innerHTML = '<div style="color:var(--sub);font-size:13px;text-align:center;padding:20px;">暂无数据</div>';
+  } else {
+    detailEl.innerHTML = ranking.map(p => {
+      const res = p.result;
+      const program = DB.getPrograms().find(x => x.id === p.id);
+      const perExclude = (program && program.excludedJudges) || [];
+      const allJudges = DB.getJudges();
+      const chips = allJudges.map(j => {
+        const s = DB.getScores().find(sc => sc.programId === p.id && sc.judgeId === j.id);
+        const isGlobalExcluded = j.excluded;
+        const isPerExcluded = perExclude.includes(j.id);
+        const isExcluded = isGlobalExcluded || isPerExcluded;
+        const isTrimHigh = res.trimmed && j.id === res.highestId;
+        const isTrimLow = res.trimmed && j.id === res.lowestId;
+        const isAuto = s && s.auto;
+        let chipClass = 'score-chip';
+        if (isExcluded) chipClass += ' excluded';
+        else if (isTrimHigh) chipClass += ' trimmed-hi';
+        else if (isTrimLow) chipClass += ' trimmed-lo';
+        if (isAuto) chipClass += ' auto-score';
+        const label = isExcluded ? (isGlobalExcluded ? '(全局排)' : '(本场排)') : isTrimHigh ? '(最高)' : isTrimLow ? '(最低)' : '';
+        return `<div class="${chipClass}" title="${j.name}${label}${isAuto ? ' [超时自动]' : ''}">
+          <div class="sj-name">${j.name}${label}</div>
+          <div class="sj-score">${s ? s.score : '—'}</div>
+        </div>`;
+      }).join('');
+      return `<div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:5px;">${p.name}
+          <span style="font-size:11px;font-weight:400;color:var(--sub);margin-left:6px;">
+            均分: <strong class="text-blue">${res.avg !== null ? res.avg : '--'}</strong>
+            ${res.note ? `<span style="font-size:10px;opacity:.7;">${res.note}</span>` : ''}
+          </span>
+        </div>
+        <div class="score-detail-grid">${chips}</div>
+      </div>`;
+    }).join('<div class="divider"></div>');
+  }
+}
+
+setInterval(() => {
+  if (document.getElementById('page-board').classList.contains('active')) renderBoard();
+}, 3000);
+
+// ════════════════════════
+// JUDGE LOGIN
+// ════════════════════════
+let currentJudge = null;
+
+function judgeLogin() {
+  const name = document.getElementById('judgeLoginName').value.trim();
+  if (!name) { toast('请输入您的姓名', 'error'); return; }
+  const judges = DB.getJudges();
+  let judge = judges.find(j => j.name === name);
+  if (!judge) {
+    if (judges.length >= 100) { toast('评委人数已达上限（100人）', 'error'); return; }
+    judge = { id: uid(), name, note: '', excluded: false, createdAt: now() };
+    judges.push(judge);
+    DB.saveJudges(judges);
+    toast('注册成功，欢迎 ' + name + '！', 'success');
+  } else {
+    toast('欢迎回来，' + name + '！', 'info');
+  }
+  currentJudge = judge;
+  document.getElementById('judgeLoginSection').style.display = 'none';
+  document.getElementById('judgeScoringSection').style.display = 'block';
+  document.getElementById('curJudgeName').textContent = judge.name;
+  document.getElementById('curJudgeId').textContent = 'ID: ' + judge.id;
+  renderJudgeScoring();
+}
+
+function judgeLogout() {
+  currentJudge = null;
+  selectedProgram = null;
+  document.getElementById('judgeLoginSection').style.display = 'block';
+  document.getElementById('judgeScoringSection').style.display = 'none';
+  document.getElementById('judgeLoginName').value = '';
+}
+
+// ════════════════════════
+// JUDGE SCORING
+// ════════════════════════
+let selectedProgram = null;
+
+function renderJudgeScoring() {
+  if (!currentJudge) return;
+  const freshJudge = DB.getJudges().find(j => j.id === currentJudge.id);
+  if (freshJudge) currentJudge = freshJudge;
+
+  if (currentJudge.excluded) {
+    document.getElementById('judgeScoringSection').innerHTML =
+      '<div class="card" style="text-align:center;padding:40px;">' +
+      '<div style="font-size:36px;margin-bottom:10px;">🚫</div>' +
+      '<div style="font-size:15px;font-weight:700;margin-bottom:6px;">您已被管理员全局排除</div>' +
+      '<div class="text-sub">您的打分不计入任何统计。如有疑问请联系管理员。</div>' +
+      '<button class="btn btn-default mt12" onclick="judgeLogout()">退出</button></div>';
+    return;
+  }
+
+  const programs = DB.getPrograms().sort((a, b) => (a.order || 99) - (b.order || 99));
+  const myScores = DB.getScores().filter(s => s.judgeId === currentJudge.id);
+  const settings = DB.getSettings();
+  const activeSession = SESSION.getActive();
+
+  // Session notice
+  updateJudgeCountdown();
+
+  // Auto-select session program if not yet selected
+  if (activeSession && !selectedProgram) {
+    const sessionProg = programs.find(p => p.id === activeSession.programId);
+    if (sessionProg) selectedProgram = sessionProg;
+  }
+
+  // Check if current judge is per-program excluded from selected program
+  let isPerExcluded = false;
+  if (selectedProgram) {
+    const prog = DB.getPrograms().find(p => p.id === selectedProgram.id);
+    isPerExcluded = prog && (prog.excludedJudges || []).includes(currentJudge.id);
+  }
+
+  // Program grid
+  const progGrid = document.getElementById('judgeProgramGrid');
+  if (progGrid) {
+    progGrid.innerHTML = programs.map(p => {
+      const scored = myScores.find(s => s.programId === p.id);
+      const sel = selectedProgram && selectedProgram.id === p.id ? ' selected' : '';
+      const sc = scored ? ' scored' : '';
+      const isActive = activeSession && activeSession.programId === p.id ? ' current-session' : '';
+      const perExcl = (p.excludedJudges || []).includes(currentJudge.id);
+      if (perExcl) return `<div class="prog-card" style="opacity:.4;cursor:not-allowed;" title="您不参与本节目评分">
+        <div class="prog-name">${p.name}</div>
+        <div class="prog-status">🚫 不参与本场</div>
+      </div>`;
+      return `<div class="prog-card${sel}${sc}${isActive}" onclick="selectProgram('${p.id}')">
+        <div class="prog-name">${p.name}${isActive ? ' 🔴' : ''}</div>
+        <div class="prog-status">${scored ? '✅ 已打 ' + scored.score + ' 分' : (isActive ? '⏱ 打分中' : '待打分')}</div>
+      </div>`;
+    }).join('') || '<div style="color:var(--sub);font-size:13px;">暂无节目</div>';
+  }
+
+  // Score input
+  if (selectedProgram && !isPerExcluded) {
+    const existScore = myScores.find(s => s.programId === selectedProgram.id);
+    const cur = existScore ? existScore.score : Math.round((settings.maxScore || 100) * 0.8);
+    const min = settings.minScore || 0;
+    const max = settings.maxScore || 100;
+    const step = max <= 10 ? 0.5 : 1;
+    document.getElementById('scoreInputArea').innerHTML = `
+      <div class="score-input-wrap">
+        <div style="font-size:15px;font-weight:700;margin-bottom:3px;">正在为《${selectedProgram.name}》打分</div>
+        <div class="text-sub mt4">${selectedProgram.description || ''} 分值: ${min} ~ ${max}</div>
+        <div class="score-display" id="scoreVal">${cur}</div>
+        <input type="range" class="score-slider" id="scoreSlider" min="${min}" max="${max}" step="${step}" value="${cur}"
+          oninput="document.getElementById('scoreVal').textContent=parseFloat(this.value)">
+        <div class="score-btns">${generateQuickBtns(min, max)}</div>
+        <button class="btn btn-success btn-full" style="margin-top:4px;" onclick="submitScore()">
+          ${existScore ? '🔄 修改打分' : '✅ 提交打分'}
+        </button>
+        ${existScore ? '<div class="text-sub mt4" style="text-align:center;">已打过此节目，提交将覆盖原分数</div>' : ''}
+      </div>`;
+  } else if (isPerExcluded) {
+    document.getElementById('scoreInputArea').innerHTML = `
+      <div style="text-align:center;padding:40px;color:var(--sub);">
+        <div style="font-size:28px;margin-bottom:8px;">🚫</div>您不参与《${selectedProgram.name}》的评分
+      </div>`;
+  }
+
+  // My scores
+  const myScoreEl = document.getElementById('myScoreList');
+  if (myScoreEl) {
+    myScoreEl.innerHTML = myScores.length === 0
+      ? '<div class="text-sub" style="text-align:center;padding:16px;">还没有打分记录</div>'
+      : `<table><thead><tr><th>节目</th><th>分数</th><th>类型</th><th>时间</th></tr></thead><tbody>
+        ${myScores.map(s => {
+          const prog = DB.getPrograms().find(p => p.id === s.programId);
+          return `<tr><td>${prog ? prog.name : '已删除'}</td>
+            <td style="font-weight:700;color:#58a6ff;">${s.score}</td>
+            <td>${s.auto ? '<span class="badge badge-yellow">超时自动</span>' : '<span class="badge badge-green">正常提交</span>'}</td>
+            <td class="text-sub" style="font-size:11px;">${s.time}</td></tr>`;
+        }).join('')}</tbody></table>`;
+  }
+}
+
+function updateJudgeCountdown() {
+  const notice = document.getElementById('judgeSessionNotice');
+  if (!notice) return;
+  const active = SESSION.getActive();
+  if (!active) {
+    const last = SESSION.get();
+    if (last && (last.status === 'expired' || last.status === 'closed')) {
+      const prog = DB.getPrograms().find(p => p.id === last.programId);
+      notice.style.display = 'block';
+      notice.innerHTML = `<div class="session-notice done">
+        <div><div class="sn-title">⏰ 打分已结束：《${prog ? prog.name : ''}》</div><div class="sn-sub">如需修改请联系管理员</div></div>
+        <div class="sn-countdown">✓</div>
+      </div>`;
+    } else {
+      notice.style.display = 'none';
+    }
+    return;
+  }
+  const prog = DB.getPrograms().find(p => p.id === active.programId);
+  const r = active.remaining;
+  const urgency = r <= 10 ? 'warning' : '';
+  notice.style.display = 'block';
+  notice.innerHTML = `<div class="session-notice ${urgency}">
+    <div>
+      <div class="sn-title">🔴 正在打分：《${prog ? prog.name : ''}》</div>
+      <div class="sn-sub">请在倒计时结束前提交，超时自动计入 ${active.defaultScore} 分</div>
+    </div>
+    <div class="sn-countdown">${r}</div>
+  </div>`;
+}
+
+function generateQuickBtns(min, max) {
+  const range = max - min;
+  const vals = max <= 10
+    ? [min, min + range * 0.3, min + range * 0.5, min + range * 0.7, min + range * 0.85, max]
+    : [60, 70, 75, 80, 85, 90, 95, 100];
+  return vals.map(v => {
+    const val = Math.round(v * 10) / 10;
+    return `<div class="score-btn" onclick="setScore(${val})">${val}</div>`;
+  }).join('');
+}
+
+function setScore(v) {
+  const sl = document.getElementById('scoreSlider');
+  const vd = document.getElementById('scoreVal');
+  if (sl) sl.value = v;
+  if (vd) vd.textContent = v;
+}
+
+function selectProgram(id) {
+  selectedProgram = DB.getPrograms().find(p => p.id === id);
+  renderJudgeScoring();
+}
+
+function submitScore() {
+  if (!selectedProgram || !currentJudge) return;
+  const score = parseFloat(document.getElementById('scoreSlider').value);
+  const settings = DB.getSettings();
+  if (score < (settings.minScore || 0) || score > (settings.maxScore || 100)) {
+    toast('分数超出范围', 'error'); return;
+  }
+  // Check per-program exclusion
+  const prog = DB.getPrograms().find(p => p.id === selectedProgram.id);
+  if (prog && (prog.excludedJudges || []).includes(currentJudge.id)) {
+    toast('您不参与本节目评分', 'error'); return;
+  }
+  const scores = DB.getScores();
+  const idx = scores.findIndex(s => s.programId === selectedProgram.id && s.judgeId === currentJudge.id);
+  const entry = { id: uid(), judgeId: currentJudge.id, programId: selectedProgram.id, score, time: now(), auto: false };
+  if (idx >= 0) scores[idx] = entry; else scores.push(entry);
+  DB.saveScores(scores);
+  toast('✅ 打分成功：《' + selectedProgram.name + '》 ' + score + ' 分', 'success');
+  renderJudgeScoring();
+}
+
+// ════════════════════════
+// ADMIN
+// ════════════════════════
+let adminLoggedIn = false;
+
+function adminLogin() {
+  const pwd = document.getElementById('adminPwdInput').value;
+  const settings = DB.getSettings();
+  if (pwd === (settings.adminPwd || 'vivi123')) {
+    adminLoggedIn = true;
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    renderAdmin();
+    toast('管理员登录成功', 'success');
+  } else {
+    toast('密码错误', 'error');
+  }
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+  document.getElementById('adminLoginSection').style.display = 'block';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('adminPwdInput').value = '';
+}
+
+function adminJoinScoring() {
+  const settings = DB.getSettings();
+  const adminName = (settings.adminName || '管理员').trim();
+  if (!adminName) { toast('请先在系统设置中填写管理员姓名', 'error'); return; }
+  // Register/find admin as a judge
+  const judges = DB.getJudges();
+  let judge = judges.find(j => j.name === adminName);
+  if (!judge) {
+    if (judges.length >= 100) { toast('评委人数已达上限', 'error'); return; }
+    judge = { id: uid(), name: adminName, note: '管理员', excluded: false, createdAt: now() };
+    judges.push(judge);
+    DB.saveJudges(judges);
+  }
+  currentJudge = judge;
+  // Switch to judge page
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-judge').classList.add('active');
+  document.querySelectorAll('.tab')[1].classList.add('active');
+  document.getElementById('judgeLoginSection').style.display = 'none';
+  document.getElementById('judgeScoringSection').style.display = 'block';
+  document.getElementById('curJudgeName').textContent = judge.name + ' (管理员)';
+  document.getElementById('curJudgeId').textContent = 'ID: ' + judge.id;
+  renderJudgeScoring();
+  toast('已切换到评委打分页面（' + adminName + '）', 'info');
+}
+
+function renderAdmin() {
+  renderProgramTable();
+  renderJudgeTable();
+  SESSION._updateUI();
+}
+
+// Programs CRUD
+function renderProgramTable() {
+  const programs = DB.getPrograms().sort((a, b) => (a.order || 99) - (b.order || 99));
+  const tbody = document.getElementById('programTable');
+  const activeSession = SESSION.getActive();
+  SESSION._updateUI();
+
+  if (programs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--sub);">暂无节目，点击右上角添加</td></tr>';
+    return;
+  }
+  tbody.innerHTML = programs.map((p, i) => {
+    const res = calcScore(p.id);
+    const excludeCount = (p.excludedJudges || []).length;
+    const isActive = activeSession && activeSession.programId === p.id;
+    const note = res.trimmed ? res.note : (res.count < 3 ? '(人数不足3)' : '');
+    return `<tr style="${isActive ? 'background:rgba(220,38,38,.05);' : ''}">
+      <td>${i + 1}</td>
+      <td><strong>${p.name}</strong>${isActive ? ' <span class="badge badge-red">打分中</span>' : ''}</td>
+      <td class="text-sub">${p.description || '—'}</td>
+      <td><strong class="text-blue">${res.avg !== null ? res.avg : '—'}</strong>
+        <div style="font-size:10px;color:var(--sub);">${note}</div></td>
+      <td>${res.count} 人有效${excludeCount > 0 ? `<span class="badge badge-yellow" style="margin-left:4px;">${excludeCount}人不参与</span>` : ''}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;">
+        ${!activeSession ? `<button class="btn btn-success btn-sm" onclick="startSession('${p.id}')">▶ 开启打分</button>` : (isActive ? `<button class="btn btn-danger btn-sm" onclick="SESSION.closeManually()">⏹ 结束打分</button>` : `<button class="btn btn-default btn-sm" disabled title="请先结束当前打分">▶ 开启打分</button>`)}
+        <button class="btn btn-info btn-sm" onclick="openExcludeModal('${p.id}')">🚫 排除设置</button>
+        <button class="btn btn-default btn-sm" onclick="editProgram('${p.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProgram('${p.id}')">删除</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function startSession(programId) {
+  const active = SESSION.getActive();
+  if (active) { toast('请先结束当前进行中的打分', 'error'); return; }
+  const prog = DB.getPrograms().find(p => p.id === programId);
+  if (!prog) return;
+  if (!confirm('确认为《' + prog.name + '》开启打分倒计时？')) return;
+  SESSION.open(programId);
+  renderProgramTable();
+}
+
+function openProgramModal(id) {
+  document.getElementById('editProgramId').value = id || '';
+  document.getElementById('programModalTitle').textContent = id ? '编辑节目' : '添加节目';
+  if (id) {
+    const p = DB.getPrograms().find(x => x.id === id);
+    if (p) {
+      document.getElementById('programName').value = p.name;
+      document.getElementById('programDesc').value = p.description || '';
+      document.getElementById('programOrder').value = p.order || '';
+    }
+  } else {
+    document.getElementById('programName').value = '';
+    document.getElementById('programDesc').value = '';
+    document.getElementById('programOrder').value = '';
+  }
+  openModal('programModal');
+}
+
+function editProgram(id) { openProgramModal(id); }
+
+function saveProgram() {
+  const name = document.getElementById('programName').value.trim();
+  if (!name) { toast('节目名称不能为空', 'error'); return; }
+  const id = document.getElementById('editProgramId').value;
+  const programs = DB.getPrograms();
+  const existing = programs.find(p => p.id === id);
+  const entry = {
+    id: id || uid(),
+    name,
+    description: document.getElementById('programDesc').value.trim(),
+    order: parseInt(document.getElementById('programOrder').value) || 99,
+    createdAt: now(),
+    excludedJudges: existing ? (existing.excludedJudges || []) : []
+  };
+  if (id) {
+    const idx = programs.findIndex(p => p.id === id);
+    if (idx >= 0) programs[idx] = entry;
+  } else {
+    programs.push(entry);
+  }
+  DB.savePrograms(programs);
+  closeModal('programModal');
+  renderProgramTable();
+  toast(id ? '节目已更新' : '节目已添加', 'success');
+}
+
+function deleteProgram(id) {
+  if (!confirm('确定删除此节目？相关打分数据也将删除。')) return;
+  DB.savePrograms(DB.getPrograms().filter(p => p.id !== id));
+  DB.saveScores(DB.getScores().filter(s => s.programId !== id));
+  renderProgramTable();
+  toast('节目已删除', 'info');
+}
+
+// ════════════════════════
+// PER-PROGRAM EXCLUDE
+// ════════════════════════
+let excludeModalJudges = []; // current judge list with pending exclusion state
+
+function openExcludeModal(programId) {
+  const prog = DB.getPrograms().find(p => p.id === programId);
+  if (!prog) return;
+  document.getElementById('excludeProgId').value = programId;
+  document.getElementById('excludeModalProgName').textContent = prog.name;
+  document.getElementById('excludeSearch').value = '';
+
+  // Build working copy
+  const judges = DB.getJudges().filter(j => !j.excluded); // only non-globally-excluded
+  const currentExcludes = prog.excludedJudges || [];
+  excludeModalJudges = judges.map(j => ({ ...j, isExcluded: currentExcludes.includes(j.id) }));
+
+  renderExcludeList('');
+  openModal('excludeModal');
+}
+
+function filterExcludeList() {
+  const q = document.getElementById('excludeSearch').value.trim();
+  renderExcludeList(q);
+}
+
+function renderExcludeList(query) {
+  const list = document.getElementById('excludeList');
+  const count = document.getElementById('excludeCount');
+  const filtered = query
+    ? excludeModalJudges.filter(j => j.name.includes(query) || (j.note || '').includes(query))
+    : excludeModalJudges;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="text-sub" style="text-align:center;padding:16px;">没有找到匹配的评委</div>';
+  } else {
+    list.innerHTML = filtered.map(j => `
+      <div class="exclude-item ${j.isExcluded ? 'excluded' : ''}" id="ei-${j.id}">
+        <div>
+          <div class="ei-name">${j.name}</div>
+          ${j.note ? `<div class="ei-note">${j.note}</div>` : ''}
+        </div>
+        <button class="toggle-exclude ${j.isExcluded ? 'te-on' : 'te-off'}"
+          onclick="toggleExcludePending('${j.id}')">
+          ${j.isExcluded ? '🚫 不参与' : '✅ 参与'}
+        </button>
+      </div>`).join('');
+  }
+
+  const exCount = excludeModalJudges.filter(j => j.isExcluded).length;
+  count.textContent = `已排除 ${exCount} 人，${excludeModalJudges.length - exCount} 人参与`;
+}
+
+function toggleExcludePending(judgeId) {
+  const j = excludeModalJudges.find(x => x.id === judgeId);
+  if (!j) return;
+  j.isExcluded = !j.isExcluded;
+  const q = document.getElementById('excludeSearch').value.trim();
+  renderExcludeList(q);
+}
+
+function saveExcludes() {
+  const programId = document.getElementById('excludeProgId').value;
+  const programs = DB.getPrograms();
+  const prog = programs.find(p => p.id === programId);
+  if (!prog) return;
+  prog.excludedJudges = excludeModalJudges.filter(j => j.isExcluded).map(j => j.id);
+  DB.savePrograms(programs);
+  closeModal('excludeModal');
+  renderProgramTable();
+  toast('排除设置已保存', 'success');
+}
+
+// Judges CRUD
+function renderJudgeTable() {
+  const judges = DB.getJudges();
+  const scores = DB.getScores();
+  document.getElementById('judgeCount').textContent = judges.length;
+  const tbody = document.getElementById('judgeTable');
+  if (judges.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--sub);">暂无评委</td></tr>';
+    return;
+  }
+  tbody.innerHTML = judges.map((j, i) => {
+    const myScores = scores.filter(s => s.judgeId === j.id).length;
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><strong>${j.name}</strong></td>
+      <td class="text-sub">${j.note || '—'}</td>
+      <td class="text-sub" style="font-size:11px;">${j.createdAt}</td>
+      <td>${j.excluded ? '<span class="badge badge-red">已排除</span>' : '<span class="badge badge-green">有效</span>'}</td>
+      <td>${myScores}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;">
+        <button class="btn btn-default btn-sm" onclick="editJudge('${j.id}')">编辑</button>
+        <button class="btn ${j.excluded ? 'btn-success' : 'btn-warning'} btn-sm"
+          onclick="toggleExcludeGlobal('${j.id}')">${j.excluded ? '恢复' : '全局排除'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteJudge('${j.id}')">删除</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openJudgeModal(id) {
+  document.getElementById('editJudgeId').value = id || '';
+  document.getElementById('judgeModalTitle').textContent = id ? '编辑评委' : '添加评委';
+  if (id) {
+    const j = DB.getJudges().find(x => x.id === id);
+    if (j) { document.getElementById('judgeName').value = j.name; document.getElementById('judgeNote').value = j.note || ''; }
+  } else {
+    document.getElementById('judgeName').value = '';
+    document.getElementById('judgeNote').value = '';
+  }
+  openModal('judgeModal');
+}
+function editJudge(id) { openJudgeModal(id); }
+
+function saveJudge() {
+  const name = document.getElementById('judgeName').value.trim();
+  if (!name) { toast('评委姓名不能为空', 'error'); return; }
+  const judges = DB.getJudges();
+  const id = document.getElementById('editJudgeId').value;
+  if (!id && judges.length >= 100) { toast('评委人数已达上限（100人）', 'error'); return; }
+  const existing = judges.find(j => j.id === id);
+  const entry = { id: id || uid(), name, note: document.getElementById('judgeNote').value.trim(), excluded: existing ? existing.excluded : false, createdAt: existing ? existing.createdAt : now() };
+  if (id) { const idx = judges.findIndex(j => j.id === id); if (idx >= 0) judges[idx] = entry; }
+  else judges.push(entry);
+  DB.saveJudges(judges);
+  closeModal('judgeModal');
+  renderJudgeTable();
+  toast(id ? '评委信息已更新' : '评委已添加', 'success');
+}
+
+function toggleExcludeGlobal(id) {
+  const judges = DB.getJudges();
+  const j = judges.find(x => x.id === id);
+  if (!j) return;
+  j.excluded = !j.excluded;
+  DB.saveJudges(judges);
+  renderJudgeTable();
+  toast(j.excluded ? j.name + ' 已全局排除' : j.name + ' 已恢复', 'info');
+}
+
+function deleteJudge(id) {
+  if (!confirm('确定删除此评委？其打分数据也将删除。')) return;
+  DB.saveJudges(DB.getJudges().filter(j => j.id !== id));
+  DB.saveScores(DB.getScores().filter(s => s.judgeId !== id));
+  renderJudgeTable();
+  toast('评委已删除', 'info');
+}
+
+// All scores
+function renderAllScores() {
+  const scores = DB.getScores();
+  const programs = DB.getPrograms();
+  const judges = DB.getJudges();
+  const tbody = document.getElementById('allScoreTable');
+  if (scores.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--sub);">暂无打分记录</td></tr>';
+    return;
+  }
+  tbody.innerHTML = scores.sort((a, b) => b.time > a.time ? 1 : -1).map(s => {
+    const prog = programs.find(p => p.id === s.programId);
+    const judge = judges.find(j => j.id === s.judgeId);
+    const perExcl = prog && (prog.excludedJudges || []).includes(s.judgeId);
+    const isExcluded = (judge && judge.excluded) || perExcl;
+    return `<tr>
+      <td>${prog ? prog.name : '<span style="color:var(--sub);">已删除</span>'}</td>
+      <td>${judge ? judge.name : '<span style="color:var(--sub);">已删除</span>'}</td>
+      <td><strong class="text-blue">${s.score}</strong></td>
+      <td>${s.auto ? '<span class="badge badge-yellow">超时自动</span>' : '<span class="badge badge-blue">正常</span>'}</td>
+      <td>${isExcluded ? '<span class="badge badge-red">排除</span>' : '<span class="badge badge-green">有效</span>'}</td>
+      <td class="text-sub" style="font-size:11px;">${s.time}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteScore('${s.id}')">删除</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function deleteScore(id) {
+  if (!confirm('确定删除此打分记录？')) return;
+  DB.saveScores(DB.getScores().filter(s => s.id !== id));
+  renderAllScores();
+  toast('已删除', 'info');
+}
+
+// Settings
+function loadSettings() {
+  const s = DB.getSettings();
+  document.getElementById('settingCompName').value = s.compName || '';
+  document.getElementById('settingMinScore').value = s.minScore !== undefined ? s.minScore : 0;
+  document.getElementById('settingMaxScore').value = s.maxScore || 100;
+  document.getElementById('settingDuration').value = s.duration || 60;
+  document.getElementById('settingDefaultScore').value = s.defaultScore !== undefined ? s.defaultScore : 60;
+  document.getElementById('settingAdminName').value = s.adminName || '';
+}
+
+function saveSettings() {
+  const s = DB.getSettings();
+  const minScore = parseFloat(document.getElementById('settingMinScore').value) || 0;
+  const maxScore = parseFloat(document.getElementById('settingMaxScore').value) || 100;
+  if (minScore >= maxScore) { toast('最低分必须小于最高分', 'error'); return; }
+  s.compName = document.getElementById('settingCompName').value.trim() || s.compName;
+  s.minScore = minScore;
+  s.maxScore = maxScore;
+  s.duration = parseInt(document.getElementById('settingDuration').value) || 60;
+  s.defaultScore = parseFloat(document.getElementById('settingDefaultScore').value) || 60;
+  s.adminName = document.getElementById('settingAdminName').value.trim();
+  const newPwd = document.getElementById('settingNewPwd').value;
+  if (newPwd) s.adminPwd = newPwd;
+  DB.saveSettings(s);
+  if (s.compName) document.getElementById('compTitle').textContent = '🏆 ' + s.compName;
+  toast('设置已保存', 'success');
+}
+
+// Export
+function exportRanking() {
+  const ranking = getRanking();
+  const settings = DB.getSettings();
+  const medals = ['🥇', '🥈', '🥉'];
+  let csv = '﻿排名,奖牌,节目名称,均分(去最高最低),有效人数,描述\n';
+  ranking.forEach((p, i) => {
+    csv += `${i+1},${i < 3 ? medals[i] : ''},${p.name},${p.result.avg !== null ? p.result.avg : '暂无'},${p.result.count},${p.description || ''}\n`;
+  });
+  downloadFile(csv, `${settings.compName || '竞技打分'}_排名_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`, 'text/csv');
+  toast('排名结果已导出', 'success');
+}
+
+function exportAllScores() {
+  const scores = DB.getScores();
+  const programs = DB.getPrograms();
+  const judges = DB.getJudges();
+  let csv = '﻿节目名称,评委姓名,分数,类型,状态,时间\n';
+  scores.forEach(s => {
+    const prog = programs.find(p => p.id === s.programId);
+    const judge = judges.find(j => j.id === s.judgeId);
+    csv += `${prog ? prog.name : '已删除'},${judge ? judge.name : '已删除'},${s.score},${s.auto ? '超时自动' : '正常'},${judge && !judge.excluded ? '有效' : '排除'},${s.time}\n`;
+  });
+  downloadFile(csv, `打分详情_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`, 'text/csv');
+  toast('打分详情已导出', 'success');
+}
+
+function exportJSON() {
+  const data = JSON.stringify({ programs: DB.getPrograms(), judges: DB.getJudges(), scores: DB.getScores(), settings: DB.getSettings(), exportTime: now() }, null, 2);
+  downloadFile(data, `数据备份_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`, 'application/json');
+  toast('数据备份已导出', 'success');
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function clearScores() {
+  if (!confirm('确定清除所有打分记录？')) return;
+  DB.saveScores([]); renderAllScores(); toast('已清除所有打分记录', 'info');
+}
+function clearPrograms() {
+  if (!confirm('确定清除所有节目？相关打分也将删除。')) return;
+  DB.savePrograms([]); DB.saveScores([]); renderProgramTable(); renderAllScores(); toast('已清除', 'info');
+}
+function clearJudges() {
+  if (!confirm('确定清除所有评委？相关打分也将删除。')) return;
+  DB.saveJudges([]); DB.saveScores([]); renderJudgeTable(); renderAllScores(); toast('已清除', 'info');
+}
+function clearAll() {
+  if (!confirm('确定清除全部数据？此操作不可撤销！')) return;
+  if (!confirm('再次确认：所有数据将全部清除。')) return;
+  ['sc_programs','sc_judges','sc_scores','sc_session'].forEach(k => localStorage.removeItem(k));
+  renderAdmin(); toast('全部数据已清除', 'info');
+}
+
+// ════════════════════════
+// INIT
+// ════════════════════════
+THEME.init();
+SESSION.resume();
+renderBoard();
+</script>
+</body>
+</html>

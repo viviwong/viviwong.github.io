@@ -4,6 +4,8 @@ sidebar_position: 1
 
 # 实训知识图谱
 
+## <a href="/web/106-竞技打分系统.html" target="_blank">全员打分系统</a>
+
 ## 小程序和uniapp开发
 
 * <a href="/web/101-flex弹性盒子演示.html" target="_blank">01-flex弹性盒子演示</a>
