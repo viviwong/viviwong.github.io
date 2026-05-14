@@ -510,9 +510,12 @@ tr:hover td{background:rgba(88,166,255,.04);}
             <label class="form-label">设置新课程密码</label>
             <input class="input" id="courseNewPwd" type="password" placeholder="输入新密码后点击更新">
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
             <button class="btn btn-primary" onclick="updateCoursePwd()">🔄 更新课程密码</button>
-            <button class="btn" onclick="resetCoursePwd()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);">↩ 恢复默认密码(66386638)</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn" onclick="resetCoursePwd()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);">↩ 恢复默认密码(<span id="resetBtnPwd" style="display:inline-block;min-width:72px;text-align:center;font-family:monospace;letter-spacing:2px;">••••••••</span>)</button>
+              <button type="button" id="eyeResetBtn" onclick="toggleResetBtnPwd()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:16px;color:var(--sub);padding:6px 10px;line-height:1;flex-shrink:0;" title="显示/隐藏默认密码">🙈</button>
+            </div>
           </div>
           <div id="coursePwdResult" style="display:none;margin-top:14px;padding:12px 16px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;font-size:13px;line-height:1.8;"></div>
         </div>
@@ -1629,6 +1632,14 @@ async function saveSettings() {
 const COURSE_PWD_KEY = 'kdl_course_pwd_hash';
 const COURSE_UNLOCK_KEY = 'kdl_pro_unlocked';
 const COURSE_PWD_FALLBACK = 'cab7337874746dbaadfafa68e0dc8012bf0d98aac2be85c7498478a1cb31d381'; // sha256('66386638')
+
+function toggleResetBtnPwd() {
+  const span = document.getElementById('resetBtnPwd');
+  const btn = document.getElementById('eyeResetBtn');
+  const hidden = span.textContent.includes('•');
+  span.textContent = hidden ? '66386638' : '••••••••';
+  btn.textContent = hidden ? '👁' : '🙈';
+}
 
 function toggleCoursePwdPanel() {
   const panel = document.getElementById('coursePwdPanel');
