@@ -1,6 +1,7 @@
 ﻿---
 sidebar_position: 3
 title: 3-蓝牙与温湿度
+locked: true
 ---
 
 #  3 - 蓝牙通信与温湿度采集

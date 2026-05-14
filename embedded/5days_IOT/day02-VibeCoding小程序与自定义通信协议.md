@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 title: 2-小程序与自定义通信协议
+locked: true
 ---
 
 # 2 - 小程序与自定义通信协议

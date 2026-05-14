@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 title: 🐍 02-Python 快速入门
+locked: true
 ---
 
 :::info 📝 课前导读

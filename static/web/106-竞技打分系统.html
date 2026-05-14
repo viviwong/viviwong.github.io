@@ -194,7 +194,7 @@ tr:hover td{background:rgba(88,166,255,.04);}
 /* ══ Toast ══ */
 .toast{position:fixed;top:20px;right:20px;background:var(--bg2);border:1px solid var(--border);
   border-radius:8px;padding:11px 16px;font-size:13px;z-index:9999;max-width:380px;
-  transform:translateX(120%);transition:transform .3s;box-shadow:var(--shadow);}
+  transform:translateX(calc(100% + 60px));transition:transform .3s;box-shadow:var(--shadow);}
 .toast.show{transform:translateX(0);}
 .toast.success{border-color:var(--green);color:#56d364;}
 [data-theme="light"] .toast.success{color:#166534;}

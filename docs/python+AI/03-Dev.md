@@ -1,6 +1,7 @@
 ---
 sidebar_position: 3
 title: 🎨 03-Python 环境配置
+locked: true
 ---
 
 ## 🌟 传送门：官方资源站

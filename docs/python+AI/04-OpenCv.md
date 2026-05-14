@@ -1,6 +1,7 @@
 ---
 sidebar_position: 4
 title: 🤖 04-OpenCV
+locked: true
 ---
 # 🚀 人脸识别：从入门到实战 
 

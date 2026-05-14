@@ -2,6 +2,7 @@
 sidebar_position: 5
 title: 5-MQTT与华为云IoT
 toc_max_heading_level: 4
+locked: true
 ---
 
 # 5 - MQTT 与华为云 IoT 平台
