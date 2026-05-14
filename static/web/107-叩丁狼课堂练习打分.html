@@ -6,7 +6,7 @@
     <link rel="icon" href="https://sykdl.com/img/favicon.ico">
     <title>🏆 叩丁狼课堂练习阶梯打分系统</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5; --primary-hover: #4338ca;
@@ -299,45 +299,64 @@
     // 部署后放 static/img/school-logo.png 即可让所有访客看到学校logo
     const SCHOOL_LOGO_DEFAULT = '/img/school-logo.png';
 
-    // ══ CLOUDBASE ══
-    const CB_ENV = 'kdl-scoring-d5g90i8wb23f829a1';
-    let _cbDB = null, _cbWatcher = null;
+    // ══ SUPABASE ══
+    const SB_URL = 'https://ysklrsmouqudzlmdmztb.supabase.co';
+    const SB_KEY = 'sb_publishable_1BIC3sDiYhCoDkkkGqgxwQ_U1qZdlNJ';
+    const SB_TABLE = 'app_data';
+    const SB_ROW   = 'scoring_107';
+    let _sb = null, _sbChannel = null;
 
-    async function initCloudBase107() {
+    async function initSupabase107() {
         try {
-            const app = cloudbase.init({ env: CB_ENV });
-            await app.auth({ persistence: 'local' }).anonymousAuthProvider().signIn();
-            _cbDB = app.database();
+            _sb = window.supabase.createClient(SB_URL, SB_KEY);
 
             // 从云端拉取最新数据
-            const res = await _cbDB.collection('scoring_107').doc('main').get();
-            if (res.data && res.data.length > 0) {
-                const d = res.data[0];
+            const { data, error } = await _sb.from(SB_TABLE).select('data').eq('id', SB_ROW).single();
+            if (!error && data && data.data) {
+                const d = data.data;
                 students       = d.students       || [];
                 exercises      = d.exercises      || [];
                 nextStudentId  = d.nextStudentId  || 1;
                 nextExerciseId = d.nextExerciseId || 1;
+                // 同步实训名称和学校链接（不覆盖本地密码和logo）
+                if (d.trainingName !== undefined || d.schoolLink !== undefined) {
+                    const s = loadSettings();
+                    if (d.trainingName !== undefined) s.trainingName = d.trainingName;
+                    if (d.schoolLink   !== undefined) s.schoolLink   = d.schoolLink;
+                    persistSettings(s);
+                    applySettings();
+                }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({ students, exercises, nextStudentId, nextExerciseId }));
                 renderUI();
             }
 
             // 开启实时监听：其他端修改后自动刷新
-            if (_cbWatcher) _cbWatcher.close();
-            _cbWatcher = _cbDB.collection('scoring_107').doc('main').watch({
-                onChange(snapshot) {
-                    if (!snapshot.docs || !snapshot.docs.length) return;
-                    const d = snapshot.docs[0];
+            if (_sbChannel) { _sb.removeChannel(_sbChannel); _sbChannel = null; }
+            _sbChannel = _sb.channel('realtime:107')
+                .on('postgres_changes', {
+                    event: 'UPDATE', schema: 'public', table: SB_TABLE,
+                    filter: `id=eq.${SB_ROW}`
+                }, payload => {
+                    const d = payload.new.data;
+                    if (!d) return;
                     students       = d.students       || [];
                     exercises      = d.exercises      || [];
                     nextStudentId  = d.nextStudentId  || 1;
                     nextExerciseId = d.nextExerciseId || 1;
+                    // 实时同步实训名称和学校链接
+                    if (d.trainingName !== undefined || d.schoolLink !== undefined) {
+                        const s = loadSettings();
+                        if (d.trainingName !== undefined) s.trainingName = d.trainingName;
+                        if (d.schoolLink   !== undefined) s.schoolLink   = d.schoolLink;
+                        persistSettings(s);
+                        applySettings();
+                    }
                     localStorage.setItem(STORAGE_KEY, JSON.stringify({ students, exercises, nextStudentId, nextExerciseId }));
                     renderUI();
-                },
-                onError(err) { console.error('CloudBase 监听错误:', err); }
-            });
+                })
+                .subscribe();
         } catch(e) {
-            console.warn('CloudBase 初始化失败，降级为本地模式:', e);
+            console.warn('Supabase 初始化失败，降级为本地模式:', e);
         }
     }
 
@@ -417,6 +436,7 @@
         }
         persistSettings(s);
         applySettings();
+        await saveData(); // 同步实训名称和学校链接到云端
         alert('✅ 设置已保存！');
     }
 
@@ -502,10 +522,17 @@
 
     // ══ DATA ══
     async function saveData() {
-        const data = { students, exercises, nextStudentId, nextExerciseId };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        if (_cbDB) {
-            try { await _cbDB.collection('scoring_107').doc('main').set(data); }
+        const localData = { students, exercises, nextStudentId, nextExerciseId };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(localData));
+        if (_sb) {
+            // 云端额外同步实训名称和学校链接，让所有访客看到一致的标题
+            const s = loadSettings();
+            const cloudData = {
+                ...localData,
+                trainingName: s.trainingName || '',
+                schoolLink:   s.schoolLink   || ''
+            };
+            try { await _sb.from(SB_TABLE).upsert({ id: SB_ROW, data: cloudData, updated_at: new Date().toISOString() }); }
             catch(e) { console.error('云保存失败:', e); }
         }
     }
@@ -529,8 +556,8 @@
             const empty = { students: [], exercises: [], nextStudentId: 1, nextExerciseId: 1 };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(empty));
             students = []; exercises = []; nextStudentId = 1; nextExerciseId = 1;
-            if (_cbDB) {
-                try { await _cbDB.collection('scoring_107').doc('main').set(empty); }
+            if (_sb) {
+                try { await _sb.from(SB_TABLE).upsert({ id: SB_ROW, data: empty, updated_at: new Date().toISOString() }); }
                 catch(e) { console.error('云清除失败:', e); }
             }
             renderUI();
@@ -734,7 +761,7 @@
     applySettings();
     loadData();        // 先从 localStorage 快速渲染
     updateAuthUI();
-    initCloudBase107(); // 异步接入云端，完成后自动拉取最新数据并开启实时监听
+    initSupabase107(); // 异步接入云端，完成后自动拉取最新数据并开启实时监听
 </script>
 </body>
 </html>

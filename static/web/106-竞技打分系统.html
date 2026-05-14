@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>竞技打分系统</title>
 <link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
-<script src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 /* ══ THEME VARIABLES ══ */
 :root {
@@ -655,28 +655,28 @@ const THEME = {
 };
 
 // ════════════════════════
-// CLOUDBASE SYNC
+// SUPABASE SYNC
 // ════════════════════════
 const CloudSync = {
-    db: null, watcher: null,
-    COL: 'scoring_106', DOC: 'main',
+    sb: null, channel: null,
+    TABLE: 'app_data', ROW: 'scoring_106',
+    URL: 'https://ysklrsmouqudzlmdmztb.supabase.co',
+    KEY: 'sb_publishable_1BIC3sDiYhCoDkkkGqgxwQ_U1qZdlNJ',
 
     async init() {
         try {
-            const app = cloudbase.init({ env: 'kdl-scoring-d5g90i8wb23f829a1' });
-            await app.auth({ persistence: 'local' }).anonymousAuthProvider().signIn();
-            this.db = app.database();
+            this.sb = window.supabase.createClient(this.URL, this.KEY);
             await this.pull(true);   // 拉取云端数据并刷新UI
             this.startWatch();       // 开启实时监听
-        } catch(e) { console.warn('CloudBase 初始化失败，降级为本地模式:', e); }
+        } catch(e) { console.warn('Supabase 初始化失败，降级为本地模式:', e); }
     },
 
     async pull(rerender) {
-        if (!this.db) return;
+        if (!this.sb) return;
         try {
-            const res = await this.db.collection(this.COL).doc(this.DOC).get();
-            if (res.data && res.data.length > 0) {
-                const d = res.data[0];
+            const { data, error } = await this.sb.from(this.TABLE).select('data').eq('id', this.ROW).single();
+            if (!error && data && data.data) {
+                const d = data.data;
                 if (d.programs !== undefined) localStorage.setItem('sc_programs', JSON.stringify(d.programs));
                 if (d.judges   !== undefined) localStorage.setItem('sc_judges',   JSON.stringify(d.judges));
                 if (d.scores   !== undefined) localStorage.setItem('sc_scores',   JSON.stringify(d.scores));
@@ -687,23 +687,27 @@ const CloudSync = {
     },
 
     async push() {
-        if (!this.db) return;
+        if (!this.sb) return;
         try {
-            await this.db.collection(this.COL).doc(this.DOC).set({
+            const data = {
                 programs: DB.getPrograms(),
                 judges:   DB.getJudges(),
                 scores:   DB.getScores(),
                 session:  SESSION.get()
-            });
+            };
+            await this.sb.from(this.TABLE).upsert({ id: this.ROW, data, updated_at: new Date().toISOString() });
         } catch(e) { console.error('云保存失败:', e); }
     },
 
     startWatch() {
-        if (this.watcher) { this.watcher.close(); this.watcher = null; }
-        this.watcher = this.db.collection(this.COL).doc(this.DOC).watch({
-            onChange: (snapshot) => {
-                if (!snapshot.docs || !snapshot.docs.length) return;
-                const d = snapshot.docs[0];
+        if (this.channel) { this.sb.removeChannel(this.channel); this.channel = null; }
+        this.channel = this.sb.channel('realtime:106')
+            .on('postgres_changes', {
+                event: 'UPDATE', schema: 'public', table: this.TABLE,
+                filter: `id=eq.${this.ROW}`
+            }, payload => {
+                const d = payload.new.data;
+                if (!d) return;
                 if (d.programs !== undefined) localStorage.setItem('sc_programs', JSON.stringify(d.programs));
                 if (d.judges   !== undefined) localStorage.setItem('sc_judges',   JSON.stringify(d.judges));
                 if (d.scores   !== undefined) localStorage.setItem('sc_scores',   JSON.stringify(d.scores));
@@ -711,9 +715,8 @@ const CloudSync = {
                 renderBoard();
                 if (typeof adminLoggedIn !== 'undefined' && adminLoggedIn) renderAdmin();
                 SESSION.resume();
-            },
-            onError: (err) => console.error('CloudBase 监听错误:', err)
-        });
+            })
+            .subscribe();
     }
 };
 
@@ -1840,7 +1843,7 @@ function clearAll() {
   if (!confirm('确定清除全部数据？此操作不可撤销！')) return;
   if (!confirm('再次确认：所有数据将全部清除。')) return;
   ['sc_programs','sc_judges','sc_scores','sc_session'].forEach(k => localStorage.removeItem(k));
-  if (CloudSync.db) CloudSync.db.collection(CloudSync.COL).doc(CloudSync.DOC).set({ programs:[], judges:[], scores:[], session:null });
+  if (CloudSync.sb) CloudSync.sb.from(CloudSync.TABLE).upsert({ id: CloudSync.ROW, data: { programs:[], judges:[], scores:[], session:null }, updated_at: new Date().toISOString() });
   renderAdmin(); toast('全部数据已清除', 'info');
 }
 
