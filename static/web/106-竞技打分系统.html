@@ -490,6 +490,30 @@ tr:hover td{background:rgba(88,166,255,.04);}
           <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
         </div>
       </div>
+
+      <!-- 就业班课程密码管理 -->
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title"><span class="icon">🔐</span>就业班课程密码管理</div>
+        <div style="max-width:480px;">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;line-height:1.7;color:var(--sub);">
+            管理 <strong style="color:var(--text);">sykdl.com</strong> 文档站中锁定课程页面的访问密码。<br>
+            修改后，当前浏览器立即生效；学生需重新输入新密码。
+          </div>
+          <div class="form-group">
+            <label class="form-label">当前状态</label>
+            <div id="coursePwdStatus" style="padding:8px 12px;background:var(--bg3);border-radius:6px;font-size:13px;color:var(--sub);">检测中…</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">设置新课程密码</label>
+            <input class="input" id="courseNewPwd" type="password" placeholder="输入新密码后点击更新">
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="updateCoursePwd()">🔄 更新课程密码</button>
+            <button class="btn" onclick="resetCoursePwd()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);">↩ 恢复默认密码(6638)</button>
+          </div>
+          <div id="coursePwdResult" style="display:none;margin-top:14px;padding:12px 16px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;font-size:13px;line-height:1.8;"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -633,7 +657,8 @@ const DB = {
   saveJudges: d => localStorage.setItem('sc_judges', JSON.stringify(d)),
   getScores: () => JSON.parse(localStorage.getItem('sc_scores') || '[]'),
   saveScores: d => localStorage.setItem('sc_scores', JSON.stringify(d)),
-  getSettings: () => JSON.parse(localStorage.getItem('sc_settings') || '{"adminPwd":"vivi123","maxScore":100,"minScore":0,"compName":"竞技打分系统","duration":60,"defaultScore":60,"adminName":"管理员"}'),
+  // adminPwd 存的是 SHA-256 哈希，默认值是 sha256('vivi345')
+  getSettings: () => JSON.parse(localStorage.getItem('sc_settings') || '{"adminPwd":"98e3ddc0b350eaa51757f8fdba1d26d2169d5d3e941f81067e04a51c7f5dd011","maxScore":100,"minScore":0,"compName":"竞技打分系统","duration":60,"defaultScore":60,"adminName":"管理员"}'),
   saveSettings: d => localStorage.setItem('sc_settings', JSON.stringify(d)),
 };
 
@@ -1211,10 +1236,28 @@ function submitScore() {
 // ════════════════════════
 let adminLoggedIn = false;
 
-function adminLogin() {
+// SHA-256 工具（Web Crypto API，浏览器原生支持）
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// 启动时迁移：若 localStorage 里存的还是明文密码，自动哈希化
+(async function migratePassword() {
+  const s = DB.getSettings();
+  if (s.adminPwd && !/^[a-f0-9]{64}$/.test(s.adminPwd)) {
+    s.adminPwd = await sha256(s.adminPwd);
+    DB.saveSettings(s);
+  }
+})();
+
+async function adminLogin() {
   const pwd = document.getElementById('adminPwdInput').value;
+  if (!pwd) return;
+  const hash = await sha256(pwd);
   const settings = DB.getSettings();
-  if (pwd === (settings.adminPwd || 'vivi123')) {
+  const correct = settings.adminPwd || '98e3ddc0b350eaa51757f8fdba1d26d2169d5d3e941f81067e04a51c7f5dd011';
+  if (hash === correct) {
     adminLoggedIn = true;
     document.getElementById('adminLoginSection').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
@@ -1263,6 +1306,7 @@ function renderAdmin() {
   renderProgramTable();
   renderJudgeTable();
   SESSION._updateUI();
+  refreshCoursePwdStatus();
 }
 
 // Programs CRUD
@@ -1557,7 +1601,7 @@ function loadSettings() {
   document.getElementById('settingAdminName').value = s.adminName || '';
 }
 
-function saveSettings() {
+async function saveSettings() {
   const s = DB.getSettings();
   const minScore = parseFloat(document.getElementById('settingMinScore').value) || 0;
   const maxScore = parseFloat(document.getElementById('settingMaxScore').value) || 100;
@@ -1569,10 +1613,58 @@ function saveSettings() {
   s.defaultScore = parseFloat(document.getElementById('settingDefaultScore').value) || 60;
   s.adminName = document.getElementById('settingAdminName').value.trim();
   const newPwd = document.getElementById('settingNewPwd').value;
-  if (newPwd) s.adminPwd = newPwd;
+  if (newPwd) s.adminPwd = await sha256(newPwd); // 存哈希，不存明文
   DB.saveSettings(s);
   if (s.compName) document.getElementById('compTitle').textContent = '🏆 ' + s.compName;
+  document.getElementById('settingNewPwd').value = ''; // 清空密码框
   toast('设置已保存', 'success');
+}
+
+// ════════════════════════
+// 就业班课程密码管理
+// ════════════════════════
+const COURSE_PWD_KEY = 'kdl_course_pwd_hash';
+const COURSE_UNLOCK_KEY = 'kdl_pro_unlocked';
+const COURSE_PWD_FALLBACK = '39cff4eb438907bd6de0ed9bd739ce88daf3a06eba8c883c92c25e7e36f28fb0'; // sha256('6638')
+
+function refreshCoursePwdStatus() {
+  const el = document.getElementById('coursePwdStatus');
+  if (!el) return;
+  const custom = localStorage.getItem(COURSE_PWD_KEY);
+  if (custom) {
+    el.innerHTML = '<span style="color:var(--green);">✅ 已设置自定义密码</span>（哈希：' + custom.slice(0, 12) + '…）';
+  } else {
+    el.innerHTML = '<span style="color:var(--sub);">使用默认密码（6638）</span>';
+  }
+}
+
+async function updateCoursePwd() {
+  const pwd = document.getElementById('courseNewPwd').value.trim();
+  if (!pwd) { toast('请输入新密码', 'error'); return; }
+  const hash = await sha256(pwd);
+  localStorage.setItem(COURSE_PWD_KEY, hash);
+  // 清除所有已解锁状态，强制重新验证
+  localStorage.removeItem(COURSE_UNLOCK_KEY);
+  document.getElementById('courseNewPwd').value = '';
+  refreshCoursePwdStatus();
+  const result = document.getElementById('coursePwdResult');
+  result.style.display = 'block';
+  result.innerHTML =
+    '✅ <strong>课程密码已更新</strong><br>' +
+    '新密码：<strong style="color:var(--primary);">' + pwd + '</strong>（请告知就业班学员）<br>' +
+    '所有已解锁的浏览器将在下次访问时要求重新输入密码。';
+  toast('课程密码已更新', 'success');
+}
+
+function resetCoursePwd() {
+  localStorage.removeItem(COURSE_PWD_KEY);
+  localStorage.removeItem(COURSE_UNLOCK_KEY);
+  document.getElementById('courseNewPwd').value = '';
+  refreshCoursePwdStatus();
+  const result = document.getElementById('coursePwdResult');
+  result.style.display = 'block';
+  result.innerHTML = '↩ <strong>已恢复默认密码（6638）</strong><br>所有已解锁的浏览器将在下次访问时要求重新输入密码。';
+  toast('已恢复默认密码', 'success');
 }
 
 // Export

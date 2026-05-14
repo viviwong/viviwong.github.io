@@ -3,28 +3,47 @@ import Content from '@theme-original/DocItem/Content';
 import type ContentType from '@theme/DocItem/Content';
 import type { WrapperProps } from '@docusaurus/types';
 import { useDoc } from '@docusaurus/plugin-content-docs/client';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 
 type Props = WrapperProps<typeof ContentType>;
 
-const PASSWORD = '6638';
-const STORAGE_KEY = 'kdl_pro_unlocked';
+// 兜底哈希 = sha256('6638')，当 106.html 未设置自定义密码时使用
+const FALLBACK_HASH = '39cff4eb438907bd6de0ed9bd739ce88daf3a06eba8c883c92c25e7e36f28fb0';
+// 106.html 管理后台写入此 key 来更新课程密码
+const COURSE_PWD_KEY = 'kdl_course_pwd_hash';
+// 解锁状态存储 key（值 = 当前正确哈希，密码更新后旧值自动失效）
+const UNLOCK_KEY = 'kdl_pro_unlocked';
+
+async function sha256(text: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function getCorrectHash(): string {
+  return localStorage.getItem(COURSE_PWD_KEY) || FALLBACK_HASH;
+}
 
 function PasswordGate({ children }: { children: React.ReactNode }) {
   const [unlocked, setUnlocked] = useState(false);
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem(STORAGE_KEY) === '1') {
+    // 解锁状态值 = 正确哈希；密码更新后旧值自动失配，强制重新输入
+    if (localStorage.getItem(UNLOCK_KEY) === getCorrectHash()) {
       setUnlocked(true);
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input === PASSWORD) {
-      localStorage.setItem(STORAGE_KEY, '1');
+    setLoading(true);
+    const hash = await sha256(input);
+    setLoading(false);
+    if (hash === getCorrectHash()) {
+      localStorage.setItem(UNLOCK_KEY, hash);
       setUnlocked(true);
       setError('');
     } else {
@@ -55,36 +74,21 @@ function PasswordGate({ children }: { children: React.ReactNode }) {
           border-color: var(--ifm-color-primary) !important;
           box-shadow: 0 0 0 3px var(--ifm-color-primary-lightest);
         }
-        .kdl-unlock-btn:hover {
-          opacity: 0.88;
-        }
+        .kdl-unlock-btn:hover { opacity: 0.88; }
+        .kdl-unlock-btn:disabled { opacity: 0.5; cursor: not-allowed; }
       `}</style>
 
-      {/* 锁图标 */}
       <div style={{ fontSize: '60px', marginBottom: '20px', lineHeight: 1 }}>🔒</div>
 
-      {/* 标题 */}
-      <h2 style={{
-        fontSize: '1.4rem',
-        fontWeight: 700,
-        marginBottom: '10px',
-        color: 'var(--ifm-color-content)',
-      }}>
-        就业班专属内容
+      <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '10px', color: 'var(--ifm-color-content)' }}>
+        叩丁狼嵌入式AI就业班专属内容
       </h2>
 
-      {/* 描述 */}
-      <p style={{
-        color: 'var(--ifm-color-emphasis-600)',
-        marginBottom: '32px',
-        lineHeight: 1.7,
-        fontSize: '0.95rem',
-      }}>
+      <p style={{ color: 'var(--ifm-color-emphasis-600)', marginBottom: '32px', lineHeight: 1.7, fontSize: '0.95rem' }}>
         此内容为就业班课程专属，请输入课程密码解锁。<br />
         解锁后同一浏览器无需再次输入。
       </p>
 
-      {/* 密码表单 */}
       <form
         onSubmit={handleSubmit}
         style={{
@@ -102,6 +106,7 @@ function PasswordGate({ children }: { children: React.ReactNode }) {
           onChange={e => setInput(e.target.value)}
           placeholder="请输入课程密码"
           autoFocus
+          disabled={loading}
           style={{
             padding: '10px 16px',
             borderRadius: '8px',
@@ -116,6 +121,7 @@ function PasswordGate({ children }: { children: React.ReactNode }) {
         <button
           className="kdl-unlock-btn"
           type="submit"
+          disabled={loading}
           style={{
             padding: '10px 24px',
             background: 'var(--ifm-color-primary)',
@@ -128,18 +134,12 @@ function PasswordGate({ children }: { children: React.ReactNode }) {
             transition: 'opacity .2s',
           }}
         >
-          解锁
+          {loading ? '验证中…' : '解锁'}
         </button>
       </form>
 
-      {/* 错误提示 */}
       {error && (
-        <p style={{
-          color: 'var(--ifm-color-danger)',
-          marginTop: '14px',
-          fontSize: '14px',
-          fontWeight: 500,
-        }}>
+        <p style={{ color: 'var(--ifm-color-danger)', marginTop: '14px', fontSize: '14px', fontWeight: 500 }}>
           ❌ {error}
         </p>
       )}
@@ -153,9 +153,15 @@ export default function DocItemContentWrapper(props: Props): JSX.Element {
 
   if (isLocked) {
     return (
-      <PasswordGate>
-        <Content {...props} />
-      </PasswordGate>
+      <BrowserOnly fallback={
+        <div style={{ textAlign: 'center', padding: '80px 20px', fontSize: '60px' }}>🔒</div>
+      }>
+        {() => (
+          <PasswordGate>
+            <Content {...props} />
+          </PasswordGate>
+        )}
+      </BrowserOnly>
     );
   }
 
