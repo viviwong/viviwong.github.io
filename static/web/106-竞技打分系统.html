@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>竞技打分系统</title>
 <link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
 <style>
 /* ══ THEME VARIABLES ══ */
 :root {
@@ -654,15 +655,78 @@ const THEME = {
 };
 
 // ════════════════════════
+// CLOUDBASE SYNC
+// ════════════════════════
+const CloudSync = {
+    db: null, watcher: null,
+    COL: 'scoring_106', DOC: 'main',
+
+    async init() {
+        try {
+            const app = cloudbase.init({ env: 'kdl-scoring-d5g90i8wb23f829a1' });
+            await app.auth({ persistence: 'local' }).anonymousAuthProvider().signIn();
+            this.db = app.database();
+            await this.pull(true);   // 拉取云端数据并刷新UI
+            this.startWatch();       // 开启实时监听
+        } catch(e) { console.warn('CloudBase 初始化失败，降级为本地模式:', e); }
+    },
+
+    async pull(rerender) {
+        if (!this.db) return;
+        try {
+            const res = await this.db.collection(this.COL).doc(this.DOC).get();
+            if (res.data && res.data.length > 0) {
+                const d = res.data[0];
+                if (d.programs !== undefined) localStorage.setItem('sc_programs', JSON.stringify(d.programs));
+                if (d.judges   !== undefined) localStorage.setItem('sc_judges',   JSON.stringify(d.judges));
+                if (d.scores   !== undefined) localStorage.setItem('sc_scores',   JSON.stringify(d.scores));
+                if (d.session  !== undefined) localStorage.setItem('sc_session',  JSON.stringify(d.session));
+                if (rerender) { renderBoard(); if (typeof adminLoggedIn !== 'undefined' && adminLoggedIn) renderAdmin(); SESSION.resume(); }
+            }
+        } catch(e) { console.error('云读取失败:', e); }
+    },
+
+    async push() {
+        if (!this.db) return;
+        try {
+            await this.db.collection(this.COL).doc(this.DOC).set({
+                programs: DB.getPrograms(),
+                judges:   DB.getJudges(),
+                scores:   DB.getScores(),
+                session:  SESSION.get()
+            });
+        } catch(e) { console.error('云保存失败:', e); }
+    },
+
+    startWatch() {
+        if (this.watcher) { this.watcher.close(); this.watcher = null; }
+        this.watcher = this.db.collection(this.COL).doc(this.DOC).watch({
+            onChange: (snapshot) => {
+                if (!snapshot.docs || !snapshot.docs.length) return;
+                const d = snapshot.docs[0];
+                if (d.programs !== undefined) localStorage.setItem('sc_programs', JSON.stringify(d.programs));
+                if (d.judges   !== undefined) localStorage.setItem('sc_judges',   JSON.stringify(d.judges));
+                if (d.scores   !== undefined) localStorage.setItem('sc_scores',   JSON.stringify(d.scores));
+                if (d.session  !== undefined) localStorage.setItem('sc_session',  JSON.stringify(d.session));
+                renderBoard();
+                if (typeof adminLoggedIn !== 'undefined' && adminLoggedIn) renderAdmin();
+                SESSION.resume();
+            },
+            onError: (err) => console.error('CloudBase 监听错误:', err)
+        });
+    }
+};
+
+// ════════════════════════
 // DATA LAYER
 // ════════════════════════
 const DB = {
   getPrograms: () => JSON.parse(localStorage.getItem('sc_programs') || '[]'),
-  savePrograms: d => localStorage.setItem('sc_programs', JSON.stringify(d)),
+  savePrograms: d => { localStorage.setItem('sc_programs', JSON.stringify(d)); CloudSync.push(); },
   getJudges: () => JSON.parse(localStorage.getItem('sc_judges') || '[]'),
-  saveJudges: d => localStorage.setItem('sc_judges', JSON.stringify(d)),
+  saveJudges: d => { localStorage.setItem('sc_judges', JSON.stringify(d)); CloudSync.push(); },
   getScores: () => JSON.parse(localStorage.getItem('sc_scores') || '[]'),
-  saveScores: d => localStorage.setItem('sc_scores', JSON.stringify(d)),
+  saveScores: d => { localStorage.setItem('sc_scores', JSON.stringify(d)); CloudSync.push(); },
   // adminPwd 存的是 SHA-256 哈希，默认值是 sha256('vivi345')
   getSettings: () => JSON.parse(localStorage.getItem('sc_settings') || '{"adminPwd":"98e3ddc0b350eaa51757f8fdba1d26d2169d5d3e941f81067e04a51c7f5dd011","maxScore":100,"minScore":0,"compName":"竞技打分系统","duration":60,"defaultScore":60,"adminName":"管理员"}'),
   saveSettings: d => localStorage.setItem('sc_settings', JSON.stringify(d)),
@@ -684,6 +748,7 @@ const SESSION = {
     const defaultScore = parseFloat(settings.defaultScore) || 60;
     const session = { programId, openedAt: Date.now(), duration, defaultScore, status: 'active' };
     localStorage.setItem(this.KEY, JSON.stringify(session));
+    CloudSync.push();
     const prog = DB.getPrograms().find(p => p.id === programId);
     toast('▶ 已为《' + (prog ? prog.name : '') + '》开启打分，倒计时 ' + (duration/1000) + ' 秒！', 'success');
     this._startTimer();
@@ -696,6 +761,7 @@ const SESSION = {
     s.status = 'closed';
     s.closedAt = Date.now();
     localStorage.setItem(this.KEY, JSON.stringify(s));
+    CloudSync.push();
     if (this._timer) { clearInterval(this._timer); this._timer = null; }
     this._updateUI();
     toast('打分已手动结束', 'info');
@@ -771,6 +837,7 @@ const SESSION = {
     s.closedAt = Date.now();
     s.notScored = notScored;
     localStorage.setItem(this.KEY, JSON.stringify(s));
+    CloudSync.push();
 
     this._updateUI();
 
@@ -1773,6 +1840,7 @@ function clearAll() {
   if (!confirm('确定清除全部数据？此操作不可撤销！')) return;
   if (!confirm('再次确认：所有数据将全部清除。')) return;
   ['sc_programs','sc_judges','sc_scores','sc_session'].forEach(k => localStorage.removeItem(k));
+  if (CloudSync.db) CloudSync.db.collection(CloudSync.COL).doc(CloudSync.DOC).set({ programs:[], judges:[], scores:[], session:null });
   renderAdmin(); toast('全部数据已清除', 'info');
 }
 
@@ -1782,6 +1850,7 @@ function clearAll() {
 THEME.init();
 SESSION.resume();
 renderBoard();
+CloudSync.init(); // 接入云端，拉取最新数据并开启实时监听
 </script>
 </body>
 </html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://sykdl.com/img/favicon.ico">
+    <title>🏆 叩丁狼课堂练习阶梯打分系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-hover: #4338ca;
+            --bg: #f3f4f6; --card-bg: #ffffff;
+            --text-main: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+            --green: #10b981; --red: #ef4444; --yellow: #f59e0b;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 0; }
+
+        /* ══ SITE HEADER ══ */
+        #site-header {
+            background: #fff; border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 80px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative;   /* 让 sh-center 绝对居中用 */
+            box-shadow: 0 2px 8px rgba(0,0,0,.06); position: sticky; top: 0; z-index: 100;
+        }
+        .sh-left  { display: flex; align-items: center; flex-shrink: 0; z-index: 1; }
+        .sh-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; z-index: 1; }
+        /* 中央区域：在两侧 logo 之间自然居中 */
+        .sh-center { flex: 1; text-align: center; min-width: 0; padding: 0 16px; }
+        /* KDL logo */
+        #kdlLogo { height: 52px; width: auto; cursor: pointer; display: block; }
+        /* 校徽：固定宽高但不裁切 */
+        #schoolLogoWrap { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        #schoolLogoImg  { max-height: 60px; max-width: 60px; width: auto; height: auto; object-fit: contain; cursor: pointer; }
+        #defaultSchoolIcon { font-size: 38px; line-height: 1; cursor: pointer; }
+        /* 中央文字 */
+        .sh-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin: 0; line-height: 1.4; }
+        #trainingNameDisplay { font-size: 22px; font-weight: 900; color: var(--primary); margin-bottom: 2px; }
+        /* 登录/退出按钮 */
+        .btn-login  { padding: 7px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; white-space: nowrap; }
+        .btn-login:hover  { background: var(--primary-hover); }
+        .btn-logout { padding: 7px 16px; background: #f3f4f6; color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; white-space: nowrap; }
+        .btn-logout:hover { background: #e5e7eb; }
+
+        /* ══ MAIN CONTENT ══ */
+        .page-body { padding: 20px; }
+        .header-title { text-align: center; color: var(--primary); margin: 0 0 4px; font-size: 26px; }
+        #trainingNameBig { text-align: center; font-size: 15px; color: var(--text-muted); margin-bottom: 18px; min-height: 22px; }
+
+        /* ══ CONTROLS ══ */
+        .controls {
+            display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+            align-items: center; justify-content: center;
+            background: var(--card-bg); padding: 14px; border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.05);
+        }
+        .controls.hidden { display: none; }
+        .input-group { display: flex; gap: 10px; align-items: center; }
+        input[type="text"] { padding: 9px 14px; border: 2px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; transition: border-color .3s; }
+        input[type="text"]:focus { border-color: var(--primary); }
+        #studentName { width: 150px; }
+
+        /* ══ SETTINGS PANEL ══ */
+        #settingsPanel { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,.05); margin-bottom: 16px; overflow: hidden; }
+        #settingsPanel.hidden { display: none; }
+        .settings-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; cursor: pointer; user-select: none; border-bottom: 1px solid transparent; }
+        .settings-header:hover { background: #f9fafb; }
+        .settings-header.open { border-bottom-color: var(--border); }
+        .settings-body { padding: 16px 18px; display: none; }
+        .settings-body.open { display: block; }
+        .settings-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+        .settings-field { display: flex; flex-direction: column; gap: 5px; }
+        .settings-field label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .settings-field input[type="text"],
+        .settings-field input[type="password"] { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; width: 200px; outline: none; transition: border-color .2s; }
+        .settings-field input:focus { border-color: var(--primary); }
+        .pwd-wrap { display: flex; align-items: center; gap: 6px; }
+        .eye-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 4px; color: var(--text-muted); box-shadow: none; transform: none; }
+        .eye-btn:hover { background: none; transform: none; box-shadow: none; color: var(--text-main); }
+        /* 防止通配符规则给 sf-pwd-wrap 内的 input 加边框 */
+        .sf-pwd-wrap input[type="password"], .sf-pwd-wrap input[type="text"] { border: none !important; box-shadow: none !important; width: auto; }
+
+        /* ══ LAYOUT ══ */
+        .layout-container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }
+        .main-board { flex: 1; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.05); overflow-x: auto; padding: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+        th { background: #f9fafb; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+        .th-exercise { transition: background .2s; }
+        .th-exercise.editable { cursor: pointer; }
+        .th-exercise.editable:hover { background: #e5e7eb; color: var(--primary); }
+        .th-hint { font-size: 12px; color: #10b981; display: block; margin-top: 4px; pointer-events: none; }
+        tbody tr:hover td { background: #fefce8; }
+        .score-cell { position: relative; font-weight: bold; min-width: 90px; user-select: none; }
+        .score-cell.editable { cursor: pointer; }
+        .score-cell.editable:hover { background: #e0e7ff !important; transform: scale(1.05); border-radius: 6px; box-shadow: 0 0 10px rgba(79,70,229,.2); z-index: 10; }
+        .total-score { font-size: 18px; font-weight: 900; color: var(--red); }
+        .rank-badge { display: inline-block; padding: 6px 10px; border-radius: 12px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,.1); width: 60px; }
+        .tier-20 { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .tier-15 { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .tier-10 { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+        .click-hint { color: #cbd5e1; font-size: 13px; border: 1px dashed #cbd5e1; padding: 5px 10px; border-radius: 8px; }
+        .name-cell { font-weight: bold; font-size: 16px; }
+        .name-cell.editable { cursor: pointer; }
+        .name-cell.editable:hover { color: var(--primary); text-decoration: underline; }
+
+        /* ══ LEADERBOARD ══ */
+        .leaderboard { width: 300px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.05); padding: 20px; flex-shrink: 0; position: sticky; top: 80px; }
+        .leaderboard h2 { margin-top: 0; color: var(--red); font-size: 20px; text-align: center; border-bottom: 2px solid #fee2e2; padding-bottom: 10px; }
+        .rank-list { list-style: none; padding: 0; margin: 0; }
+        .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px dashed var(--border); transition: all .3s; }
+        .rank-item:hover { background: #f9fafb; transform: translateX(5px); }
+        .rank-num { font-weight: 900; font-size: 18px; width: 30px; color: var(--text-muted); }
+        .rank-item.top-1 .rank-num { color: #eab308; }
+        .rank-item.top-2 .rank-num { color: #9ca3af; }
+        .rank-item.top-3 .rank-num { color: #d97706; }
+        .rank-name { flex: 1; font-weight: bold; color: var(--text-main); }
+        .rank-score { font-weight: bold; color: var(--red); background: #fee2e2; padding: 2px 8px; border-radius: 8px; }
+
+        /* ══ BUTTONS ══ */
+        button { padding: 9px 18px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; transition: all .2s; box-shadow: 0 4px 6px rgba(79,70,229,.2); }
+        button:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        .btn-excel { background: var(--yellow); box-shadow: 0 4px 6px rgba(245,158,11,.2); }
+        .btn-excel:hover { background: #d97706; }
+        .btn-export { background: #3b82f6; box-shadow: 0 4px 6px rgba(59,130,246,.2); }
+        .btn-export:hover { background: #2563eb; }
+        .btn-add-exercise { background: var(--green); box-shadow: 0 4px 6px rgba(16,185,129,.2); }
+        .btn-add-exercise:hover { background: #059669; }
+        .btn-danger { background: var(--red); box-shadow: 0 4px 6px rgba(239,68,68,.2); margin-left: auto; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-save { background: var(--green); box-shadow: 0 4px 6px rgba(16,185,129,.2); padding: 8px 18px; font-size: 14px; }
+        .btn-save:hover { background: #059669; }
+
+        /* ══ LOGIN MODAL ══ */
+        #loginModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 999; align-items: center; justify-content: center; }
+        #loginModal.show { display: flex; }
+        .modal-box { background: #fff; border-radius: 16px; padding: 36px 32px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,.2); text-align: center; }
+        .modal-box h2 { margin: 0 0 6px; font-size: 1.3rem; color: var(--text-main); }
+        .modal-box p { color: var(--text-muted); font-size: 14px; margin: 0 0 24px; }
+        .modal-input-wrap { display: flex; align-items: center; gap: 6px; border: 2px solid var(--border); border-radius: 10px; padding: 0 12px; transition: border-color .2s; margin-bottom: 8px; }
+        .modal-input-wrap:focus-within { border-color: var(--primary); }
+        .modal-input-wrap input { flex: 1; border: none; outline: none; font-size: 16px; padding: 10px 0; background: transparent; }
+        .modal-error { color: var(--red); font-size: 13px; min-height: 20px; margin-bottom: 12px; }
+        .modal-btn { width: 100%; padding: 12px; font-size: 16px; border-radius: 10px; }
+        .modal-close-btn { margin-top: 12px; background: none; color: var(--text-muted); box-shadow: none; border: 1px solid var(--border); width: 100%; padding: 10px; font-size: 14px; border-radius: 10px; }
+        .modal-close-btn:hover { background: #f3f4f6; transform: none; }
+
+        /* ══ GUEST TAB — fixed，挂在浏览器顶边，校徽左侧 20px ══ */
+        #guestBadge {
+            position: fixed; top: 0; z-index: 9999;
+            /* 校徽容器 56px + 右 padding 24px + 登录按钮~86px + gap 12px = 178px；再加 20px = 198px */
+            right: 198px;
+            background: #fef9c3; color: #92400e;
+            border: 1px solid #fde68a; border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 5px 14px 8px;
+            font-size: 12px; font-weight: 700;
+            box-shadow: 0 3px 10px rgba(0,0,0,.12);
+            pointer-events: none; white-space: nowrap;
+        }
+
+        /* ══ SETTINGS FORM ══ */
+        .sf-grid { display: grid; grid-template-columns: auto auto; gap: 12px 16px; align-items: center; margin-bottom: 16px; justify-content: start; }
+        .sf-label { font-size: 13px; color: var(--text-muted); font-weight: 600; white-space: nowrap; text-align: right; }
+        .sf-input { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color .2s; width: 460px; }
+        .sf-input:focus { border-color: var(--primary); }
+        .sf-pwd-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color .2s; width: 460px; }
+        .sf-pwd-wrap:focus-within { border-color: var(--primary); }
+        .sf-pwd-wrap input { flex: 1; border: none; outline: none; padding: 8px 12px; font-size: 14px; background: transparent; min-width: 0; }
+        .sf-pwd-wrap .eye-btn { padding: 0 10px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<!-- ══ SITE HEADER ══ -->
+<div id="site-header">
+    <div class="sh-left">
+        <a href="https://sykdl.com/" target="_blank" style="line-height:0;">
+            <img id="kdlLogo" src="/img/logo.png" alt="叩丁狼">
+        </a>
+    </div>
+    <div class="sh-center">
+        <div id="trainingNameDisplay">——</div>
+        <div class="sh-title">🏆 叩丁狼课堂练习阶梯打分系统</div>
+    </div>
+    <div class="sh-right">
+        <div id="schoolLogoWrap">
+            <a id="schoolLogoLink" href="#" target="_blank" style="line-height:0;display:none;">
+                <img id="schoolLogoImg" src="" alt="学校Logo" title="点击访问学校主页">
+            </a>
+            <span id="defaultSchoolIcon" title="登录后可上传学校logo">🏫</span>
+        </div>
+        <button id="loginBtn" class="btn-login" onclick="showLoginModal()">🔑 登录</button>
+        <button id="logoutBtn" class="btn-logout" style="display:none;" onclick="doLogout()">退出登录</button>
+    </div>
+</div>
+
+<!-- ══ GUEST TAB ══ -->
+<div id="guestBadge" style="display:none;">👁 仅查看</div>
+
+<!-- ══ LOGIN MODAL ══ -->
+<div id="loginModal">
+    <div class="modal-box">
+        <div style="font-size:48px;margin-bottom:12px;">🔑</div>
+        <h2>管理员登录</h2>
+        <p>登录后可进行打分和数据管理</p>
+        <div class="modal-input-wrap">
+            <input type="password" id="loginPwdInput" placeholder="请输入密码"
+                   onkeydown="if(event.key==='Enter')doLogin()">
+            <button type="button" class="eye-btn" id="loginEye" onclick="toggleEye('loginPwdInput','loginEye')">🙈</button>
+        </div>
+        <div class="modal-error" id="loginError"></div>
+        <button class="modal-btn" onclick="doLogin()">登 录</button>
+        <button class="modal-close-btn" onclick="hideLoginModal()">取 消</button>
+    </div>
+</div>
+
+<!-- ══ PAGE BODY ══ -->
+<div class="page-body">
+
+    <!-- Settings panel (login-gated) -->
+    <div id="settingsPanel" class="hidden">
+        <div class="settings-header" id="settingsToggle" onclick="toggleSettings()">
+            <span>⚙️ <strong>系统设置</strong>（实训名称 · 学校Logo · 修改密码）</span>
+            <span id="settingsArrow" style="color:var(--text-muted);transition:transform .25s;">▶</span>
+        </div>
+        <div class="settings-body" id="settingsBody">
+            <div class="sf-grid">
+                <!-- 实训名称 -->
+                <span class="sf-label">实训名称</span>
+                <input class="sf-input" type="text" id="settingTrainingName" placeholder="例如：沈航26级嵌入式实训">
+
+                <!-- 学校主页链接 -->
+                <span class="sf-label">学校主页链接</span>
+                <input class="sf-input" type="text" id="settingSchoolLink" placeholder="例如：https://www.example.edu.cn">
+
+                <!-- 修改登录密码 -->
+                <span class="sf-label">修改登录密码</span>
+                <div class="sf-pwd-wrap">
+                    <input type="password" id="settingNewPwd" placeholder="留空则不修改">
+                    <button type="button" class="eye-btn" id="settingEye" onclick="toggleEye('settingNewPwd','settingEye')">🙈</button>
+                </div>
+
+                <!-- 学校Logo -->
+                <span class="sf-label">学校Logo</span>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <input type="file" id="logoUpload" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
+                    <button class="btn-save" style="background:#6366f1;width:140px;" onclick="document.getElementById('logoUpload').click()">📷 上传Logo</button>
+                    <button class="btn-save" style="background:#ef4444;width:140px;box-shadow:0 4px 6px rgba(239,68,68,.2);" onclick="clearSchoolLogo()">🗑️ 移除Logo</button>
+                    <span id="logoStatus" style="font-size:13px;color:var(--text-muted);">未上传</span>
+                </div>
+
+                <!-- 保存按钮 -->
+                <span></span>
+                <div>
+                    <button class="btn-save" onclick="saveSettings()">💾 保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls (login-gated) -->
+    <div class="controls hidden" id="controlsBar">
+        <div class="input-group">
+            <input type="text" id="studentName" placeholder="输入姓名回车" onkeypress="handleEnter(event)">
+            <button onclick="addStudent()">➕ 单个添加</button>
+            <input type="file" id="excelUpload" accept=".xlsx,.xls" style="display:none;" onchange="handleExcelUpload(event)">
+            <button class="btn-excel" onclick="document.getElementById('excelUpload').click()">📁 导入名单</button>
+            <button class="btn-export" onclick="exportToExcel()">💾 导出成绩</button>
+        </div>
+        <button class="btn-add-exercise" onclick="addExercise()">📝 添加新练习</button>
+        <button class="btn-danger" onclick="clearAllData()">🗑️ 清空所有数据</button>
+    </div>
+
+    <!-- Main layout -->
+    <div class="layout-container">
+        <div class="main-board">
+            <table id="scoreTable">
+                <thead><tr id="tableHeader"><th>姓名</th><th>总分 🌟</th></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="leaderboard">
+            <h2>🔥 实时排行榜</h2>
+            <ul class="rank-list" id="leaderboardList"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ══ CONSTANTS ══
+    const STORAGE_KEY   = 'classroom_score_data_v2';
+    const SETTINGS_KEY  = 'kdl107_settings';
+    // sha256('vivi123')
+    const DEFAULT_PWD_HASH = 'd7af1c018b68fc5b325f3e9cf56a82587f7057bc59fb7675e7b56451bcca086b';
+    // 部署后放 static/img/school-logo.png 即可让所有访客看到学校logo
+    const SCHOOL_LOGO_DEFAULT = '/img/school-logo.png';
+
+    // ══ CLOUDBASE ══
+    const CB_ENV = 'kdl-scoring-d5g90i8wb23f829a1';
+    let _cbDB = null, _cbWatcher = null;
+
+    async function initCloudBase107() {
+        try {
+            const app = cloudbase.init({ env: CB_ENV });
+            await app.auth({ persistence: 'local' }).anonymousAuthProvider().signIn();
+            _cbDB = app.database();
+
+            // 从云端拉取最新数据
+            const res = await _cbDB.collection('scoring_107').doc('main').get();
+            if (res.data && res.data.length > 0) {
+                const d = res.data[0];
+                students       = d.students       || [];
+                exercises      = d.exercises      || [];
+                nextStudentId  = d.nextStudentId  || 1;
+                nextExerciseId = d.nextExerciseId || 1;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ students, exercises, nextStudentId, nextExerciseId }));
+                renderUI();
+            }
+
+            // 开启实时监听：其他端修改后自动刷新
+            if (_cbWatcher) _cbWatcher.close();
+            _cbWatcher = _cbDB.collection('scoring_107').doc('main').watch({
+                onChange(snapshot) {
+                    if (!snapshot.docs || !snapshot.docs.length) return;
+                    const d = snapshot.docs[0];
+                    students       = d.students       || [];
+                    exercises      = d.exercises      || [];
+                    nextStudentId  = d.nextStudentId  || 1;
+                    nextExerciseId = d.nextExerciseId || 1;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({ students, exercises, nextStudentId, nextExerciseId }));
+                    renderUI();
+                },
+                onError(err) { console.error('CloudBase 监听错误:', err); }
+            });
+        } catch(e) {
+            console.warn('CloudBase 初始化失败，降级为本地模式:', e);
+        }
+    }
+
+    const SCORE_TIERS = [
+        { score: 20, label: '优 🌟', class: 'tier-20' },
+        { score: 15, label: '良 ⭐',  class: 'tier-15' },
+        { score: 10, label: '及格 ✅', class: 'tier-10' }
+    ];
+
+    let students = [], exercises = [], nextStudentId = 1, nextExerciseId = 1;
+    let isLoggedIn = false;
+
+    // ══ SHA-256 ══
+    async function sha256(text) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    // ══ SETTINGS ══
+    function loadSettings() {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
+    }
+    function persistSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+    function getPwdHash() { return loadSettings().pwdHash || DEFAULT_PWD_HASH; }
+
+    function applySettings() {
+        const s = loadSettings();
+        const name = s.trainingName || '';
+        document.getElementById('trainingNameDisplay').textContent = name || '——';
+        document.getElementById('trainingNameBig') && (document.getElementById('trainingNameBig').textContent = name);
+        document.getElementById('settingTrainingName') && (document.getElementById('settingTrainingName').value = name);
+        // School link
+        const link = s.schoolLink || '';
+        const linkEl = document.getElementById('schoolLogoLink');
+        if (linkEl) {
+            linkEl.href = link || '#';
+            linkEl.style.pointerEvents = link ? 'auto' : 'none';
+            linkEl.title = link ? '点击访问学校主页' : '登录后可设置学校主页链接';
+        }
+        document.getElementById('settingSchoolLink') && (document.getElementById('settingSchoolLink').value = link);
+        // School logo：优先用本地上传的 base64，其次用部署的静态文件
+        const logoSrc = s.schoolLogo || null;
+        if (logoSrc) {
+            // 本地 base64（仅本机可见，预览用）
+            document.getElementById('schoolLogoImg').src = logoSrc;
+            document.getElementById('schoolLogoLink').style.display = 'inline-block';
+            document.getElementById('defaultSchoolIcon').style.display = 'none';
+            document.getElementById('logoStatus') && (document.getElementById('logoStatus').textContent = '已上传（本地）✅');
+        } else {
+            // 尝试加载部署的静态 logo
+            const defaultImg = new Image();
+            defaultImg.onload = function() {
+                document.getElementById('schoolLogoImg').src = SCHOOL_LOGO_DEFAULT;
+                document.getElementById('schoolLogoLink').style.display = 'inline-block';
+                document.getElementById('defaultSchoolIcon').style.display = 'none';
+            };
+            defaultImg.onerror = function() {
+                // 静态文件也不存在，显示默认图标
+                document.getElementById('schoolLogoLink').style.display = 'none';
+                document.getElementById('defaultSchoolIcon').style.display = 'block';
+            };
+            defaultImg.src = SCHOOL_LOGO_DEFAULT;
+            document.getElementById('logoStatus') && (document.getElementById('logoStatus').textContent = '未上传（本地）');
+        }
+    }
+
+    async function saveSettings() {
+        const s = loadSettings();
+        s.trainingName = document.getElementById('settingTrainingName').value.trim();
+        s.schoolLink = document.getElementById('settingSchoolLink').value.trim();
+        const newPwd = document.getElementById('settingNewPwd').value;
+        if (newPwd) {
+            s.pwdHash = await sha256(newPwd);
+            document.getElementById('settingNewPwd').value = '';
+            alert('✅ 密码已更新！');
+        }
+        persistSettings(s);
+        applySettings();
+        alert('✅ 设置已保存！');
+    }
+
+    function handleLogoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const s = loadSettings();
+            s.schoolLogo = ev.target.result;
+            persistSettings(s);
+            applySettings();
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    }
+
+    function clearSchoolLogo() {
+        const s = loadSettings();
+        delete s.schoolLogo;
+        persistSettings(s);
+        applySettings();
+    }
+
+    // ══ LOGIN ══
+    function showLoginModal() {
+        document.getElementById('loginModal').classList.add('show');
+        document.getElementById('loginPwdInput').value = '';
+        document.getElementById('loginError').textContent = '';
+        setTimeout(() => document.getElementById('loginPwdInput').focus(), 100);
+    }
+    function hideLoginModal() {
+        document.getElementById('loginModal').classList.remove('show');
+    }
+
+    async function doLogin() {
+        const input = document.getElementById('loginPwdInput').value;
+        if (!input) return;
+        const hash = await sha256(input);
+        if (hash === getPwdHash()) {
+            isLoggedIn = true;
+            hideLoginModal();
+            updateAuthUI();
+        } else {
+            document.getElementById('loginError').textContent = '❌ 密码错误，请重试';
+            document.getElementById('loginPwdInput').value = '';
+            document.getElementById('loginPwdInput').focus();
+        }
+    }
+
+    function doLogout() {
+        isLoggedIn = false;
+        updateAuthUI();
+    }
+
+    function updateAuthUI() {
+        const loggedIn = isLoggedIn;
+        document.getElementById('loginBtn').style.display  = loggedIn ? 'none'  : '';
+        document.getElementById('logoutBtn').style.display = loggedIn ? ''     : 'none';
+        document.getElementById('guestBadge').style.display = loggedIn ? 'none' : '';
+        document.getElementById('settingsPanel').classList.toggle('hidden', !loggedIn);
+        document.getElementById('controlsBar').classList.toggle('hidden', !loggedIn);
+        if (loggedIn) applySettings();
+        renderUI();
+    }
+
+    function toggleSettings() {
+        const body  = document.getElementById('settingsBody');
+        const arrow = document.getElementById('settingsArrow');
+        const head  = document.getElementById('settingsToggle');
+        const open  = body.classList.toggle('open');
+        head.classList.toggle('open', open);
+        arrow.style.transform = open ? 'rotate(90deg)' : '';
+    }
+
+    function toggleEye(inputId, btnId) {
+        const inp = document.getElementById(inputId);
+        const btn = document.getElementById(btnId);
+        const show = inp.type === 'password';
+        inp.type = show ? 'text' : 'password';
+        btn.textContent = show ? '👁' : '🙈';
+    }
+
+    // ══ DATA ══
+    async function saveData() {
+        const data = { students, exercises, nextStudentId, nextExerciseId };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        if (_cbDB) {
+            try { await _cbDB.collection('scoring_107').doc('main').set(data); }
+            catch(e) { console.error('云保存失败:', e); }
+        }
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                const p = JSON.parse(saved);
+                students = p.students || [];
+                exercises = p.exercises || [];
+                nextStudentId = p.nextStudentId || 1;
+                nextExerciseId = p.nextExerciseId || 1;
+            } catch(e) { console.error(e); }
+        }
+        renderUI();
+    }
+
+    async function clearAllData() {
+        if (confirm('⚠️ 确定要清空所有学生和打分数据吗？此操作不可恢复！')) {
+            const empty = { students: [], exercises: [], nextStudentId: 1, nextExerciseId: 1 };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(empty));
+            students = []; exercises = []; nextStudentId = 1; nextExerciseId = 1;
+            if (_cbDB) {
+                try { await _cbDB.collection('scoring_107').doc('main').set(empty); }
+                catch(e) { console.error('云清除失败:', e); }
+            }
+            renderUI();
+        }
+    }
+
+    // ══ STUDENT / EXERCISE OPERATIONS ══
+    function handleEnter(e) { if (e.key === 'Enter') addStudent(); }
+
+    function addStudent() {
+        const input = document.getElementById('studentName');
+        const name = input.value.trim();
+        if (!name) return;
+        if (students.find(s => s.name === name)) { alert('该学生已存在！'); return; }
+        students.push({ id: nextStudentId++, name, scores: {} });
+        input.value = '';
+        saveData(); renderUI();
+    }
+
+    function editStudentName(studentId) {
+        if (!isLoggedIn) return;
+        const student = students.find(s => s.id === studentId);
+        if (!student) return;
+        const newName = prompt(`请输入学生 [${student.name}] 的新姓名：`, student.name);
+        if (newName === null) return;
+        const trimmed = newName.trim();
+        if (!trimmed) { alert('姓名不能为空！'); return; }
+        if (students.find(s => s.name === trimmed && s.id !== studentId)) { alert('该姓名已存在！'); return; }
+        student.name = trimmed;
+        saveData(); renderUI();
+    }
+
+    function addExercise() {
+        exercises.push({ id: 'ex_' + nextExerciseId, name: nextExerciseId.toString() });
+        nextExerciseId++;
+        saveData(); renderUI();
+    }
+
+    function manageExercise(exId) {
+        if (!isLoggedIn) return;
+        const exIndex = exercises.findIndex(e => e.id === exId);
+        if (exIndex === -1) return;
+        const ex = exercises[exIndex];
+        const action = prompt(`当前练习名:【${ex.name}】\n\n- 输入新名字进行重命名\n- 输入"删除"将彻底删除该练习及全部分数`, ex.name);
+        if (action === null) return;
+        if (action.trim() === '删除') {
+            if (confirm(`⚠️ 确定要删除 [${ex.name}] 吗？\n所有学生在该练习下的分数都将丢失！`)) {
+                exercises.splice(exIndex, 1);
+                students.forEach(s => { delete s.scores[exId]; });
+            }
+        } else if (action.trim() !== '') {
+            ex.name = action.trim();
+        }
+        saveData(); renderUI();
+    }
+
+    function handleCellClick(studentId, exerciseId) {
+        if (!isLoggedIn) return;
+        const student = students.find(s => s.id === studentId);
+        if (!student) return;
+        const cur = student.scores[exerciseId];
+        if (!cur) {
+            student.scores[exerciseId] = { tierIndex: 0 };
+        } else {
+            const next = cur.tierIndex + 1;
+            if (next >= SCORE_TIERS.length) delete student.scores[exerciseId];
+            else student.scores[exerciseId] = { tierIndex: next };
+        }
+        saveData(); renderUI();
+    }
+
+    // ══ RENDER ══
+    function renderUI() {
+        students.forEach(student => {
+            let total = 0;
+            for (let key in student.scores) {
+                const t = student.scores[key].tierIndex;
+                if (SCORE_TIERS[t]) total += SCORE_TIERS[t].score;
+            }
+            student.totalScore = total;
+        });
+        renderMainTable();
+        renderLeaderboard();
+    }
+
+    function renderMainTable() {
+        const header = document.getElementById('tableHeader');
+        header.innerHTML = '<th>姓名</th><th>总分 🌟</th>';
+        exercises.forEach(ex => {
+            const editClass = isLoggedIn ? 'editable' : '';
+            const hint = isLoggedIn ? `<span class="th-hint">点击循环给分</span>` : '';
+            const onclick = isLoggedIn ? `onclick="manageExercise('${ex.id}')"` : '';
+            header.innerHTML += `<th class="th-exercise ${editClass}" ${onclick} title="${isLoggedIn ? '点击修改名字或删除' : ''}">练习 ${ex.name}${hint}</th>`;
+        });
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        students.forEach(student => {
+            const tr = document.createElement('tr');
+            const nameClass = isLoggedIn ? 'editable' : '';
+            const nameOnclick = isLoggedIn ? `onclick="editStudentName(${student.id})"` : '';
+            let html = `
+                <td class="name-cell ${nameClass}" ${nameOnclick} title="${isLoggedIn ? '点击修改姓名' : ''}">${student.name}</td>
+                <td class="total-score">${student.totalScore}</td>`;
+            exercises.forEach(ex => {
+                const record = student.scores[ex.id];
+                const editClass = isLoggedIn ? 'editable' : '';
+                const onclick = isLoggedIn ? `onclick="handleCellClick(${student.id},'${ex.id}')"` : '';
+                const title = isLoggedIn ? 'title="继续点击可降档或撤销"' : '';
+                if (record && SCORE_TIERS[record.tierIndex]) {
+                    const tier = SCORE_TIERS[record.tierIndex];
+                    html += `<td class="score-cell ${editClass}" ${onclick} ${title}><span class="rank-badge ${tier.class}">${tier.label}<br><small>+${tier.score}分</small></span></td>`;
+                } else {
+                    html += `<td class="score-cell ${editClass}" ${onclick} ${title}>${isLoggedIn ? '<span class="click-hint">点击打分</span>' : ''}</td>`;
+                }
+            });
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderLeaderboard() {
+        const list = document.getElementById('leaderboardList');
+        list.innerHTML = '';
+        const sorted = [...students].sort((a,b) => b.totalScore - a.totalScore);
+        let rank = 1;
+        sorted.forEach((s, i) => {
+            if (s.totalScore === 0) return;
+            if (i > 0 && s.totalScore < sorted[i-1].totalScore) rank = i + 1;
+            const li = document.createElement('li');
+            li.className = `rank-item top-${rank}`;
+            let icon = rank;
+            if (rank===1) icon='🥇'; else if (rank===2) icon='🥈'; else if (rank===3) icon='🥉';
+            li.innerHTML = `<span class="rank-num">${icon}</span><span class="rank-name">${s.name}</span><span class="rank-score">${s.totalScore} 分</span>`;
+            list.appendChild(li);
+        });
+        if (!sorted.length || sorted[0].totalScore === 0) {
+            list.innerHTML = '<li style="text-align:center;color:gray;padding:20px 0;">暂无数据</li>';
+        }
+    }
+
+    // ══ EXCEL ══
+    function handleExcelUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+                let count = 0;
+                rows.forEach(row => {
+                    if (row && row.length > 0 && row[0] !== undefined) {
+                        const name = String(row[0]).trim();
+                        if (name && !['姓名','名字','学生姓名'].includes(name)) {
+                            if (!students.find(s => s.name === name)) {
+                                students.push({ id: nextStudentId++, name, scores: {} });
+                                count++;
+                            }
+                        }
+                    }
+                });
+                if (count > 0) { alert(`✅ 成功导入 ${count} 名学生！`); saveData(); renderUI(); }
+                else alert('⚠️ 未能在第一列找到新的学生姓名。');
+            } catch { alert('❌ 解析 Excel 失败，请检查文件格式。'); }
+            event.target.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function exportToExcel() {
+        if (!students.length) { alert('目前没有学生数据可以导出！'); return; }
+        const sorted = [...students].sort((a,b) => b.totalScore - a.totalScore);
+        let header = ['排名','姓名','总分'];
+        exercises.forEach(ex => header.push(`练习 ${ex.name}`));
+        const rows = [header];
+        let rank = 1;
+        sorted.forEach((s, i) => {
+            if (i > 0 && s.totalScore < sorted[i-1].totalScore) rank = i + 1;
+            const row = [rank, s.name, s.totalScore || 0];
+            exercises.forEach(ex => {
+                const rec = s.scores[ex.id];
+                row.push(rec && SCORE_TIERS[rec.tierIndex] ? SCORE_TIERS[rec.tierIndex].score : 0);
+            });
+            rows.push(row);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{wch:6},{wch:15},{wch:10}];
+        exercises.forEach(() => ws['!cols'].push({wch:12}));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, '课堂练习成绩');
+        const d = new Date();
+        const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        const s = loadSettings();
+        const trainName = s.trainingName ? `_${s.trainingName}` : '';
+        XLSX.writeFile(wb, `叩丁狼课堂练习打分汇总${trainName}_${dateStr}.xlsx`);
+    }
+
+    // ══ INIT ══
+    applySettings();
+    loadData();        // 先从 localStorage 快速渲染
+    updateAuthUI();
+    initCloudBase107(); // 异步接入云端，完成后自动拉取最新数据并开启实时监听
+</script>
+</body>
+</html>

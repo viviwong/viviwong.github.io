@@ -6,6 +6,9 @@ sidebar_position: 1
 
 ## <a href="/web/106-竞技打分系统.html" target="_blank">全员打分系统</a>
 
+## 实训分数
+### <a href="/web/107-叩丁狼课堂练习打分.html" target="_blank">叩丁狼课堂练习打分</a>
+
 ## 小程序和uniapp开发
 
 * <a href="/web/101-flex弹性盒子演示.html" target="_blank">01-flex弹性盒子演示</a>
