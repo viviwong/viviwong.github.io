@@ -7,8 +7,8 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 
 type Props = WrapperProps<typeof ContentType>;
 
-// 兜底哈希 = sha256('6638')，当 106.html 未设置自定义密码时使用
-const FALLBACK_HASH = '39cff4eb438907bd6de0ed9bd739ce88daf3a06eba8c883c92c25e7e36f28fb0';
+// 兜底哈希 = sha256('66386638')，当 106.html 未设置自定义密码时使用
+const FALLBACK_HASH = 'cab7337874746dbaadfafa68e0dc8012bf0d98aac2be85c7498478a1cb31d381';
 // 106.html 管理后台写入此 key 来更新课程密码
 const COURSE_PWD_KEY = 'kdl_course_pwd_hash';
 // 解锁状态存储 key（值 = 当前正确哈希，密码更新后旧值自动失效）

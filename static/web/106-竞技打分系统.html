@@ -493,8 +493,11 @@ tr:hover td{background:rgba(88,166,255,.04);}
 
       <!-- 就业班课程密码管理 -->
       <div class="card" style="margin-top:16px;">
-        <div class="card-title"><span class="icon">🔐</span>就业班课程密码管理</div>
-        <div style="max-width:480px;">
+        <div class="card-title" onclick="toggleCoursePwdPanel()" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;">
+          <span><span class="icon">🔐</span>就业班课程密码管理</span>
+          <span id="coursePwdArrow" style="font-size:13px;color:var(--sub);transition:transform .25s;">▶</span>
+        </div>
+        <div id="coursePwdPanel" style="display:none;max-width:480px;margin-top:4px;">
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;line-height:1.7;color:var(--sub);">
             管理 <strong style="color:var(--text);">sykdl.com</strong> 文档站中锁定课程页面的访问密码。<br>
             修改后，当前浏览器立即生效；学生需重新输入新密码。
@@ -505,11 +508,14 @@ tr:hover td{background:rgba(88,166,255,.04);}
           </div>
           <div class="form-group">
             <label class="form-label">设置新课程密码</label>
-            <input class="input" id="courseNewPwd" type="password" placeholder="输入新密码后点击更新">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input class="input" id="courseNewPwd" type="password" placeholder="输入新密码后点击更新" style="flex:1;">
+              <button type="button" onclick="togglePwdVisible('courseNewPwd','eyeCoursePwd')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--sub);padding:4px;line-height:1;" title="显示/隐藏密码"><span id="eyeCoursePwd">🙈</span></button>
+            </div>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="updateCoursePwd()">🔄 更新课程密码</button>
-            <button class="btn" onclick="resetCoursePwd()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);">↩ 恢复默认密码(6638)</button>
+            <button class="btn" onclick="resetCoursePwd()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);">↩ 恢复默认密码(66386638)</button>
           </div>
           <div id="coursePwdResult" style="display:none;margin-top:14px;padding:12px 16px;background:var(--bg3);border:1px solid var(--green);border-radius:8px;font-size:13px;line-height:1.8;"></div>
         </div>
@@ -1625,7 +1631,24 @@ async function saveSettings() {
 // ════════════════════════
 const COURSE_PWD_KEY = 'kdl_course_pwd_hash';
 const COURSE_UNLOCK_KEY = 'kdl_pro_unlocked';
-const COURSE_PWD_FALLBACK = '39cff4eb438907bd6de0ed9bd739ce88daf3a06eba8c883c92c25e7e36f28fb0'; // sha256('6638')
+const COURSE_PWD_FALLBACK = 'cab7337874746dbaadfafa68e0dc8012bf0d98aac2be85c7498478a1cb31d381'; // sha256('66386638')
+
+function toggleCoursePwdPanel() {
+  const panel = document.getElementById('coursePwdPanel');
+  const arrow = document.getElementById('coursePwdArrow');
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(90deg)' : '';
+  if (open) refreshCoursePwdStatus();
+}
+
+function togglePwdVisible(inputId, eyeId) {
+  const inp = document.getElementById(inputId);
+  const eye = document.getElementById(eyeId);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  eye.textContent = show ? '👁' : '🙈';
+}
 
 function refreshCoursePwdStatus() {
   const el = document.getElementById('coursePwdStatus');
@@ -1634,7 +1657,7 @@ function refreshCoursePwdStatus() {
   if (custom) {
     el.innerHTML = '<span style="color:var(--green);">✅ 已设置自定义密码</span>（哈希：' + custom.slice(0, 12) + '…）';
   } else {
-    el.innerHTML = '<span style="color:var(--sub);">使用默认密码（6638）</span>';
+    el.innerHTML = '<span style="color:var(--sub);">使用默认密码（66386638）</span>';
   }
 }
 
@@ -1663,7 +1686,7 @@ function resetCoursePwd() {
   refreshCoursePwdStatus();
   const result = document.getElementById('coursePwdResult');
   result.style.display = 'block';
-  result.innerHTML = '↩ <strong>已恢复默认密码（6638）</strong><br>所有已解锁的浏览器将在下次访问时要求重新输入密码。';
+  result.innerHTML = '↩ <strong>已恢复默认密码（66386638）</strong><br>所有已解锁的浏览器将在下次访问时要求重新输入密码。';
   toast('已恢复默认密码', 'success');
 }
 
