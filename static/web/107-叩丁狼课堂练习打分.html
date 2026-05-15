@@ -171,6 +171,62 @@
         .sf-pwd-wrap:focus-within { border-color: var(--primary); }
         .sf-pwd-wrap input { flex: 1; border: none; outline: none; padding: 8px 12px; font-size: 14px; background: transparent; min-width: 0; }
         .sf-pwd-wrap .eye-btn { padding: 0 10px; flex-shrink: 0; }
+
+        /* ══ MOBILE RESPONSIVE ══ */
+        @media (max-width: 768px) {
+            /* Header */
+            #site-header { height: 60px; padding: 0 12px; }
+            #kdlLogo { height: 36px; }
+            #schoolLogoWrap { width: 40px; height: 40px; }
+            #schoolLogoImg  { max-height: 40px; max-width: 40px; }
+            #defaultSchoolIcon { font-size: 26px; }
+            #trainingNameDisplay { font-size: 15px; margin-bottom: 1px; }
+            .sh-title { font-size: 11px; }
+            .sh-center { padding: 0 8px; }
+            .btn-login  { padding: 6px 12px; font-size: 13px; }
+            .btn-logout { padding: 6px 10px; font-size: 13px; }
+            .sh-right { gap: 6px; }
+
+            /* guestBadge：改为居中挂顶，不再 right 定位 */
+            #guestBadge { right: auto; left: 50%; transform: translateX(-50%); }
+
+            /* Page body */
+            .page-body { padding: 10px; }
+
+            /* Controls：所有按钮换行，撑满容器 */
+            .controls { gap: 8px; padding: 10px; }
+            .input-group { flex-wrap: wrap; width: 100%; gap: 8px; }
+            #studentName { width: 100%; flex: 1; min-width: 0; }
+            .controls button { font-size: 13px; padding: 8px 12px; flex: 1; min-width: 0; }
+
+            /* Layout：主表格和排行榜竖向堆叠 */
+            .layout-container { flex-direction: column; gap: 14px; }
+            .leaderboard { width: 100%; position: static; }
+
+            /* 表格：减小内边距，字号缩小 */
+            th, td { padding: 8px 6px; font-size: 13px; }
+            .name-cell { font-size: 14px; }
+            .rank-badge { width: 50px; font-size: 12px; padding: 4px 6px; }
+            .total-score { font-size: 15px; }
+
+            /* Settings：输入框改为全宽，表格改为单列 */
+            .sf-grid { grid-template-columns: 1fr; gap: 6px 0; }
+            .sf-label { text-align: left; padding-top: 6px; }
+            .sf-input { width: 100%; }
+            .sf-pwd-wrap { width: 100%; }
+            .settings-body { padding: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            /* 极小屏（≤480px）：进一步缩减 */
+            #trainingNameDisplay { font-size: 13px; }
+            .sh-title { display: none; }   /* 隐藏副标题，节省空间 */
+            #kdlLogo { height: 30px; }
+            .btn-login  { padding: 5px 10px; font-size: 12px; }
+            .btn-logout { padding: 5px 8px;  font-size: 12px; }
+            .controls button { font-size: 12px; padding: 7px 10px; }
+            .leaderboard h2 { font-size: 16px; }
+        }
     </style>
 </head>
 <body>

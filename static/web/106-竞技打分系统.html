@@ -1020,9 +1020,11 @@ function renderBoard() {
   }
 
   document.getElementById('statPrograms').textContent = ranking.length;
-  document.getElementById('statJudges').textContent = activeJudges.length;
-  document.getElementById('statScores').textContent = totalDone;
-  document.getElementById('statComplete').textContent = totalPossible > 0 ? Math.round(totalDone / totalPossible * 100) + '%' : '0%';
+  document.getElementById('statJudges').textContent = adminLoggedIn ? activeJudges.length : '🔒';
+  document.getElementById('statScores').textContent  = adminLoggedIn ? totalDone : '🔒';
+  document.getElementById('statComplete').textContent = adminLoggedIn
+    ? (totalPossible > 0 ? Math.round(totalDone / totalPossible * 100) + '%' : '0%')
+    : '🔒';
   document.getElementById('lastUpdate').textContent = '更新: ' + new Date().toLocaleTimeString('zh-CN');
 
   const rankEl = document.getElementById('rankList');
@@ -1030,6 +1032,7 @@ function renderBoard() {
     rankEl.innerHTML = '<div class="no-data"><div class="emoji">🎭</div>暂无节目数据</div>';
   } else {
     const medals = ['🥇', '🥈', '🥉'];
+    // 所有人都能看到排名和均分
     rankEl.innerHTML = ranking.map((p, i) => {
       const res = p.result;
       const scoreClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'normal';
@@ -1039,7 +1042,7 @@ function renderBoard() {
         ${i < 3 ? `<div class="rank-medal">${medals[i]}</div>` : `<div class="rank-num">${i + 1}</div>`}
         <div class="rank-info">
           <div class="rank-name">${p.name}</div>
-          <div class="rank-detail">${p.description || ''}&emsp;${res.count}/${res.eligibleCount} 人有效打分${res.trimmed ? ' · 已去最高最低' : ''}</div>
+          <div class="rank-detail">${p.description || ''}${adminLoggedIn ? `&emsp;${res.count}/${res.eligibleCount} 人有效打分${res.trimmed ? ' · 已去最高最低' : ''}` : ''}</div>
         </div>
         <div class="rank-score ${scoreClass}">${res.avg !== null ? res.avg : '--'}</div>
         <div class="rank-bar" style="width:${barW}%"></div>
@@ -1047,9 +1050,11 @@ function renderBoard() {
     }).join('');
   }
 
-  // Score details
+  // Score details（只有管理员可见）
   const detailEl = document.getElementById('scoreDetails');
-  if (ranking.length === 0) {
+  if (!adminLoggedIn) {
+    detailEl.innerHTML = '<div style="color:var(--sub);font-size:13px;text-align:center;padding:30px 20px;">🔒 打分明细仅管理员可见</div>';
+  } else if (ranking.length === 0) {
     detailEl.innerHTML = '<div style="color:var(--sub);font-size:13px;text-align:center;padding:20px;">暂无数据</div>';
   } else {
     detailEl.innerHTML = ranking.map(p => {
