@@ -444,7 +444,7 @@ Page({
 })</pre>
 
     <h3>关键代码：宫格布局 WXSS</h3>
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">/* pages/home/home.wxss */
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>/* pages/home/home.wxss */
 .grid {
   display: flex;
   flex-wrap: wrap;
@@ -503,7 +503,7 @@ Page({
     </div>
 
     <h3>关键代码：utils/request.js</h3>
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// utils/request.js
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// utils/request.js
 const BASE_JUHE = 'https://v.juhe.cn'
 
 function request(url, method = 'GET', data = {}) {
@@ -567,7 +567,7 @@ const MOCK_JOKE = {
 module.exports = { request, getNews, getJoke }</pre>
 
     <h3>关键代码：新闻页调用</h3>
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/news/news.js
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// pages/news/news.js
 const { getNews } = require('../../utils/request')
 
 Page({
@@ -637,7 +637,7 @@ Page({
     </table>
 
     <h3>关键代码：utils/aiChat.js</h3>
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// utils/aiChat.js
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// utils/aiChat.js
 const PROVIDERS = {
   deepseek: { url: 'https://api.deepseek.com/v1/chat/completions', defaultModel: 'deepseek-chat' },
   qwen:     { url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', defaultModel: 'qwen-turbo' },
@@ -710,7 +710,7 @@ function saveConfig(provider, key, model) {
 module.exports = { chat, loadConfig, saveConfig, PROVIDERS }</pre>
 
     <h3>关键代码：对话页 JS</h3>
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/chat/chat.js
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// pages/chat/chat.js
 const { chat, loadConfig } = require('../../utils/aiChat')
 
 Page({
@@ -1224,7 +1224,7 @@ module.exports = { request, getNews, getJoke, getWeather }</pre>
   </div>
 
   <div id="ct-chatWxml" class="code-pane">
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">&lt;!-- pages/chat/chat.wxml --&gt;
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>&lt;!-- pages/chat/chat.wxml --&gt;
 &lt;view class="page"&gt;
 
   &lt;!-- 消息列表 --&gt;
@@ -1271,7 +1271,7 @@ module.exports = { request, getNews, getJoke, getWeather }</pre>
   </div>
 
   <div id="ct-chatJs" class="code-pane">
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/chat/chat.js
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// pages/chat/chat.js
 const { chat, loadConfig } = require('../../utils/aiChat')
 
 Page({
@@ -1356,7 +1356,7 @@ Page({
   </div>
 
   <div id="ct-settingJs" class="code-pane">
-    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button">// pages/setting/setting.js
+    <pre><button class="copy-btn" onclick="copyCode(this)">复制</button>// pages/setting/setting.js
 const { saveConfig, loadConfig, PROVIDERS } = require('../../utils/aiChat')
 
 Page({

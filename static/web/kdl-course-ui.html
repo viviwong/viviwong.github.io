@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIGC + UI 设计就业班 · 叩丁狼教育</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#08090A;--bg1:#0F1011;--bg2:#141516;--bg3:#1C1C1F;
+  --tx1:#F7F8F8;--tx2:#D0D6E0;--tx3:#8A8F98;--tx4:#62666D;
+  --bd1:#23252A;--bd2:#34343A;--bd3:#3E3E44;
+  --acc:#7070FF;--acc2:#9ba3ff;--acc-dim:rgba(112,112,255,.1);--acc-border:rgba(112,112,255,.25);
+  --font:'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg0);color:var(--tx1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:100;height:60px;padding:0 32px;display:flex;align-items:center;gap:16px;background:rgba(8,9,10,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd1)}
+.nav-back{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--tx3);text-decoration:none;padding:5px 11px;border-radius:7px;border:1px solid var(--bd1);transition:all .15s}
+.nav-back:hover{color:var(--tx1);border-color:var(--bd2);background:var(--bg3)}
+.nav-logo{font-size:15px;font-weight:700;color:var(--tx1);margin-left:4px}
+.nav-pill{font-size:11px;font-weight:600;color:var(--acc2);background:var(--acc-dim);border:1px solid var(--acc-border);padding:3px 10px;border-radius:20px;margin-left:4px}
+.nav-cta{margin-left:auto;background:var(--acc);color:#fff;border:none;padding:7px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.nav-cta:hover{background:var(--acc2);color:#08090A;transform:translateY(-1px)}
+.hero{padding:80px 32px 72px;position:relative;overflow:hidden;border-bottom:1px solid var(--bd1)}
+.hero-glow{position:absolute;width:700px;height:400px;background:radial-gradient(ellipse,rgba(112,112,255,.1),transparent 70%);top:-80px;right:-200px;pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--acc-dim);border:1px solid var(--acc-border);color:var(--acc2);font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:20px}
+.hero-h1{font-size:clamp(34px,5vw,60px);font-weight:800;line-height:1.08;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:18px}
+.hero-h1 em{font-style:normal;color:var(--acc2)}
+.hero-desc{font-size:17px;color:var(--tx3);line-height:1.75;max-width:600px;margin-bottom:40px}
+.hero-stats{display:flex;gap:0;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;overflow:hidden;margin-bottom:36px;max-width:700px}
+.hstat{flex:1;padding:20px 24px;border-right:1px solid var(--bd1);min-width:120px}
+.hstat:last-child{border-right:none}
+.hstat-val{font-size:26px;font-weight:800;color:var(--acc2);letter-spacing:-0.02em;line-height:1}
+.hstat-lbl{font-size:12px;color:var(--tx4);margin-top:4px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-p{background:var(--acc);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 20px rgba(112,112,255,.3)}
+.btn-p:hover{background:var(--acc2);color:#08090A;transform:translateY(-2px)}
+.btn-g{background:transparent;color:var(--tx2);border:1px solid var(--bd2);padding:11px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-g:hover{border-color:var(--bd3);background:rgba(255,255,255,.04)}
+section{padding:80px 32px}
+.s-inner{max-width:1100px;margin:0 auto}
+.sl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2);margin-bottom:8px}
+.sh2{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--tx1);letter-spacing:-0.025em;line-height:1.2;margin-bottom:10px}
+.ss{font-size:15px;color:var(--tx3);line-height:1.7;max-width:520px}
+.shead{margin-bottom:48px}
+#why{background:var(--bg1);border-bottom:1px solid var(--bd1)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.wc{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:24px;transition:border-color .2s}
+.wc:hover{border-color:var(--bd2)}
+.wi{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;background:var(--acc-dim);border:1px solid var(--acc-border)}
+.wt{font-size:15px;font-weight:600;color:var(--tx1);margin-bottom:6px}
+.wd{font-size:13px;color:var(--tx3);line-height:1.65}
+#curriculum{background:var(--bg0)}
+.stages{display:flex;flex-direction:column}
+.stage{display:grid;grid-template-columns:80px 1fr}
+.sl2{display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.sdot{width:14px;height:14px;border-radius:50%;background:var(--acc);border:2px solid var(--bg0);box-shadow:0 0 0 2px var(--acc);flex-shrink:0;z-index:1}
+.scon{flex:1;width:2px;background:var(--bd2);margin:4px 0}
+.stage:last-child .scon{background:transparent}
+.sc{padding:0 0 40px 16px}
+.sn{font-size:11px;font-weight:700;color:var(--acc2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.sti{font-size:18px;font-weight:700;color:var(--tx1);margin-bottom:8px;letter-spacing:-0.01em}
+.sde{font-size:13.5px;color:var(--tx3);line-height:1.7;margin-bottom:12px}
+.stags{display:flex;gap:6px;flex-wrap:wrap}
+.stag{font-size:12px;color:var(--tx3);border:1px solid var(--bd2);background:var(--bg2);padding:3px 10px;border-radius:5px;font-weight:500}
+.stag.h{color:var(--acc2);border-color:var(--acc-border);background:var(--acc-dim)}
+
+/* PORTFOLIO section */
+#portfolio{background:var(--bg1);border-top:1px solid var(--bd1);border-bottom:1px solid var(--bd1)}
+.portfolio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pg-card{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:22px 20px;transition:border-color .2s,transform .2s;text-align:center}
+.pg-card:hover{border-color:var(--acc-border);transform:translateY(-2px)}
+.pg-icon{font-size:28px;margin-bottom:10px}
+.pg-title{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:4px}
+.pg-desc{font-size:12px;color:var(--tx3);line-height:1.55}
+
+#careers{background:var(--bg0);border-top:1px solid var(--bd1)}
+.cc{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:22px;transition:border-color .2s,transform .2s}
+.cc:hover{border-color:var(--acc-border);transform:translateY(-2px)}
+.ci{font-size:24px;margin-bottom:10px}
+.ct{font-size:14px;font-weight:600;color:var(--tx1);margin-bottom:5px}
+.cs{font-size:20px;font-weight:800;color:var(--acc2);letter-spacing:-0.02em;margin-bottom:6px}
+.cd{font-size:12.5px;color:var(--tx3);line-height:1.6}
+#cta{background:var(--bg0);border-top:1px solid var(--bd1);padding:80px 32px;text-align:center}
+.ch2{font-size:clamp(26px,3.5vw,42px);font-weight:800;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:12px}
+.ch2 em{font-style:normal;color:var(--acc2)}
+.csub{font-size:15px;color:var(--tx3);margin-bottom:32px;line-height:1.7}
+.cbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+footer{background:var(--bg1);border-top:1px solid var(--bd1);padding:32px;text-align:center}
+footer a{color:var(--tx3);font-size:13px;text-decoration:none}
+footer a:hover{color:var(--acc2)}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+@media(max-width:768px){
+  nav{padding:0 16px}.hero{padding:52px 16px}section{padding:56px 16px}
+  .grid3,.portfolio-grid{grid-template-columns:1fr 1fr}.portfolio-grid{grid-template-columns:1fr 1fr}
+  .hero-stats{flex-direction:column}.hstat{border-right:none;border-bottom:1px solid var(--bd1)}.hstat:last-child{border-bottom:none}
+  .stage{grid-template-columns:50px 1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-back" href="kdl-home.html">← 返回主页</a>
+  <span class="nav-logo">叩丁狼教育</span>
+  <span class="nav-pill">UI 设计方向</span>
+  <button class="nav-cta">免费咨询</button>
+</nav>
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">🎨 AIGC + UI 设计就业班</div>
+    <h1 class="hero-h1">用 AI 重新定义<br>你的 <em>设计能力</em><br>边界</h1>
+    <p class="hero-desc">从视觉基础到 UI 交互设计，结合 Midjourney、Stable Diffusion 等 AIGC 工具链，培养能用 AI 提效 10 倍的新时代设计师，横跨创意与技术边界。</p>
+    <div class="hero-stats reveal">
+      <div class="hstat"><div class="hstat-val">8</div><div class="hstat-lbl">个月课程</div></div>
+      <div class="hstat"><div class="hstat-val">94%</div><div class="hstat-lbl">就业率</div></div>
+      <div class="hstat"><div class="hstat-val">8K+</div><div class="hstat-lbl">平均起薪</div></div>
+      <div class="hstat"><div class="hstat-val">100+</div><div class="hstat-lbl">合作企业</div></div>
+    </div>
+    <div class="hero-btns reveal"><button class="btn-p">🎓 申请免费试听</button><button class="btn-g">下载课程大纲</button></div>
+  </div>
+</div>
+
+<section id="why">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Why Us</div><h2 class="sh2">为什么选择 AIGC + UI 设计方向</h2><p class="ss">AI 工具正在重塑设计行业，掌握 AIGC 工具的设计师正在成为市场上最抢手的稀缺资源。</p></div>
+    <div class="grid3">
+      <div class="wc reveal"><div class="wi">🚀</div><div class="wt">AIGC 是设计新基建</div><div class="wd">AI 生图工具已让设计师效率提升 5-10 倍，不掌握 AIGC 的设计师将面临严峻的竞争压力。</div></div>
+      <div class="wc reveal d1"><div class="wi">💼</div><div class="wt">岗位持续增长</div><div class="wd">移动互联网、电商、品牌营销——每家公司都需要 UI 设计师，且 AIGC 能力已成为加分项。</div></div>
+      <div class="wc reveal d2"><div class="wi">🎨</div><div class="wt">创意与技术结合</div><div class="wd">UI 设计兼具艺术表达与工程实现，是少数能将创造力直接变现的技术方向，适合有设计感的同学。</div></div>
+      <div class="wc reveal"><div class="wi">📱</div><div class="wt">全端设计能力</div><div class="wd">覆盖 App、Web、品牌视觉、动效设计，毕业后可在互联网、电商、品牌等多个行业灵活就业。</div></div>
+      <div class="wc reveal d1"><div class="wi">🔬</div><div class="wt">用研驱动设计</div><div class="wd">掌握用户研究方法，以数据和真实用户洞察驱动设计决策，成为能主导产品体验的设计师。</div></div>
+      <div class="wc reveal d2"><div class="wi">🎯</div><div class="wt">叩丁狼专属资源</div><div class="wd">与互联网头部企业建立了设计专项合作，就业方向精准，避免进入薪资低廉的外包设计市场。</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="curriculum">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Curriculum</div><h2 class="sh2">系统化 5 阶学习路线</h2><p class="ss">从零美术基础到能独立交付商业级 UI 项目，每阶段都有真实的作品产出。</p></div>
+    <div class="stages">
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 01</div><div class="sti">设计基础与视觉语言</div><div class="sde">学习色彩理论、版式构图、字体排印、品牌视觉原则，建立正确的设计审美体系，完成第一个品牌识别设计项目。</div><div class="stags"><span class="stag">色彩理论</span><span class="stag">版式设计</span><span class="stag">字体排印</span><span class="stag">Photoshop</span><span class="stag">Illustrator</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 02</div><div class="sti">UI 界面与交互设计</div><div class="sde">深入 Figma 组件化设计，掌握 Material Design / Apple HIG 规范，学习交互原型制作，完成 App 和 Web 端完整 UI 设计稿。</div><div class="stags"><span class="stag h">Figma</span><span class="stag">组件系统</span><span class="stag">交互原型</span><span class="stag">设计规范</span><span class="stag">响应式设计</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 03</div><div class="sti">AIGC 工具链与创作</div><div class="sde">系统学习 Midjourney、Stable Diffusion、ControlNet、Runway，掌握提示词工程，将 AI 生图能力融入商业设计工作流，效率提升 5-10 倍。</div><div class="stags"><span class="stag h">Midjourney</span><span class="stag h">Stable Diffusion</span><span class="stag h">ControlNet</span><span class="stag">提示词工程</span><span class="stag">Runway</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 04</div><div class="sti">用户研究与体验分析</div><div class="sde">学习用户访谈、问卷设计、数据分析、竞品分析方法，以用研结论驱动设计迭代，完成完整的 UX 设计案例分析报告。</div><div class="stags"><span class="stag">用户访谈</span><span class="stag">可用性测试</span><span class="stag">数据分析</span><span class="stag">竞品分析</span><span class="stag h">UX设计</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 05</div><div class="sti">毕业项目与作品集</div><div class="sde">以 AIGC + UI 为核心，完成一个包含完整用研、设计稿、交互原型、品牌视觉的综合项目，打磨作品集，进行模拟面试与简历辅导。</div><div class="stags"><span class="stag h">综合项目</span><span class="stag h">作品集</span><span class="stag">简历打磨</span><span class="stag">模拟面试</span><span class="stag">就业对接</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="portfolio">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Portfolio</div><h2 class="sh2">毕业作品集方向</h2><p class="ss">每位学员毕业时将拥有 4+ 个完整作品，覆盖不同类型的商业设计场景。</p></div>
+    <div class="portfolio-grid">
+      <div class="pg-card reveal"><div class="pg-icon">📱</div><div class="pg-title">App UI 设计</div><div class="pg-desc">完整的移动端产品设计，从 IA 到高保真原型</div></div>
+      <div class="pg-card reveal d1"><div class="pg-icon">🌐</div><div class="pg-title">Web 端界面</div><div class="pg-desc">响应式网站设计，PC 与移动端双端适配</div></div>
+      <div class="pg-card reveal d2"><div class="pg-icon">🎨</div><div class="pg-title">AIGC 创作集</div><div class="pg-desc">Midjourney 商业插画、品牌视觉、AI 海报系列</div></div>
+      <div class="pg-card reveal d3"><div class="pg-icon">🏢</div><div class="pg-title">品牌视觉系统</div><div class="pg-desc">完整 Logo + 品牌规范 + 视觉应用展示</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="careers">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Career Paths</div><h2 class="sh2">毕业后的 6 条职业路径</h2><p class="ss">AIGC + UI 的组合让你能进入互联网、品牌、电商等多个行业，选择空间更大。</p></div>
+    <div class="grid3">
+      <div class="cc reveal"><div class="ci">📱</div><div class="ct">UI 设计师</div><div class="cs">8K–16K</div><div class="cd">负责 App/Web 界面视觉和交互设计，是互联网行业需求量最大的设计岗位。</div></div>
+      <div class="cc reveal d1"><div class="ci">🔄</div><div class="ct">UX 交互设计师</div><div class="cs">10K–20K</div><div class="cd">以用户体验为核心，主导产品交互流程设计，是产品团队中的核心创意角色。</div></div>
+      <div class="cc reveal d2"><div class="ci">🤖</div><div class="ct">AIGC 创作设计师</div><div class="cs">10K–18K</div><div class="cd">专注 AI 工具驱动的商业创意内容生产，电商、品牌、广告行业需求爆发式增长。</div></div>
+      <div class="cc reveal"><div class="ci">🎯</div><div class="ct">产品设计师</div><div class="cs">14K–28K</div><div class="cd">兼顾产品思维与设计能力，参与产品策略制定，是设计师的高阶发展路径。</div></div>
+      <div class="cc reveal d1"><div class="ci">✨</div><div class="ct">视觉设计师</div><div class="cs">8K–15K</div><div class="cd">负责品牌视觉、营销物料、活动页面设计，适合偏好视觉创意的同学。</div></div>
+      <div class="cc reveal d2"><div class="ci">🔬</div><div class="ct">用研设计师</div><div class="cs">12K–22K</div><div class="cd">以用户研究驱动设计决策，是成熟产品团队和大厂中的专项核心岗位。</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <div style="max-width:560px;margin:0 auto">
+    <h2 class="ch2 reveal">准备好成为<br><em>AI 时代设计师</em>了吗？</h2>
+    <p class="csub reveal">免费试听一周，与 UI 设计方向导师深度沟通，评估你的设计潜力。</p>
+    <div class="cbtns reveal"><button class="btn-p">🎓 申请免费试听</button><button class="btn-g">下载完整课程大纲</button></div>
+  </div>
+</section>
+<footer><a href="kdl-home.html">← 返回叩丁狼教育主页</a> &nbsp;·&nbsp; <span style="color:#62666D">© 2025 叩丁狼教育</span></footer>
+<script>
+const ro=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');ro.unobserve(x.target);}}) ,{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>

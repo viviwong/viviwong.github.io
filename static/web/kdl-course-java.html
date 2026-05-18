@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java 全端 + AI 就业班 · 叩丁狼教育</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#08090A;--bg1:#0F1011;--bg2:#141516;--bg3:#1C1C1F;
+  --tx1:#F7F8F8;--tx2:#D0D6E0;--tx3:#8A8F98;--tx4:#62666D;
+  --bd1:#23252A;--bd2:#34343A;--bd3:#3E3E44;
+  --acc:#FC7840;--acc2:#FF9A5C;--acc-dim:rgba(252,120,64,.1);--acc-border:rgba(252,120,64,.22);
+  --font:'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg0);color:var(--tx1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:100;height:60px;padding:0 32px;display:flex;align-items:center;gap:16px;background:rgba(8,9,10,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd1)}
+.nav-back{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--tx3);text-decoration:none;padding:5px 11px;border-radius:7px;border:1px solid var(--bd1);transition:all .15s}
+.nav-back:hover{color:var(--tx1);border-color:var(--bd2);background:var(--bg3)}
+.nav-logo{font-size:15px;font-weight:700;color:var(--tx1);margin-left:4px}
+.nav-pill{font-size:11px;font-weight:600;color:var(--acc);background:var(--acc-dim);border:1px solid var(--acc-border);padding:3px 10px;border-radius:20px;margin-left:4px}
+.nav-cta{margin-left:auto;background:var(--acc);color:#fff;border:none;padding:7px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.nav-cta:hover{background:var(--acc2);transform:translateY(-1px)}
+.hero{padding:80px 32px 72px;position:relative;overflow:hidden;border-bottom:1px solid var(--bd1)}
+.hero-glow{position:absolute;width:700px;height:400px;background:radial-gradient(ellipse,rgba(252,120,64,.1),transparent 70%);top:-80px;right:-200px;pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--acc-dim);border:1px solid var(--acc-border);color:var(--acc);font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:20px}
+.hero-h1{font-size:clamp(34px,5vw,60px);font-weight:800;line-height:1.08;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:18px}
+.hero-h1 em{font-style:normal;color:var(--acc)}
+.hero-desc{font-size:17px;color:var(--tx3);line-height:1.75;max-width:600px;margin-bottom:40px}
+.hero-stats{display:flex;gap:0;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;overflow:hidden;margin-bottom:36px;max-width:700px}
+.hstat{flex:1;padding:20px 24px;border-right:1px solid var(--bd1);min-width:120px}
+.hstat:last-child{border-right:none}
+.hstat-val{font-size:26px;font-weight:800;color:var(--acc);letter-spacing:-0.02em;line-height:1}
+.hstat-lbl{font-size:12px;color:var(--tx4);margin-top:4px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-p{background:var(--acc);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 20px rgba(252,120,64,.3)}
+.btn-p:hover{background:var(--acc2);transform:translateY(-2px)}
+.btn-g{background:transparent;color:var(--tx2);border:1px solid var(--bd2);padding:11px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-g:hover{border-color:var(--bd3);background:rgba(255,255,255,.04)}
+section{padding:80px 32px}
+.s-inner{max-width:1100px;margin:0 auto}
+.sl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.sh2{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--tx1);letter-spacing:-0.025em;line-height:1.2;margin-bottom:10px}
+.ss{font-size:15px;color:var(--tx3);line-height:1.7;max-width:520px}
+.shead{margin-bottom:48px}
+#why{background:var(--bg1);border-bottom:1px solid var(--bd1)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.wc{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:24px;transition:border-color .2s}
+.wc:hover{border-color:var(--bd2)}
+.wi{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;background:var(--acc-dim);border:1px solid var(--acc-border)}
+.wt{font-size:15px;font-weight:600;color:var(--tx1);margin-bottom:6px}
+.wd{font-size:13px;color:var(--tx3);line-height:1.65}
+#curriculum{background:var(--bg0)}
+.stages{display:flex;flex-direction:column}
+.stage{display:grid;grid-template-columns:80px 1fr}
+.sl2{display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.sdot{width:14px;height:14px;border-radius:50%;background:var(--acc);border:2px solid var(--bg0);box-shadow:0 0 0 2px var(--acc);flex-shrink:0;z-index:1}
+.scon{flex:1;width:2px;background:var(--bd2);margin:4px 0}
+.stage:last-child .scon{background:transparent}
+.sc{padding:0 0 40px 16px}
+.sn{font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.sti{font-size:18px;font-weight:700;color:var(--tx1);margin-bottom:8px;letter-spacing:-0.01em}
+.sde{font-size:13.5px;color:var(--tx3);line-height:1.7;margin-bottom:12px}
+.stags{display:flex;gap:6px;flex-wrap:wrap}
+.stag{font-size:12px;color:var(--tx3);border:1px solid var(--bd2);background:var(--bg2);padding:3px 10px;border-radius:5px;font-weight:500}
+.stag.h{color:var(--acc);border-color:var(--acc-border);background:var(--acc-dim)}
+#careers{background:var(--bg1);border-top:1px solid var(--bd1)}
+.cc{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:22px;transition:border-color .2s,transform .2s}
+.cc:hover{border-color:var(--acc-border);transform:translateY(-2px)}
+.ci{font-size:24px;margin-bottom:10px}
+.ct{font-size:14px;font-weight:600;color:var(--tx1);margin-bottom:5px}
+.cs{font-size:20px;font-weight:800;color:var(--acc);letter-spacing:-0.02em;margin-bottom:6px}
+.cd{font-size:12.5px;color:var(--tx3);line-height:1.6}
+#cta{background:var(--bg0);border-top:1px solid var(--bd1);padding:80px 32px;text-align:center}
+.ch2{font-size:clamp(26px,3.5vw,42px);font-weight:800;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:12px}
+.ch2 em{font-style:normal;color:var(--acc)}
+.csub{font-size:15px;color:var(--tx3);margin-bottom:32px;line-height:1.7}
+.cbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+footer{background:var(--bg1);border-top:1px solid var(--bd1);padding:32px;text-align:center}
+footer a{color:var(--tx3);font-size:13px;text-decoration:none}
+footer a:hover{color:var(--acc)}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}
+@media(max-width:768px){
+  nav{padding:0 16px}.hero{padding:52px 16px}section{padding:56px 16px}
+  .grid3{grid-template-columns:1fr}.hero-stats{flex-direction:column}
+  .hstat{border-right:none;border-bottom:1px solid var(--bd1)}.hstat:last-child{border-bottom:none}
+  .stage{grid-template-columns:50px 1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-back" href="kdl-home.html">← 返回主页</a>
+  <span class="nav-logo">叩丁狼教育</span>
+  <span class="nav-pill">Java 全端方向</span>
+  <button class="nav-cta">免费咨询</button>
+</nav>
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">☕ Java 全端 + AI 就业班</div>
+    <h1 class="hero-h1">前后端全栈<br>拥抱 <em>AI 智能体</em><br>开发时代</h1>
+    <p class="hero-desc">从 Java 基础到 Spring 全家桶，从 Vue3 前端到 AI Agent 开发，构建完整的全栈技术体系，满足互联网大厂和新兴 AI 公司的核心招聘需求。</p>
+    <div class="hero-stats reveal">
+      <div class="hstat"><div class="hstat-val">10</div><div class="hstat-lbl">个月课程</div></div>
+      <div class="hstat"><div class="hstat-val">95%</div><div class="hstat-lbl">就业率</div></div>
+      <div class="hstat"><div class="hstat-val">10K+</div><div class="hstat-lbl">平均起薪</div></div>
+      <div class="hstat"><div class="hstat-val">100+</div><div class="hstat-lbl">合作企业</div></div>
+    </div>
+    <div class="hero-btns reveal"><button class="btn-p">🎓 申请免费试听</button><button class="btn-g">下载课程大纲</button></div>
+  </div>
+</div>
+<section id="why">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Why Us</div><h2 class="sh2">为什么选择 Java 全端方向</h2><p class="ss">Java 生态是国内就业市场需求量最大的技术方向，结合 AI 智能体能力后，竞争优势进一步放大。</p></div>
+    <div class="grid3">
+      <div class="wc reveal"><div class="wi">📊</div><div class="wt">岗位需求第一</div><div class="wd">Java 后端是国内招聘岗位数量最多的技术方向，大厂、外包、创业公司均大量需求，就业渠道极宽。</div></div>
+      <div class="wc reveal d1"><div class="wi">🌐</div><div class="wt">全栈更具竞争力</div><div class="wd">前后端兼具，既能独立交付完整项目，又能与设计和产品高效协作，面试通过率远高于纯后端。</div></div>
+      <div class="wc reveal d2"><div class="wi">🤖</div><div class="wt">AI 智能体开发</div><div class="wd">深度整合 LangChain、RAG、AI Agent，让你成为传统 Java 工程师中能做 AI 应用的稀缺人才。</div></div>
+      <div class="wc reveal"><div class="wi">🏗️</div><div class="wt">企业级技术栈</div><div class="wd">Spring Boot、Spring Cloud、Redis、MySQL、消息队列——完整覆盖互联网企业后端技术架构。</div></div>
+      <div class="wc reveal d1"><div class="wi">📈</div><div class="wt">薪资增长稳健</div><div class="wd">Java 工程师薪资随经验线性增长，3 年工程师平均 20K+，5 年以上架构师可达 40K+。</div></div>
+      <div class="wc reveal d2"><div class="wi">🎯</div><div class="wt">项目驱动教学</div><div class="wd">每个阶段配套真实企业项目，毕业时拥有电商、社区、AI 助手等完整作品，面试不再空手。</div></div>
+    </div>
+  </div>
+</section>
+<section id="curriculum">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Curriculum</div><h2 class="sh2">系统化 6 阶学习路线</h2><p class="ss">从零到全栈 AI 工程师，每个阶段都有完整的项目实战与技能验收。</p></div>
+    <div class="stages">
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 01</div><div class="sti">Java 基础与面向对象</div><div class="sde">夯实 Java 语法基础，深入理解面向对象设计原则，掌握集合、泛型、异常处理、IO 流，具备独立编写 Java 程序的能力。</div><div class="stags"><span class="stag">Java基础语法</span><span class="stag">OOP</span><span class="stag">集合框架</span><span class="stag">多线程</span><span class="stag">IO/网络</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 02</div><div class="sti">前端开发 Vue3 全栈</div><div class="sde">从 HTML/CSS/JS 基础到 Vue3 组件化开发，掌握 Axios、Pinia 状态管理、ElementPlus UI 框架，独立完成前端工程。</div><div class="stags"><span class="stag">HTML/CSS</span><span class="stag h">Vue3</span><span class="stag">Pinia</span><span class="stag">Axios</span><span class="stag">ElementPlus</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 03</div><div class="sti">Spring 全家桶后端开发</div><div class="sde">深入 Spring Boot、Spring MVC、MyBatis-Plus，掌握 RESTful API 设计、拦截器、JWT 鉴权，构建规范的企业级后端服务。</div><div class="stags"><span class="stag h">Spring Boot</span><span class="stag">Spring MVC</span><span class="stag">MyBatis-Plus</span><span class="stag">RESTful API</span><span class="stag">JWT</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 04</div><div class="sti">数据库与缓存中间件</div><div class="sde">掌握 MySQL 高级查询优化、事务与锁机制，深入 Redis 缓存设计、消息队列应用，具备高并发系统的数据层设计能力。</div><div class="stags"><span class="stag">MySQL进阶</span><span class="stag h">Redis</span><span class="stag">RabbitMQ</span><span class="stag">索引优化</span><span class="stag">分库分表</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 05</div><div class="sti">AI 智能体与大模型开发</div><div class="sde">学习 LangChain4j、RAG 检索增强生成、Function Calling，使用 Java 构建 AI 智能体应用，将大模型能力集成到企业系统中。</div><div class="stags"><span class="stag h">LangChain4j</span><span class="stag h">RAG</span><span class="stag h">AI Agent</span><span class="stag">向量数据库</span><span class="stag">提示词工程</span></div></div></div>
+      <div class="stage reveal"><div class="sl2"><div class="sdot"></div><div class="scon"></div></div><div class="sc"><div class="sn">Stage 06</div><div class="sti">微服务架构与毕业项目</div><div class="sde">深入 Spring Cloud 微服务、Nacos 注册中心、Gateway 网关，完成一个完整的全栈 AI 项目，形成可展示的作品集。</div><div class="stags"><span class="stag h">Spring Cloud</span><span class="stag">Nacos</span><span class="stag">Gateway</span><span class="stag">Docker</span><span class="stag">综合项目</span></div></div></div>
+    </div>
+  </div>
+</section>
+<section id="careers">
+  <div class="s-inner">
+    <div class="shead reveal"><div class="sl">Career Paths</div><h2 class="sh2">毕业后的 6 条职业路径</h2><p class="ss">Java 全栈 + AI 能力，让你在最广泛的就业市场中保持强势竞争力。</p></div>
+    <div class="grid3">
+      <div class="cc reveal"><div class="ci">☕</div><div class="ct">Java 后端工程师</div><div class="cs">10K–20K</div><div class="cd">负责企业后端服务开发，覆盖互联网、金融、政务等各行业，是最广泛的就业岗位。</div></div>
+      <div class="cc reveal d1"><div class="ci">🌐</div><div class="ct">全栈工程师</div><div class="cs">12K–22K</div><div class="cd">前后端均能独立开发，是创业公司和中小团队最受欢迎的角色，薪资议价空间大。</div></div>
+      <div class="cc reveal d2"><div class="ci">🤖</div><div class="ct">AI 应用工程师</div><div class="cs">15K–28K</div><div class="cd">负责将大模型能力集成到企业业务中，是 2025-2026 年最热门的新兴技术岗位。</div></div>
+      <div class="cc reveal"><div class="ci">🏗️</div><div class="ct">后端架构师</div><div class="cs">25K–50K</div><div class="cd">3-5 年经验后的自然晋升路径，负责系统架构设计和技术选型，是高薪天花板岗位。</div></div>
+      <div class="cc reveal d1"><div class="ci">📱</div><div class="ct">前端工程师</div><div class="cs">10K–18K</div><div class="cd">专注 Vue/React 前端开发，全栈班学员前端能力同样达到就业标准，选择灵活。</div></div>
+      <div class="cc reveal d2"><div class="ci">⚙️</div><div class="ct">技术负责人</div><div class="cs">30K–60K</div><div class="cd">综合技术能力 + 项目管理能力，带领团队完成产品迭代，是中小公司核心管理岗位。</div></div>
+    </div>
+  </div>
+</section>
+<section id="cta">
+  <div style="max-width:560px;margin:0 auto">
+    <h2 class="ch2 reveal">准备好进入<br><em>Java 全栈 AI</em> 时代了吗？</h2>
+    <p class="csub reveal">免费试听一周，与 Java 方向导师深度沟通，规划你的职业路径。</p>
+    <div class="cbtns reveal"><button class="btn-p">🎓 申请免费试听</button><button class="btn-g">下载完整课程大纲</button></div>
+  </div>
+</section>
+<footer><a href="kdl-home.html">← 返回叩丁狼教育主页</a> &nbsp;·&nbsp; <span style="color:#62666D">© 2025 叩丁狼教育</span></footer>
+<script>
+const ro=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');ro.unobserve(x.target);}}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>

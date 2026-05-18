@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嵌入式 AI 就业班 · 叩丁狼教育</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#08090A;--bg1:#0F1011;--bg2:#141516;--bg3:#1C1C1F;--bg4:#232326;
+  --tx1:#F7F8F8;--tx2:#D0D6E0;--tx3:#8A8F98;--tx4:#62666D;
+  --bd1:#23252A;--bd2:#34343A;--bd3:#3E3E44;
+  --acc:#00B8CC;--acc2:#04D0E4;--acc-dim:rgba(0,184,204,.12);--acc-border:rgba(0,184,204,.25);
+  --font:'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg0);color:var(--tx1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;height:60px;padding:0 32px;display:flex;align-items:center;gap:16px;background:rgba(8,9,10,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd1)}
+.nav-back{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--tx3);text-decoration:none;padding:5px 11px;border-radius:7px;border:1px solid var(--bd1);transition:all .15s}
+.nav-back:hover{color:var(--tx1);border-color:var(--bd2);background:var(--bg3)}
+.nav-logo{font-size:15px;font-weight:700;color:var(--tx1);margin-left:4px}
+.nav-pill{font-size:11px;font-weight:600;color:var(--acc);background:var(--acc-dim);border:1px solid var(--acc-border);padding:3px 10px;border-radius:20px;margin-left:4px}
+.nav-right{margin-left:auto}
+.nav-cta{background:var(--acc);color:#08090A;border:none;padding:7px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s}
+.nav-cta:hover{background:var(--acc2);transform:translateY(-1px)}
+
+/* HERO */
+.hero{padding:80px 32px 72px;position:relative;overflow:hidden;border-bottom:1px solid var(--bd1)}
+.hero-glow{position:absolute;width:700px;height:400px;background:radial-gradient(ellipse,rgba(0,184,204,.12),transparent 70%);top:-100px;right:-200px;pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:2}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--acc-dim);border:1px solid var(--acc-border);color:var(--acc);font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:20px;letter-spacing:.02em}
+.hero-h1{font-size:clamp(34px,5vw,60px);font-weight:800;line-height:1.08;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:18px}
+.hero-h1 em{font-style:normal;color:var(--acc)}
+.hero-desc{font-size:17px;color:var(--tx3);line-height:1.75;max-width:600px;margin-bottom:40px}
+.hero-stats{display:flex;gap:0;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;overflow:hidden;margin-bottom:36px;max-width:700px}
+.hstat{flex:1;padding:20px 24px;border-right:1px solid var(--bd1);min-width:120px}
+.hstat:last-child{border-right:none}
+.hstat-val{font-size:26px;font-weight:800;color:var(--acc);letter-spacing:-0.02em;line-height:1}
+.hstat-lbl{font-size:12px;color:var(--tx4);margin-top:4px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-primary{background:var(--acc);color:#08090A;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 20px rgba(0,184,204,.3)}
+.btn-primary:hover{background:var(--acc2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,184,204,.4)}
+.btn-ghost{background:transparent;color:var(--tx2);border:1px solid var(--bd2);padding:11px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-ghost:hover{border-color:var(--bd3);background:rgba(255,255,255,.04)}
+
+/* SECTION */
+section{padding:80px 32px}
+.s-inner{max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.section-h2{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--tx1);letter-spacing:-0.025em;line-height:1.2;margin-bottom:10px}
+.section-sub{font-size:15px;color:var(--tx3);line-height:1.7;max-width:520px}
+.section-head{margin-bottom:48px}
+
+/* WHY CARDS */
+#why{background:var(--bg1);border-bottom:1px solid var(--bd1)}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.why-card{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:24px;transition:border-color .2s}
+.why-card:hover{border-color:var(--bd2)}
+.why-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;background:var(--acc-dim);border:1px solid var(--acc-border)}
+.why-title{font-size:15px;font-weight:600;color:var(--tx1);margin-bottom:6px}
+.why-desc{font-size:13px;color:var(--tx3);line-height:1.65}
+
+/* CURRICULUM */
+#curriculum{background:var(--bg0)}
+.stages{display:flex;flex-direction:column;gap:0}
+.stage{display:grid;grid-template-columns:80px 1fr;gap:0;position:relative}
+.stage-line{display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.stage-dot{width:14px;height:14px;border-radius:50%;background:var(--acc);border:2px solid var(--bg0);box-shadow:0 0 0 2px var(--acc);flex-shrink:0;position:relative;z-index:1}
+.stage-connector{flex:1;width:2px;background:var(--bd2);margin:4px 0}
+.stage:last-child .stage-connector{background:transparent}
+.stage-content{padding:0 0 40px 16px}
+.stage-num{font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.stage-title{font-size:18px;font-weight:700;color:var(--tx1);margin-bottom:8px;letter-spacing:-0.01em}
+.stage-desc{font-size:13.5px;color:var(--tx3);line-height:1.7;margin-bottom:12px}
+.stage-topics{display:flex;gap:6px;flex-wrap:wrap}
+.stage-topic{font-size:12px;color:var(--tx3);border:1px solid var(--bd2);background:var(--bg2);padding:3px 10px;border-radius:5px;font-weight:500}
+.stage-topic.hot{color:var(--acc);border-color:var(--acc-border);background:var(--acc-dim)}
+
+/* CAREERS */
+#careers{background:var(--bg1);border-top:1px solid var(--bd1)}
+.careers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.career-card{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:22px;transition:border-color .2s,transform .2s}
+.career-card:hover{border-color:var(--acc-border);transform:translateY(-2px)}
+.career-icon{font-size:24px;margin-bottom:10px}
+.career-title{font-size:14px;font-weight:600;color:var(--tx1);margin-bottom:5px}
+.career-salary{font-size:20px;font-weight:800;color:var(--acc);letter-spacing:-0.02em;margin-bottom:6px}
+.career-desc{font-size:12.5px;color:var(--tx3);line-height:1.6}
+
+/* CTA */
+#cta{background:var(--bg0);border-top:1px solid var(--bd1);padding:80px 32px;text-align:center}
+.cta-h2{font-size:clamp(26px,3.5vw,42px);font-weight:800;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:12px}
+.cta-h2 em{font-style:normal;color:var(--acc)}
+.cta-sub{font-size:15px;color:var(--tx3);margin-bottom:32px;line-height:1.7}
+.cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{background:var(--bg1);border-top:1px solid var(--bd1);padding:32px;text-align:center}
+.foot-back{font-size:13px;color:var(--tx4)}
+.foot-back a{color:var(--tx3);text-decoration:none;transition:color .15s}
+.foot-back a:hover{color:var(--acc)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+
+/* MOBILE */
+@media(max-width:768px){
+  nav{padding:0 16px}
+  .hero{padding:52px 16px 52px}
+  section{padding:56px 16px}
+  .why-grid,.careers-grid{grid-template-columns:1fr}
+  .hero-stats{flex-direction:column}
+  .hstat{border-right:none;border-bottom:1px solid var(--bd1)}
+  .hstat:last-child{border-bottom:none}
+  .stage{grid-template-columns:50px 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="kdl-home.html">← 返回主页</a>
+  <span class="nav-logo">叩丁狼教育</span>
+  <span class="nav-pill">嵌入式方向</span>
+  <div class="nav-right"><button class="nav-cta">免费咨询</button></div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">⚙️ 嵌入式 AI 就业班</div>
+    <h1 class="hero-h1">从芯片底层<br>到 <em>AI 边缘计算</em><br>全栈嵌入式工程师</h1>
+    <p class="hero-desc">系统学习 C/C++、嵌入式 Linux、RTOS 实时操作系统、驱动开发，最终接入 AI 视觉与大模型，成为能主导 AIoT 项目的核心工程师。</p>
+    <div class="hero-stats reveal">
+      <div class="hstat"><div class="hstat-val">8</div><div class="hstat-lbl">个月课程</div></div>
+      <div class="hstat"><div class="hstat-val">96%</div><div class="hstat-lbl">就业率</div></div>
+      <div class="hstat"><div class="hstat-val">12K+</div><div class="hstat-lbl">平均起薪</div></div>
+      <div class="hstat"><div class="hstat-val">100+</div><div class="hstat-lbl">合作企业</div></div>
+    </div>
+    <div class="hero-btns reveal">
+      <button class="btn-primary">🎓 申请免费试听</button>
+      <button class="btn-ghost">下载课程大纲</button>
+    </div>
+  </div>
+</div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="s-inner">
+    <div class="section-head reveal">
+      <div class="section-label">Why Us</div>
+      <h2 class="section-h2">为什么选择嵌入式 AI 方向</h2>
+      <p class="section-sub">硬件与 AI 的交汇，是制造业智能化的核心，也是就业市场竞争最小、薪资提升最快的赛道之一。</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal"><div class="why-icon">📈</div><div class="why-title">供需缺口巨大</div><div class="why-desc">嵌入式 AI 工程师全国缺口超过 50 万，制造业和 AIoT 领域持续扩张，高质量岗位供给充足。</div></div>
+      <div class="why-card reveal d1"><div class="why-icon">💰</div><div class="why-title">薪资天花板高</div><div class="why-desc">嵌入式 AI 岗位起薪普遍高于纯软件方向，3-5 年工程师薪资轻松达到 20K-40K，稀缺性长期存在。</div></div>
+      <div class="why-card reveal d2"><div class="why-icon">🏭</div><div class="why-title">行业需求多元</div><div class="why-desc">汽车电子、工业自动化、智能家居、无人机、机器人——几乎所有制造业升级都需要嵌入式 AI 人才。</div></div>
+      <div class="why-card reveal"><div class="why-icon">🤖</div><div class="why-title">AI 赋能硬件</div><div class="why-desc">AI 视觉、边缘推理、大模型接入已成为新一代嵌入式产品标配，掌握这些技能的工程师极为稀缺。</div></div>
+      <div class="why-card reveal d1"><div class="why-icon">🔬</div><div class="why-title">技能壁垒深厚</div><div class="why-desc">嵌入式开发需要硬件知识 + 系统编程 + AI 算法的综合能力，不可被简单替代，竞争护城河宽。</div></div>
+      <div class="why-card reveal d2"><div class="why-icon">🎯</div><div class="why-title">叩丁狼专长赛道</div><div class="why-desc">叩丁狼深耕嵌入式教育超过 8 年，课程体系经过数千名学员验证，是东北最专业的嵌入式就业培训机构。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRICULUM -->
+<section id="curriculum">
+  <div class="s-inner">
+    <div class="section-head reveal">
+      <div class="section-label">Curriculum</div>
+      <h2 class="section-h2">系统化 6 阶学习路线</h2>
+      <p class="section-sub">从零基础到可独立承担嵌入式 AI 项目，每个阶段目标清晰、项目驱动。</p>
+    </div>
+    <div class="stages">
+      <div class="stage reveal">
+        <div class="stage-line"><div class="stage-dot"></div><div class="stage-connector"></div></div>
+        <div class="stage-content">
+          <div class="stage-num">Stage 01</div>
+          <div class="stage-title">C 语言与数据结构</div>
+          <div class="stage-desc">从底层思维出发，掌握内存管理、指针、结构体，为后续所有开发打下坚实基础。同步学习 Linux 基础操作与 Shell 脚本。</div>
+          <div class="stage-topics"><span class="stage-topic">C语言基础</span><span class="stage-topic">指针与内存</span><span class="stage-topic">数据结构</span><span class="stage-topic">Linux基础</span><span class="stage-topic">Shell脚本</span></div>
+        </div>
+      </div>
+      <div class="stage reveal">
+        <div class="stage-line"><div class="stage-dot"></div><div class="stage-connector"></div></div>
+        <div class="stage-content">
+          <div class="stage-num">Stage 02</div>
+          <div class="stage-title">嵌入式 Linux 系统编程</div>
+          <div class="stage-desc">深入 Linux 内核机制，掌握进程/线程、文件I/O、网络编程、IPC进程间通信，能独立开发 Linux 应用层程序。</div>
+          <div class="stage-topics"><span class="stage-topic">进程与线程</span><span class="stage-topic">文件IO</span><span class="stage-topic">网络编程</span><span class="stage-topic">IPC通信</span><span class="stage-topic">Makefile</span></div>
+        </div>
+      </div>
+      <div class="stage reveal">
+        <div class="stage-line"><div class="stage-dot"></div><div class="stage-connector"></div></div>
+        <div class="stage-content">
+          <div class="stage-num">Stage 03</div>
+          <div class="stage-title">MCU 与 RTOS 实时系统</div>
+          <div class="stage-desc">基于 STM32 进行外设编程，掌握 FreeRTOS 任务调度、信号量、消息队列，开发具备实时响应能力的嵌入式产品。</div>
+          <div class="stage-topics"><span class="stage-topic">STM32</span><span class="stage-topic">HAL库</span><span class="stage-topic hot">FreeRTOS</span><span class="stage-topic">GPIO/UART/SPI</span><span class="stage-topic">外设驱动</span></div>
+        </div>
+      </div>
+      <div class="stage reveal">
+        <div class="stage-line"><div class="stage-dot"></div><div class="stage-connector"></div></div>
+        <div class="stage-content">
+          <div class="stage-num">Stage 04</div>
+          <div class="stage-title">Linux 驱动开发</div>
+          <div class="stage-desc">深入内核空间，掌握字符设备驱动、总线驱动模型（SPI/I2C/USB），编写 Device Tree，理解完整驱动框架。</div>
+          <div class="stage-topics"><span class="stage-topic">字符设备驱动</span><span class="stage-topic">I2C/SPI驱动</span><span class="stage-topic">设备树</span><span class="stage-topic">内核模块</span><span class="stage-topic hot">驱动框架</span></div>
+        </div>
+      </div>
+      <div class="stage reveal">
+        <div class="stage-line"><div class="stage-dot"></div><div class="stage-connector"></div></div>
+        <div class="stage-content">
+          <div class="stage-num">Stage 05</div>
+          <div class="stage-title">AI 视觉与边缘推理</div>
+          <div class="stage-desc">学习 OpenCV 图像处理、YOLO 目标检测，在嵌入式平台（RK3588/Jetson）上部署 AI 模型，掌握边缘 AI 推理全流程。</div>
+          <div class="stage-topics"><span class="stage-topic hot">OpenCV</span><span class="stage-topic hot">YOLO</span><span class="stage-topic hot">模型量化</span><span class="stage-topic">RK3588</span><span class="stage-topic">ONNX Runtime</span></div>
+        </div>
+      </div>
+      <div class="stage reveal">
+        <div class="stage-line"><div class="stage-dot"></div><div class="stage-connector"></div></div>
+        <div class="stage-content">
+          <div class="stage-num">Stage 06</div>
+          <div class="stage-title">大模型接入与毕业项目</div>
+          <div class="stage-desc">将 LLM API 接入嵌入式系统，完成一个完整的 AIoT 综合项目（如智能巡检机器人 / 工业视觉质检系统），形成可展示的作品集。</div>
+          <div class="stage-topics"><span class="stage-topic hot">LLM API</span><span class="stage-topic hot">AI Agent</span><span class="stage-topic">MQTT/边缘云</span><span class="stage-topic">综合项目</span><span class="stage-topic">作品集</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAREERS -->
+<section id="careers">
+  <div class="s-inner">
+    <div class="section-head reveal">
+      <div class="section-label">Career Paths</div>
+      <h2 class="section-h2">毕业后的 6 条职业路径</h2>
+      <p class="section-sub">嵌入式 AI 工程师的出口极为多元，覆盖从智能硬件到工业 AI 的广泛就业市场。</p>
+    </div>
+    <div class="careers-grid">
+      <div class="career-card reveal"><div class="career-icon">⚙️</div><div class="career-title">嵌入式软件工程师</div><div class="career-salary">12K–22K</div><div class="career-desc">负责嵌入式产品的应用层和驱动层开发，覆盖消费电子、工业控制等行业。</div></div>
+      <div class="career-card reveal d1"><div class="career-icon">🐧</div><div class="career-title">Linux 驱动工程师</div><div class="career-salary">15K–30K</div><div class="career-desc">专注内核驱动开发，为硬件提供软件接口，是芯片厂商和设备制造商的核心岗位。</div></div>
+      <div class="career-card reveal d2"><div class="career-icon">🌐</div><div class="career-title">AIoT 开发工程师</div><div class="career-salary">14K–25K</div><div class="career-desc">负责物联网设备的端云架构设计，集成 AI 能力，推动传统设备智能化升级。</div></div>
+      <div class="career-card reveal"><div class="career-icon">⏱️</div><div class="career-title">RTOS 固件工程师</div><div class="career-salary">12K–20K</div><div class="career-desc">基于实时操作系统开发高可靠性固件，广泛应用于汽车电子、工业自动化领域。</div></div>
+      <div class="career-card reveal d1"><div class="career-icon">👁️</div><div class="career-title">AI 视觉工程师</div><div class="career-salary">18K–35K</div><div class="career-desc">负责在嵌入式平台部署视觉 AI 算法，是机器人和工业质检领域的高薪核心岗位。</div></div>
+      <div class="career-card reveal d2"><div class="career-icon">🔬</div><div class="career-title">硬件 AI 算法工程师</div><div class="career-salary">20K–40K</div><div class="career-desc">深度融合算法与硬件，负责模型部署优化和边缘推理加速，是稀缺高端岗位。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div style="max-width:560px;margin:0 auto">
+    <h2 class="cta-h2 reveal">准备好踏入<br><em>嵌入式 AI</em> 赛道了吗？</h2>
+    <p class="cta-sub reveal">免费试听一周课程，和嵌入式方向导师一对一沟通职业规划。</p>
+    <div class="cta-btns reveal">
+      <button class="btn-primary">🎓 申请免费试听</button>
+      <button class="btn-ghost">下载完整课程大纲</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-back">
+    <a href="kdl-home.html">← 返回叩丁狼教育主页</a> &nbsp;·&nbsp; © 2025 叩丁狼教育
+  </div>
+</footer>
+
+<script>
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target);}});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>

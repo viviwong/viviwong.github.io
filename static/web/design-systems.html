@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Systems Library — 150 Brand Design Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090e;
+  --bg2:#0f0f18;
+  --bg3:#14141f;
+  --surface:#1a1a28;
+  --surface2:#20202e;
+  --border:#252535;
+  --border2:#2e2e42;
+  --text:#e8e8f0;
+  --text2:#9898b0;
+  --text3:#5c5c78;
+  --accent:#6d6aff;
+  --accent2:#a5a3ff;
+  --accent-glow:rgba(109,106,255,0.15);
+  --green:#22c55e;
+  --font:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(9,9,14,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:16px;height:60px;padding:0 24px}
+.logo{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;text-decoration:none}
+.logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6d6aff,#a855f7);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon svg{width:16px;height:16px;color:#fff}
+.logo-badge{display:inline-flex;align-items:center;background:rgba(109,106,255,0.12);border:1px solid rgba(109,106,255,0.3);color:var(--accent2);font-size:11px;font-weight:500;padding:1px 7px;border-radius:20px;margin-left:2px}
+.search-wrap{flex:1;max-width:440px;position:relative}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;flex-shrink:0}
+#search{width:100%;height:38px;background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:0 12px 0 38px;font-family:var(--font);font-size:13.5px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
+#search::placeholder{color:var(--text3)}
+#search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.header-stat{font-size:12px;color:var(--text3);margin-left:auto;white-space:nowrap;padding:4px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px}
+
+/* HERO */
+.hero{text-align:center;padding:60px 24px 44px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 700px 320px at 50% -20%,rgba(109,106,255,0.09),transparent 70%)}
+.hero-label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--accent2);border:1px solid var(--border2);border-radius:20px;padding:5px 14px;margin-bottom:22px;background:rgba(109,106,255,0.06);letter-spacing:0.01em}
+.hero-label span{width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block}
+.hero h1{font-size:clamp(30px,5vw,54px);font-weight:700;line-height:1.1;letter-spacing:-0.025em;background:linear-gradient(160deg,#e8e8f0 30%,#6d6aff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.hero-desc{font-size:16px;color:var(--text2);max-width:520px;margin:0 auto 0;line-height:1.65}
+
+/* FILTER BAR */
+.filter-wrap{max-width:1400px;margin:0 auto;padding:32px 24px 20px}
+.filter-scroll{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.filter-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font)}
+.filter-btn:hover{border-color:var(--border2);background:var(--surface2);color:var(--text)}
+.filter-btn.active{background:var(--accent-glow);border-color:rgba(109,106,255,0.4);color:var(--accent2)}
+.filter-cnt{font-size:11px;background:var(--bg3);padding:1px 6px;border-radius:10px;color:var(--text3)}
+.filter-btn.active .filter-cnt{background:rgba(109,106,255,0.18);color:var(--accent2)}
+.filter-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;margin:0 2px}
+
+/* GRID */
+.grid-section{max-width:1400px;margin:0 auto;padding:0 24px 80px}
+.result-line{font-size:13px;color:var(--text3);margin-bottom:14px}
+.result-line em{color:var(--text2);font-style:normal;font-weight:500}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:14px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s,background .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:12px}
+.card:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(109,106,255,0.08);background:var(--surface2)}
+.card-top{display:flex;align-items:center;gap:12px}
+.co-logo{width:38px;height:38px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.co-logo img{width:24px;height:24px;object-fit:contain;display:block}
+.co-initials{font-size:13px;font-weight:700;color:var(--text2);letter-spacing:-0.5px;display:none}
+.card-info{flex:1;min-width:0}
+.card-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;margin-bottom:3px}
+.cat-pill{display:inline-block;font-size:10.5px;font-weight:500;padding:2px 7px;border-radius:5px}
+.c-DevTools{background:rgba(99,102,241,.14);color:#a5b4fc}
+.c-AITech{background:rgba(168,85,247,.14);color:#d8b4fe}
+.c-Creative{background:rgba(236,72,153,.14);color:#f9a8d4}
+.c-SaaS{background:rgba(6,182,212,.14);color:#67e8f9}
+.c-Finance{background:rgba(34,197,94,.14);color:#86efac}
+.c-Commerce{background:rgba(245,158,11,.14);color:#fcd34d}
+.c-Social{background:rgba(59,130,246,.14);color:#93c5fd}
+.c-Gaming{background:rgba(239,68,68,.14);color:#fca5a5}
+.c-Media{background:rgba(20,184,166,.14);color:#5eead4}
+.c-Education{background:rgba(234,179,8,.14);color:#fef08a}
+.card-colors{display:flex;gap:4px}
+.cdot{width:20px;height:20px;border-radius:5px;border:1px solid rgba(255,255,255,.07);flex-shrink:0;transition:transform .15s}
+.card:hover .cdot{transform:scale(1.12)}
+.card-tagline{font-size:12.5px;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.card-domain{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.card-arrow{color:var(--accent2);opacity:0;transition:opacity .15s,transform .15s;display:flex;align-items:center;gap:3px;font-size:11.5px;font-weight:500}
+.card:hover .card-arrow{opacity:1;transform:translateX(2px)}
+
+/* EMPTY */
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 24px;color:var(--text3)}
+.empty-state svg{opacity:.25;margin-bottom:16px}
+.empty-state p{font-size:14px}
+
+/* DRAWER */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;right:0;top:0;bottom:0;z-index:201;width:min(700px,95vw);background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.25,.46,.45,.94);box-shadow:-20px 0 60px rgba(0,0,0,.6)}
+.drawer.open{transform:translateX(0)}
+.d-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.d-logo{width:42px;height:42px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.d-logo img{width:28px;height:28px;object-fit:contain;display:block}
+.d-logo .co-initials{display:none}
+.d-meta{flex:1;min-width:0}
+.d-name{font-size:17px;font-weight:600;color:var(--text);margin-bottom:5px}
+.d-swatches{display:flex;gap:4px}
+.d-swatch{width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.1)}
+.d-actions{display:flex;gap:6px;margin-left:auto}
+.ibt{width:34px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--text2)}
+.ibt:hover{background:var(--surface2);border-color:var(--border2);color:var(--text)}
+.ibt.ok{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:var(--green)}
+.d-body{flex:1;overflow-y:auto;padding:28px 30px}
+
+/* MD */
+.md h1{font-size:24px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-0.02em}
+.md blockquote{border-left:3px solid var(--accent);padding:10px 14px;background:rgba(109,106,255,0.08);border-radius:0 8px 8px 0;margin:0 0 22px;color:var(--text2);font-size:13.5px;line-height:1.6}
+.md blockquote p{margin:0}
+.md h2{font-size:15px;font-weight:600;color:var(--text);margin:28px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--border);letter-spacing:-0.01em}
+.md h3{font-size:13.5px;font-weight:600;color:var(--text2);margin:16px 0 7px}
+.md p{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.md ul,.md ol{padding-left:18px;margin-bottom:10px}
+.md li{font-size:13.5px;color:var(--text2);line-height:1.6;margin-bottom:3px}
+.md table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12.5px}
+.md th{background:var(--surface);color:var(--text2);font-weight:600;padding:7px 10px;text-align:left;border:1px solid var(--border)}
+.md td{padding:6px 10px;border:1px solid var(--border);color:var(--text2)}
+.md td:first-child{color:var(--text);font-family:var(--mono);font-size:11.5px}
+.md tr:nth-child(even) td{background:var(--bg3)}
+.md code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a5b4fc}
+.md pre{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;overflow-x:auto}
+.md pre code{background:none;border:none;padding:0;font-size:12px;color:#a5b4fc;display:block}
+.md hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.md strong{color:var(--text);font-weight:600}
+.md a{color:var(--accent2);text-decoration:none}
+.md a:hover{text-decoration:underline}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .hero{padding:36px 16px 28px}
+  .hero h1{font-size:26px}
+  .filter-wrap,.grid-section{padding-left:16px;padding-right:16px}
+  .cards-grid{grid-template-columns:1fr}
+  .header-stat{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        </svg>
+      </div>
+      Design Systems <span class="logo-badge">150</span>
+    </a>
+    <div class="search-wrap">
+      <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="search" type="search" placeholder="Search companies, styles, colors…" autocomplete="off">
+    </div>
+    <div class="header-stat">150 systems &middot; 10 categories</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-label"><span></span> Open Source &middot; MIT License</div>
+  <h1>Design Systems Library</h1>
+  <p class="hero-desc">150 brand design systems — colors, typography, components &amp; AI agent prompts. Drop a <code style="background:rgba(109,106,255,0.12);border:1px solid rgba(109,106,255,0.3);color:var(--accent2);padding:2px 7px;border-radius:5px;font-family:var(--mono);font-size:13px">DESIGN.md</code> into your project and generate pixel-perfect UI.</p>
+</section>
+
+<div class="filter-wrap">
+  <div class="filter-scroll" id="filter-bar">
+    <button class="filter-btn active" data-cat="all">All <span class="filter-cnt" id="cnt-all">150</span></button>
+    <div class="filter-sep"></div>
+  </div>
+</div>
+
+<div class="grid-section">
+  <div class="result-line" id="result-line">Showing <em>150</em> design systems</div>
+  <div class="cards-grid" id="cards-grid"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="d-head">
+    <div class="d-logo" id="d-logo"></div>
+    <div class="d-meta">
+      <div class="d-name" id="d-name"></div>
+      <div class="d-swatches" id="d-swatches"></div>
+    </div>
+    <div class="d-actions">
+      <button class="ibt" id="copy-btn" title="Copy file path">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+      <button class="ibt" id="close-btn" title="Close (Esc)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="d-body"><div class="md" id="md-content"></div></div>
+</div>
+
+<script>
+const DATA = [{"id":"1password","name":"1Password","tagline":"Identity and access security with a calm, premium SaaS frame. 1Password's public site uses deep indigo and blue gradient","colors":["#13233A","#3B82F6","#EAF2FF","#FFFFFF","#172033"],"category":"Dev Tools","domain":"1password.com"},{"id":"acer","name":"Acer","tagline":"Accessible performance technology with sharp retail clarity. Acer's current public site combines deep charcoal framing, ","colors":["#111111","#1E1E1E","#FFFFFF","#F5F6F8","#1F2937"],"category":"AI & Tech","domain":"acer.com"},{"id":"adobe","name":"Adobe","tagline":"Creative software and digital experience tooling with a bold brand spine. Adobe's current public site uses `Adobe Clean`","colors":["#000000","#FFFFFF","#F5F5F5","#2C2C2C","#FA0F00"],"category":"Creative","domain":"adobe.com"},{"id":"adp","name":"ADP","tagline":"Workforce and payroll software design with approachable professionalism and direct conversion focus. ADP’s current site ","colors":["#D91F26","#B71B20","#FDEBEC","#1F2937","#334155"],"category":"SaaS","domain":"adp.com"},{"id":"affirm","name":"Affirm","tagline":"Buy-now-pay-later fintech with deep blue trust, consumer-retail clarity, and installment-friendly messaging. Affirm's pu","colors":["#1A5CFF","#102A43","#FFFFFF","#F5F8FF","#6B7280"],"category":"Finance","domain":"affirm.com"},{"id":"airbnb","name":"Airbnb","tagline":"Hospitality marketplace with polished editorial warmth. The current public site ships `Airbnb Cereal VF` and pairs crisp","colors":["#FFFFFF","#F7F7F7","#F7F6F2","#F5F1EA","#222222"],"category":"Commerce","domain":"airbnb.com"},{"id":"amazon","name":"Amazon","tagline":"","colors":["#FF9900","#131921","#232F3E","#FFFFFF","#EAEDED"],"category":"Commerce","domain":"amazon.com"},{"id":"amd","name":"AMD","tagline":"High-performance computing with sharp technical confidence. AMD's current public site combines deep charcoal foundations","colors":["#000000","#111111","#1C1C1C","#FFFFFF","#F3F4F6"],"category":"AI & Tech","domain":"amd.com"},{"id":"anthropic","name":"Anthropic (Claude)","tagline":"AI safety research company with warm editorial elegance. Cream backgrounds (#FAF9F5) and warm terracotta accents (#DA775","colors":["#FAF9F5","#DA7756","#C4553D","#1F1915","#F5F3ED"],"category":"AI & Tech","domain":"anthropic.com"},{"id":"apple","name":"Apple","tagline":"Premium consumer technology with extreme visual restraint. The current public Apple site pairs `SF Pro Display`, `SF Pro","colors":["#FFFFFF","#F5F5F7","#FBFBFD","#1D1D1F","#86868B"],"category":"AI & Tech","domain":"apple.com"},{"id":"arm","name":"Arm","tagline":"AI-era semiconductor branding with deep compute minimalism, luminous gradients, and efficiency-first storytelling. Arm’s","colors":["#0E1625","#162238","#26344D","#FFFFFF","#A9B4C6"],"category":"AI & Tech","domain":"arm.com"},{"id":"asana","name":"Asana","tagline":"Work management with a polished, AI-forward enterprise feel. Asana's current public site combines a refined neo-grotesk ","colors":["#FC636B","#FFFFFF","#0D0D0D","#5E626A","#F7F7F8"],"category":"SaaS","domain":"asana.com"},{"id":"asus","name":"ASUS","tagline":"Personal computing with broad innovation energy. ASUS's current public site blends bright white merchandising surfaces, ","colors":["#FFFFFF","#F4F6F8","#0E1420","#1D2635","#1F2937"],"category":"AI & Tech","domain":"asus.com"},{"id":"atlassian","name":"Atlassian","tagline":"Work coordination software with sharp enterprise clarity and bright blue structure. Atlassian's public site uses `Charli","colors":["#0052CC","#2684FF","#FFFFFF","#F4F5F7","#172B4D"],"category":"Dev Tools","domain":"atlassian.com"},{"id":"autodesk","name":"Autodesk","tagline":"Bold industrial-modern brand with black-and-white confidence and high-visibility yellow. Autodesk’s current identity use","colors":["#000000","#FFFFFF","#FFFF00","#D5D5CB","#666666"],"category":"Creative","domain":"autodesk.com"},{"id":"behance","name":"Behance","tagline":"Creative portfolio discovery with Adobe-adjacent polish, white gallery surfaces, and strong project framing. Behance's p","colors":["#1769FF","#111111","#FFFFFF","#F5F5F5","#6B6B6B"],"category":"Creative","domain":"behance.net"},{"id":"bestbuy","name":"Best Buy","tagline":"Electronics retail with strong blue-yellow branding and high-visibility merchandising. Best Buy's public site uses a viv","colors":["#0046BE","#FFF200","#FFFFFF","#F3F6FB","#111827"],"category":"Commerce","domain":"bestbuy.com"},{"id":"bloomberg","name":"Bloomberg","tagline":"Information-dense media and terminal design with unmistakable black-and-amber identity. Bloomberg combines bold contrast","colors":["#000000","#FFB000","#FF6B00","#FFFFFF","#111111"],"category":"Finance","domain":"bloomberg.com"},{"id":"booking","name":"Booking.com","tagline":"","colors":["#003580","#00224f","#0071c2","#febb02","#e5a800"],"category":"Commerce","domain":"booking.com"},{"id":"box","name":"Box","tagline":"Enterprise content management with white space, blue trust cues, and AI-era document workflows. Box's public site uses b","colors":["#0061D5","#0D2B45","#FFFFFF","#F7FAFF","#182230"],"category":"SaaS","domain":"box.com"},{"id":"brex","name":"Brex","tagline":"Intelligent finance for high-speed companies. Brex's current public site pairs deep ink and white surfaces with saturate","colors":["#0B1020","#161D33","#FFFFFF","#F5F7FB","#111827"],"category":"Finance","domain":"brex.com"},{"id":"canva","name":"Canva","tagline":"Creative-tool design with playful confidence, rainbow-gradient energy, and strong workflow simplification. Canva combine","colors":["#00C4CC","#2B8CFF","#8B3DFF","#FF4ECD","#7D2AE8"],"category":"Creative","domain":"canva.com"},{"id":"cisco","name":"Cisco","tagline":"Infrastructure-led enterprise brand with bright network blue, dark technical gradients, and mobile-first content discipl","colors":["#049FD9","#0B5CAB","#6CCFF6","#0F1F33","#07111F"],"category":"AI & Tech","domain":"cisco.com"},{"id":"clickup","name":"ClickUp","tagline":"Productivity software with a bright gradient brand, polished dashboards, and all-in-one work platform messaging. ClickUp","colors":["#7B61FF","#F63D68","#3B82F6","#FFFFFF","#101828"],"category":"SaaS","domain":"clickup.com"},{"id":"cloudflare","name":"Cloudflare","tagline":"Internet infrastructure with bold contrast and unmistakable orange brand energy. Cloudflare's public site mixes white an","colors":["#F38020","#E06A0A","#111111","#FFFFFF","#F7F7F8"],"category":"Dev Tools","domain":"cloudflare.com"},{"id":"coinbase","name":"Coinbase","tagline":"Crypto finance with a highly controlled, confidence-first interface. Coinbase's current public site pairs `Coinbase Sans","colors":["#0052FF","#EEF4FF","#FFFFFF","#0A0B0D","#5B616E"],"category":"Finance","domain":"coinbase.com"},{"id":"confluent","name":"Confluent","tagline":"Data-streaming platform design with bright coral energy, cloud-native confidence, and modular enterprise storytelling. C","colors":["#FF5F46","#E84A32","#FFE7E1","#132238","#334155"],"category":"Dev Tools","domain":"confluent.io"},{"id":"costco","name":"Costco","tagline":"Membership retail with practical red-blue branding and warehouse-scale merchandising. Costco's public site uses white su","colors":["#005DAA","#E31837","#FFFFFF","#F6F7F9","#111827"],"category":"Commerce","domain":"costco.com"},{"id":"coursera","name":"Coursera","tagline":"Online learning with marketplace breadth, academic trust, and blue-led clarity. Coursera's public site uses a clean sans","colors":["#0056D2","#003E9A","#FFFFFF","#F5F8FF","#1F1F1F"],"category":"Education","domain":"coursera.org"},{"id":"crowdstrike","name":"CrowdStrike","tagline":"Cybersecurity platform design with dark urgency, high-contrast red emphasis, and mission-clear hierarchy. CrowdStrike’s ","colors":["#111111","#FFFFFF","#3E4145","#7E8082","#D12127"],"category":"Dev Tools","domain":"crowdstrike.com"},{"id":"databricks","name":"Databricks","tagline":"Data-and-AI platform design with sharp technical clarity and optimistic orange energy. Databricks pairs modern enterpris","colors":["#FF5F46","#E84A32","#FFE8E2","#1B3139","#314A52"],"category":"Dev Tools","domain":"databricks.com"},{"id":"datadog","name":"Datadog","tagline":"Observability software with dark dashboards, vivid purple brand cues, and dense technical clarity. Datadog's public site","colors":["#632CA6","#7F56D9","#101828","#FFFFFF","#F7F7FB"],"category":"Dev Tools","domain":"datadoghq.com"},{"id":"dell","name":"Dell","tagline":"Technology retail and enterprise computing with blue trust cues and hardware-led commerce. Dell's public site uses white","colors":["#0076CE","#FFFFFF","#F5F8FB","#111827","#6B7280"],"category":"AI & Tech","domain":"dell.com"},{"id":"digitalocean","name":"DigitalOcean","tagline":"Developer cloud infrastructure with approachable blue branding and practical product clarity. DigitalOcean's public site","colors":["#0080FF","#0069D9","#FFFFFF","#F5F9FF","#0F172A"],"category":"Dev Tools","domain":"digitalocean.com"},{"id":"discord","name":"Discord","tagline":"Community chat platform with gaming-focused aesthetic. Blurple accent (#5865F2), dark theme dominant, voice-first commun","colors":["#5865F2","#313338","#2b2d31","#232428","#1e1f22"],"category":"Social","domain":"discord.com"},{"id":"docker","name":"Docker","tagline":"Container tooling with unmistakable blue branding and developer-centric product proof. Docker's public site uses a brigh","colors":["#2496ED","#0B6FC2","#FFFFFF","#F4FAFF","#0F172A"],"category":"Dev Tools","domain":"docker.com"},{"id":"doordash","name":"DoorDash","tagline":"","colors":["#FF3008","#C41E00","#FF6B4D","#5C2D91","#7B4CB8"],"category":"Commerce","domain":"doordash.com"},{"id":"dribbble","name":"Dribbble","tagline":"Design discovery with soft pink branding, gallery density, and polished creative-marketplace framing. Dribbble's public ","colors":["#EA4C89","#111111","#FFFFFF","#F8F8F8","#6B7280"],"category":"Creative","domain":"dribbble.com"},{"id":"dropbox","name":"Dropbox","tagline":"Cloud collaboration with editorial confidence and product clarity. Dropbox's current public site combines `Sharp Grotesk","colors":["#0061FF","#1E1919","#FFFFFF","#F7F5F2","#EEE8E2"],"category":"SaaS","domain":"dropbox.com"},{"id":"duolingo","name":"Duolingo","tagline":"Playful learning with high-energy brand character. Duolingo's current public presence pairs a white app-like foundation ","colors":["#58CC02","#46A302","#D7FFB8","#FFFFFF","#F7F7F7"],"category":"Education","domain":"duolingo.com"},{"id":"ebay","name":"eBay Specification","tagline":"","colors":["#E53238","#0064D2","#F5AF02","#86B817","#3665F3"],"category":"Commerce","domain":"ebay.com"},{"id":"elastic","name":"Elastic","tagline":"Technical platform UI with crisp semantic color and controlled depth. Elastic’s product language pairs Inter, dense but ","colors":["#0B64DD","#BC1E70","#008B87","#008A5E","#FACB3D"],"category":"Dev Tools","domain":"elastic.co"},{"id":"epicgames","name":"Epic Games Store","tagline":"Digital gaming marketplace with sleek, cinematic dark aesthetic. Deep black backgrounds (#121212, #202020), vibrant blue","colors":["#121212","#202020","#0074e4","#000000","#2a2a2a"],"category":"Gaming","domain":"epicgames.com"},{"id":"etsy","name":"Etsy","tagline":"","colors":["#F56400","#F1641E","#D35400","#FF7B29","#222222"],"category":"Commerce","domain":"etsy.com"},{"id":"expedia","name":"Expedia","tagline":"Travel booking with royal-blue trust signals, search-led layouts, and marketplace clarity. Expedia's public site uses st","colors":["#1668E3","#003E9A","#FFFFFF","#F5F8FF","#1F2937"],"category":"Commerce","domain":"expedia.com"},{"id":"figma","name":"Figma","tagline":"Collaborative product-design platform with a sharp black-and-white foundation and bright product accents. The current pu","colors":["#000000","#FFFFFF","#4D49FC","#24CB71","#00B6FF"],"category":"Creative","domain":"figma.com"},{"id":"framer","name":"Framer","tagline":"Designer-first site building with minimal structure and modern motion-ready polish. Framer's public site uses a sharp, c","colors":["#0B0B0D","#FFFFFF","#F7F8FA","#111827","#6B7280"],"category":"Creative","domain":"framer.com"},{"id":"github","name":"GitHub Primer","tagline":"The official design system for building GitHub's product UI. Primer provides foundations, patterns, and components for c","colors":["#0969da","#1a7f37","#d1242f","#9a6700","#8250df"],"category":"Dev Tools","domain":"github.com"},{"id":"gitlab","name":"GitLab","tagline":"DevSecOps platform with dark contrast, purple-orange brand energy, and lifecycle-spanning product messaging. GitLab's pu","colors":["#FC6D26","#554488","#171321","#FFFFFF","#F8F5FF"],"category":"Dev Tools","domain":"gitlab.com"},{"id":"google","name":"Google","tagline":"High-clarity product ecosystem with Material influence and playful restraint. Google's public brand surfaces pair `Googl","colors":["#4285F4","#EA4335","#FBBC05","#34A853","#FFFFFF"],"category":"AI & Tech","domain":"google.com"},{"id":"grafana","name":"Grafana","tagline":"Observability-platform design with dark dashboards, strong signal color, and highly structured reusable UI. Grafana’s Sa","colors":["#F05A28","#D44A1A","#FFE8DE","#111217","#181B1F"],"category":"Dev Tools","domain":"grafana.com"},{"id":"grammarly","name":"Grammarly","tagline":"Writing assistance with polished calm and enterprise trust. Grammarly's current public site pairs a bright white canvas ","colors":["#FFFFFF","#F4F7FB","#EAF3F1","#0E101A","#1F2430"],"category":"SaaS","domain":"grammarly.com"},{"id":"hashicorp","name":"HashiCorp","tagline":"Infrastructure-cloud branding with elegant black-and-white fundamentals, custom typography, and portfolio gradients deri","colors":["#000000","#FFFFFF","#844FBA","#E4572E","#1F6FEB"],"category":"Dev Tools","domain":"hashicorp.com"},{"id":"homedepot","name":"Home Depot","tagline":"Home improvement retail with vivid orange branding and highly practical commerce structure. Home Depot's public site use","colors":["#F96302","#111111","#FFFFFF","#F7F7F7","#666666"],"category":"Commerce","domain":"homedepot.com"},{"id":"hp","name":"HP","tagline":"Consumer and business computing with blue brand trust, clean hardware merchandising, and accessible technology framing. ","colors":["#0096D6","#0073A6","#FFFFFF","#F5FAFD","#111827"],"category":"AI & Tech","domain":"hp.com"},{"id":"huawei","name":"Huawei","tagline":"Global intelligent technology with enterprise-scale polish. Huawei's current public presence combines bright white edito","colors":["#FFFFFF","#F5F7FA","#0B1A33","#162742","#1F2937"],"category":"AI & Tech","domain":"huawei.com"},{"id":"hubspot","name":"HubSpot","tagline":"CRM and growth software with approachable enterprise warmth. HubSpot's current public site mixes friendly display type w","colors":["#FF5C35","#FFFFFF","#FFF8F4","#213343","#516F90"],"category":"SaaS","domain":"hubspot.com"},{"id":"ibm","name":"IBM","tagline":"Enterprise technology brand with engineered clarity. Neutral gray layers, IBM Blue 60 (#0f62fe), IBM Plex typography, an","colors":["#0f62fe","#0043ce","#002d9c","#d0e2ff","#edf5ff"],"category":"AI & Tech","domain":"ibm.com"},{"id":"ikea","name":"IKEA","tagline":"Home retail with democratic warmth, practical utility, and unmistakable brand color. IKEA's public site uses a clean san","colors":["#0058A3","#FFDA1A","#FFFFFF","#F5F5F5","#111111"],"category":"Commerce","domain":"ikea.com"},{"id":"instacart","name":"Instacart","tagline":"Grocery marketplace with fresh green branding and a practical shopping-first interface. Instacart's public site uses whi","colors":["#43B02A","#2F8B1E","#FFFFFF","#F7FBF5","#1F2937"],"category":"Commerce","domain":"instacart.com"},{"id":"intel","name":"Intel","tagline":"Computing and silicon innovation with blue brand authority and clean technology framing. Intel's public site uses white ","colors":["#0071C5","#004A86","#FFFFFF","#F5F9FF","#14213D"],"category":"AI & Tech","domain":"intel.com"},{"id":"intercom","name":"Intercom","tagline":"Customer support software with AI-era warmth, rounded surfaces, and a conversational product tone. Intercom's public sit","colors":["#111111","#FF6B3D","#FFFFFF","#F8F5F1","#1F2937"],"category":"SaaS","domain":"intercom.com"},{"id":"intuit","name":"Intuit","tagline":"Friendly financial software design with optimism, precision, and brand discipline. Avenir Next for Intuit, a 4px grid, b","colors":["#0077C5","#0B5CAB","#E8F4FB","#2CA01C","#D7F26E"],"category":"Finance","domain":"intuit.com"},{"id":"klarna","name":"Klarna","tagline":"Flexible payments with distinctly Swedish attitude. Klarna's current public and brand sites pair a bold pink brand core ","colors":["#FFB3C7","#000000","#FFFFFF","#FFF8F3","#1A1A1A"],"category":"Finance","domain":"klarna.com"},{"id":"lenovo","name":"Lenovo","tagline":"Computing and device retail with black-red branding, practical hierarchy, and broad catalog structure. Lenovo's public s","colors":["#E2231A","#111111","#FFFFFF","#F7F7F7","#6B7280"],"category":"AI & Tech","domain":"lenovo.com"},{"id":"lg","name":"LG","tagline":"Consumer electronics and appliances with deep red branding, glossy product presentation, and broad lifestyle-tech mercha","colors":["#A50034","#111111","#FFFFFF","#F7F7F7","#6B7280"],"category":"AI & Tech","domain":"lg.com"},{"id":"linear","name":"Linear","tagline":"Product-development platform with disciplined dark surfaces and indigo brand focus. The current public Linear site ships","colors":["#08090A","#0F1011","#141516","#1C1C1F","#232326"],"category":"Dev Tools","domain":"linear.app"},{"id":"linkedin","name":"LinkedIn","tagline":"","colors":["#0A66C2","#70B5F9","#004182","#000000","#FFFFFF"],"category":"Social","domain":"linkedin.com"},{"id":"loom","name":"Loom","tagline":"Async video communication with gentle gradients, rounded UI, and simple productivity framing. Loom's public site uses a ","colors":["#6D5EF8","#4C8DFF","#F25FB5","#FFFFFF","#F8F7FF"],"category":"Creative","domain":"loom.com"},{"id":"lowes","name":"Lowe's","tagline":"Home improvement retail with deep blue trust cues, clean retail structure, and project-friendly browsing. Lowe's public ","colors":["#004990","#0B63CE","#FFFFFF","#F5F7FA","#111827"],"category":"Commerce","domain":"lowes.com"},{"id":"mailchimp","name":"Mailchimp","tagline":"The iconic email marketing platform with playful personality and signature yellow branding. Mailchimp pairs a white/ligh","colors":["#FFE01B","#DE3A3A","#3AB551","#241C15","#FFFFFF"],"category":"SaaS","domain":"mailchimp.com"},{"id":"mastodon","name":"Mastodon","tagline":"Decentralized, open-source social network with privacy-first design. Mastodon Purple (#6364FF) accent, dark immersive th","colors":["#6364FF","#191b22","#282c37","#1f232b","#313543"],"category":"Social","domain":"mastodon.social"},{"id":"mcdonalds","name":"McDonald's","tagline":"Fast-food commerce with strong red-and-yellow branding, friendly utility, and mainstream consumer accessibility. McDonal","colors":["#DA291C","#FFC72C","#FFFFFF","#111111","#666666"],"category":"Commerce","domain":"mcdonalds.com"},{"id":"medium","name":"Medium","tagline":"Reading and writing platform with magazine-like simplicity and strong black-and-green branding. Medium's public site use","colors":["#1A8917","#111111","#FFFFFF","#F7F7F7","#6B6B6B"],"category":"Creative","domain":"medium.com"},{"id":"metamask","name":"MetaMask","tagline":"The most popular crypto wallet and web3 gateway. MetaMask combines a dark, cyber-focused foundation with fox-inspired br","colors":["#9269F3","#8B5CF6","#3B82F6","#10B981","#000000"],"category":"Finance","domain":"metamask.io"},{"id":"microsoft","name":"Microsoft","tagline":"Broad computing and productivity ecosystem with Fluent-driven clarity. Microsoft's current public site combines `Segoe U","colors":["#0067B8","#FFFFFF","#F5F5F5","#F2F2F2","#1A1A1A"],"category":"AI & Tech","domain":"microsoft.com"},{"id":"miro","name":"Miro","tagline":"Collaborative whiteboard software with bright yellow branding and board-first visual structure. Miro's public site pairs","colors":["#FFD02F","#111111","#FFFFFF","#F7F7F7","#1F2937"],"category":"Creative","domain":"miro.com"},{"id":"monday","name":"Monday.com","tagline":"Work management with vivid color coding, polished SaaS structure, and strong product modularity. Monday.com's public sit","colors":["#006BFF","#FF3D71","#00C875","#FFCB00","#784BD1"],"category":"SaaS","domain":"monday.com"},{"id":"mongodb","name":"MongoDB","tagline":"Developer-platform design with calm green confidence and open-source product rigor. MongoDB’s LeafyGreen system uses str","colors":["#00ED64","#13AA52","#E3FCF7","#001E2B","#112733"],"category":"Dev Tools","domain":"mongodb.com"},{"id":"monzo","name":"Monzo","tagline":"Mobile banking with cheerful confidence. Monzo's current public site centers its signature Hot Coral card, bright white ","colors":["#FF5A5F","#E5484D","#FFFFFF","#FFF7F0","#1F2A37"],"category":"Finance","domain":"monzo.com"},{"id":"mozilla","name":"Mozilla","tagline":"Mission-driven web brand with activist energy. High-contrast black and off-white, bright green and seed accents, Mozilla","colors":["#161616","#000000","#fafafa","#ffffff","#b3b3b3"],"category":"Dev Tools","domain":"mozilla.org"},{"id":"n26","name":"N26","tagline":"Digital banking with calm European clarity. N26's current public site combines white surfaces, deep charcoal and teal-gr","colors":["#FFFFFF","#F5F7F8","#111111","#1E2428","#1F2933"],"category":"Finance","domain":"n26.com"},{"id":"netflix","name":"Netflix","tagline":"Streaming entertainment with cinematic contrast. The public Netflix signup site is built around `Netflix Sans` and a sta","colors":["#000000","#141414","#181818","#FFFFFF","#B3B3B3"],"category":"Media","domain":"netflix.com"},{"id":"netlify","name":"Netlify","tagline":"Modern web platform with bright teal-blue energy, black-and-white structure, and agent-ready developer tooling. Netlify'","colors":["#00C7B7","#00A89A","#0F172A","#FFFFFF","#F5FBFA"],"category":"Dev Tools","domain":"netlify.com"},{"id":"nike","name":"Nike","tagline":"Performance retail with aggressive simplicity and image-led energy. Nike's public site stays rooted in black (`#111111`)","colors":["#111111","#FFFFFF","#F5F5F5","#E5E5E5","#757575"],"category":"Commerce","domain":"nike.com"},{"id":"nokia","name":"Nokia","tagline":"Connectivity-for-the-AI-era branding with cool gradients, dark technological depth, and clean industrial structure. Noki","colors":["#071A2B","#0B3D91","#169BFF","#25D0C5","#7CE8FF"],"category":"AI & Tech","domain":"nokia.com"},{"id":"notion","name":"Notion","tagline":"Connected workspace with editorial calm. The live site currently serves `NotionInter` webfonts and pairs warm white surf","colors":["#FFFFFF","#F9F9F8","#FCF8F5","#191919","#37352F"],"category":"SaaS","domain":"notion.so"},{"id":"nvidia","name":"NVIDIA","tagline":"High-performance computing and AI with black surfaces, luminous green branding, and premium technical polish. NVIDIA's p","colors":["#76B900","#0B0B0B","#171717","#FFFFFF","#B0B3B8"],"category":"AI & Tech","domain":"nvidia.com"},{"id":"okta","name":"Okta","tagline":"Identity-platform design with clear blue emphasis, accessible structure, and enterprise focus. Okta’s Odyssey system is ","colors":["#1662DD","#0F4FBF","#EAF2FF","#0F172A","#334155"],"category":"Dev Tools","domain":"okta.com"},{"id":"oneplus","name":"OnePlus","tagline":"Premium mobile technology with focused intensity. OnePlus's current public presence combines deep black and white contra","colors":["#000000","#151515","#FFFFFF","#F5F5F5","#1F1F1F"],"category":"AI & Tech","domain":"oneplus.com"},{"id":"openai","name":"OpenAI","tagline":"Research-driven AI company with academic elegance. Clean whites (#ffffff) and conversational darks (#212121, #343541), s","colors":["#ffffff","#212121","#343541","#10a37f","#40414f"],"category":"AI & Tech","domain":"openai.com"},{"id":"oracle","name":"Oracle","tagline":"Enterprise cloud and applications with stark red-black branding and high-density product breadth. Oracle's public site u","colors":["#C74634","#161513","#FFFFFF","#F5F5F5","#1F1F1F"],"category":"Dev Tools","domain":"oracle.com"},{"id":"palantir","name":"Palantir","tagline":"Operational software design with rigorous structure and dark analytical clarity. Palantir’s application styling guidance","colors":["#137CBD","#2B95D6","#0F9960","#D9822B","#DB3737"],"category":"Dev Tools","domain":"palantir.com"},{"id":"patreon","name":"Patreon","tagline":"Creator membership platform with a warm coral identity, rounded UI, and creator-economy pragmatism. Patreon's public sit","colors":["#FF424D","#111111","#FFFFFF","#FFF7F6","#666666"],"category":"Creative","domain":"patreon.com"},{"id":"paypal","name":"PayPal","tagline":"Digital payments with a polished blue trust system. PayPal's current public site combines `PayPal Pro` / `PayPal Sans`-s","colors":["#003087","#0070E0","#009CDE","#FFFFFF","#0C0C0D"],"category":"Finance","domain":"paypal.com"},{"id":"pinterest","name":"Pinterest","tagline":"Inspiration-first consumer product with soft warmth and bold action cues. Pinterest Red (#e60023), rounded surfaces, lar","colors":["#e60023","#ad081b","#ffe0e5","#111111","#211922"],"category":"Social","domain":"pinterest.com"},{"id":"playstation","name":"PlayStation","tagline":"Premium gaming ecosystem with iconic blue identity. PlayStation Blue (#003791), dark immersive backgrounds, SST typograp","colors":["#003791","#0070d1","#00bfff","#ffffff","#000000"],"category":"Gaming","domain":"playstation.com"},{"id":"qualcomm","name":"Qualcomm","tagline":"Intelligent computing everywhere with enterprise-scale polish. Qualcomm's current public site blends bright white sectio","colors":["#FFFFFF","#F4F7FB","#081A35","#10284D","#10243E"],"category":"AI & Tech","domain":"qualcomm.com"},{"id":"qualtrics","name":"Qualtrics","tagline":"Experience-management design with flexible survey styling, clean enterprise surfaces, and explicit accessibility safegua","colors":["#4F46E5","#111827","#F8FAFC","#FFFFFF","#6B7280"],"category":"SaaS","domain":"qualtrics.com"},{"id":"realme","name":"realme","tagline":"Youth-focused technology with energetic confidence. realme's current global site combines bright yellow, black, and whit","colors":["#FFD600","#111111","#FFFFFF","#F5F6F8","#1F2937"],"category":"AI & Tech","domain":"realme.com"},{"id":"reddit","name":"Reddit","tagline":"Community-driven social platform with card-based content, threaded discussions, and the iconic orangered accent. Clean, ","colors":["#FF4500","#7193FF","#0079D3","#DAE0E6","#FFFFFF"],"category":"Social","domain":"reddit.com"},{"id":"redhat","name":"Red Hat","tagline":"Enterprise open-source brand with editorial red-black energy and product-grade PatternFly structure. Red Hat Display/Tex","colors":["#EE0000","#C9190B","#0066CC","#004080","#73BCF7"],"category":"Dev Tools","domain":"redhat.com"},{"id":"revolut","name":"Revolut","tagline":"Global money movement with sleek app-first confidence. Revolut's current public site uses bright white surfaces, deep ne","colors":["#FFFFFF","#F6F7FB","#0B0D12","#1A1F2C","#1F2937"],"category":"Finance","domain":"revolut.com"},{"id":"robinhood","name":"Robinhood","tagline":"Investing and trading with a stripped-down, high-contrast fintech identity. Robinhood's public site uses a mostly black-","colors":["#00C805","#0A0A0A","#FFFFFF","#F7F7F7","#666666"],"category":"Finance","domain":"robinhood.com"},{"id":"salesforce","name":"Salesforce","tagline":"Enterprise CRM with bright cloud-brand optimism and structured product breadth. Salesforce's public site uses `Salesforc","colors":["#0176D3","#032D60","#FFFFFF","#EAF5FE","#181818"],"category":"SaaS","domain":"salesforce.com"},{"id":"samsung","name":"Samsung","tagline":"Consumer electronics with premium hardware polish and broad product merchandising. Samsung's public site blends `Samsung","colors":["#000000","#FFFFFF","#F7F7F7","#E6E6E6","#666666"],"category":"AI & Tech","domain":"samsung.com"},{"id":"sap","name":"SAP","tagline":"Enterprise application design with calm clarity and rigorous structure. SAP Fiori combines the proprietary 72 typeface, ","colors":["#0070f2","#0057d2","#ebf5ff","#0064d9","#354a5f"],"category":"SaaS","domain":"sap.com"},{"id":"servicenow","name":"ServiceNow","tagline":"Enterprise workflow design with customizable structure, strong branding hooks, and pragmatic platform clarity. ServiceNo","colors":["#1F8476","#166C61","#4B5D6B","#1B2430","#697586"],"category":"SaaS","domain":"servicenow.com"},{"id":"shopify","name":"Shopify Polaris","tagline":"","colors":["#008060","#95BF47","#303030","#1A1A1A"],"category":"Commerce","domain":"shopify.com"},{"id":"slack","name":"Slack","tagline":"Work collaboration with enterprise utility and brand warmth. Slack's current public site mixes `Larsseit`-style display ","colors":["#4A154B","#FFFFFF","#F8F5F0","#2EB67D","#36C5F0"],"category":"SaaS","domain":"slack.com"},{"id":"snapchat","name":"Snapchat","tagline":"Camera-first social platform with ephemeral messaging. Signature Yellow (#FFFC00), playful Gen-Z aesthetic, Bitmoji-inte","colors":["#FFFC00","#FFFB4D","#E6E300","#000000","#FFFFFF"],"category":"Social","domain":"snapchat.com"},{"id":"snowflake","name":"Snowflake","tagline":"Data-platform design with cool precision and AI-era confidence. Bright glacier blue, dark cloud navies, crisp technical ","colors":["#29B5E8","#0B8ACD","#EAF7FF","#6AD1F5","#0B1E3B"],"category":"Dev Tools","domain":"snowflake.com"},{"id":"sofi","name":"SoFi","tagline":"Consumer finance with a bright cyan-blue identity, rounded fintech surfaces, and benefit-led product framing. SoFi's pub","colors":["#00A3E0","#0087BC","#FFFFFF","#F3FBFE","#0F172A"],"category":"Finance","domain":"sofi.com"},{"id":"sony","name":"Sony","tagline":"Consumer electronics with black-and-white premium restraint and entertainment-adjacent polish. Sony's public electronics","colors":["#000000","#FFFFFF","#F5F5F5","#111111","#6B7280"],"category":"AI & Tech","domain":"sony.com"},{"id":"spotify","name":"Spotify","tagline":"Streaming product with immersive dark-mode gravity. The current public Spotify web surfaces ship `SpotifyMixUI`, `Spotif","colors":["#121212","#181818","#141414","#000000","#282828"],"category":"Media","domain":"spotify.com"},{"id":"square","name":"Square","tagline":"Commerce infrastructure with black-and-white precision and practical business breadth. Square's public site uses a clean","colors":["#0D0D0D","#FFFFFF","#F6F6F6","#E3E3E3","#666666"],"category":"Finance","domain":"squareup.com"},{"id":"squarespace","name":"Squarespace","tagline":"Editorial website-builder design with New York polish and expressive restraint. Squarespace pairs the custom Clarkson ty","colors":["#000000","#ffffff","#f6f3ee","#e8e5df","#6f6b65"],"category":"Creative","domain":"squarespace.com"},{"id":"starbucks","name":"DESIGN.md - Starbucks","tagline":"","colors":["#00704A","#1E3932","#CBA258","#D4E9E2","#FFFFFF"],"category":"Commerce","domain":"starbucks.com"},{"id":"steam","name":"Steam","tagline":"Digital gaming distribution platform with dark, immersive aesthetic. Navy blue gradients (#1b2838), Steam cyan accent (#","colors":["#1b2838","#66c0f4","#171a21","#2a475e","#1e3a4c"],"category":"Gaming","domain":"steampowered.com"},{"id":"stripe","name":"Stripe","tagline":"Financial infrastructure with developer-grade precision. The live site currently serves `Sohne` and `Source Code Pro`, c","colors":["#FFFFFF","#F8FAFD","#061B31","#30313D","#533AFD"],"category":"Finance","domain":"stripe.com"},{"id":"substack","name":"Substack","tagline":"Publishing with literary simplicity, serif display tone, and restrained orange brand cues. Substack's public site uses a","colors":["#FF6719","#111111","#FFFFFF","#F8F8F8","#666666"],"category":"Creative","domain":"substack.com"},{"id":"supabase","name":"Supabase","tagline":"","colors":["#3ECF8E","#4FF8A8","#24B47E","#1A8F63","#1C1C1C"],"category":"Dev Tools","domain":"supabase.com"},{"id":"target","name":"Target","tagline":"","colors":["#CC0000","#A80000","#FF3333","#FFFFFF","#FAFAFA"],"category":"Commerce","domain":"target.com"},{"id":"tesla","name":"Tesla","tagline":"Minimalist product design with cinematic restraint and direct-to-consumer confidence. Tesla’s web presence relies on bla","colors":["#000000","#FFFFFF","#F4F4F4","#9CA3AF","#374151"],"category":"AI & Tech","domain":"tesla.com"},{"id":"threads","name":"Threads (Meta)","tagline":"A comprehensive design guide for Threads' visual identity (2023-2026)","colors":["#FFFFFF","#000000","#FEDA77","#F58529","#DD2A7B"],"category":"Social","domain":"threads.net"},{"id":"tiktok","name":"TikTok","tagline":"","colors":["#000000","#121212","#25F4EE","#FE2C55","#1A1A1A"],"category":"Social","domain":"tiktok.com"},{"id":"trello","name":"Trello","tagline":"Visual task management with playful productivity and board-first clarity. Trello's public site uses a bright, approachab","colors":["#0C66E4","#579DFF","#FFFFFF","#F4F5F7","#172B4D"],"category":"SaaS","domain":"trello.com"},{"id":"tripadvisor","name":"Tripadvisor","tagline":"Travel discovery with content-heavy browsing, green brand cues, and review-driven utility. Tripadvisor's public site use","colors":["#34E0A1","#111111","#FFFFFF","#F7F7F7","#6B7280"],"category":"Commerce","domain":"tripadvisor.com"},{"id":"twilio","name":"Twilio","tagline":"Developer-first enterprise platform with approachable polish. Twilio Sans, a disciplined 8px grid, token-driven semantic","colors":["#0263E0","#0047B3","#E8F0FE","#F22F46","#D61F3C"],"category":"Dev Tools","domain":"twilio.com"},{"id":"twitch","name":"Twitch","tagline":"Live streaming platform with gaming-first aesthetic. Twitch Purple (#9146FF) accent, dark immersive backgrounds, real-ti","colors":["#9146FF","#772CE8","#5C16C5","#BF94FF","#451093"],"category":"Gaming","domain":"twitch.tv"},{"id":"uber","name":"Uber","tagline":"Urban mobility with a crisp black-and-white interface core. Uber's current public site uses `Uber Move Display` and `Ube","colors":["#000000","#FFFFFF","#F6F6F6","#E2E2E2","#545454"],"category":"Commerce","domain":"uber.com"},{"id":"udemy","name":"Udemy","tagline":"Course marketplace with strong category browsing, educational commerce clarity, and a dark-purple brand anchor. Udemy's ","colors":["#A435F0","#8710D8","#1C1D1F","#FFFFFF","#F7F9FA"],"category":"Education","domain":"udemy.com"},{"id":"unity","name":"Unity","tagline":"Creator-platform design with dark technical confidence and game-industry energy. Unity’s current web presence leans on b","colors":["#111111","#FFFFFF","#1A1F28","#2A313D","#A5ACB8"],"category":"Gaming","domain":"unity.com"},{"id":"venmo","name":"Venmo","tagline":"Peer-to-peer payments with bright blue consumer-fintech energy and playful simplicity. Venmo's public site uses its icon","colors":["#008CFF","#0074D6","#FFFFFF","#F4FAFF","#0F172A"],"category":"Finance","domain":"venmo.com"},{"id":"vercel","name":"Vercel (Geist)","tagline":"Developer infrastructure platform with extreme minimalism. Pure black (#171717) and white (#ffffff) foundation, Geist ty","colors":["#171717","#ffffff","#fafafa","#eaeaea","#999999"],"category":"Dev Tools","domain":"vercel.com"},{"id":"vmware","name":"VMware","tagline":"Enterprise-ready consumer-simple design with strong action blue, structured layout logic, and explicit accessibility. VM","colors":["#0065C4","#0050A1","#EAF4FF","#182026","#202B33"],"category":"Dev Tools","domain":"vmware.com"},{"id":"walmart","name":"Walmart","tagline":"","colors":["#0071DC","#FFC220","#004F9A","#2E7D32","#DE1C24"],"category":"Commerce","domain":"walmart.com"},{"id":"wayfair","name":"Wayfair","tagline":"Home furnishings retail with broad catalog density, warm merchandising, and soft home-oriented polish. Wayfair's public ","colors":["#7B189F","#FFFFFF","#F8F7F5","#1F2937","#6B7280"],"category":"Commerce","domain":"wayfair.com"},{"id":"webflow","name":"Webflow","tagline":"Visual website building with premium black-and-white structure and electric blue product energy. Webflow's current publi","colors":["#146EF5","#0A0A0A","#FFFFFF","#F7F8FA","#111827"],"category":"Creative","domain":"webflow.com"},{"id":"wise","name":"Wise","tagline":"Global money movement with practical clarity. Wise's current public site uses a fresh green brand palette, white and pal","colors":["#9FE870","#163300","#2E8B57","#FFFFFF","#EAF8E2"],"category":"Finance","domain":"wise.com"},{"id":"wix","name":"Wix","tagline":"Friendly no-code web-design platform with bright utility color and high customization energy. Wix combines the custom Ma","colors":["#0C6EFC","#FAAD4D","#008463","#DF3131","#7F2275"],"category":"Creative","domain":"wix.com"},{"id":"workday","name":"Workday","tagline":"Enterprise operations design with calm authority and warm orange emphasis. Workday’s current visual language pairs soft ","colors":["#F38B00","#D97706","#FFE7C2","#0F172A","#1F2937"],"category":"SaaS","domain":"workday.com"},{"id":"x","name":"X (Twitter)","tagline":"A comprehensive design guide for X's current visual identity (2024-2026)","colors":["#000000","#FFFFFF","#1D9BF0","#0F1419","#536471"],"category":"Social","domain":"x.com"},{"id":"xbox","name":"Xbox","tagline":"Microsoft Fluent Design meets gaming. Xbox Green (#107C10), deep dark backgrounds, Segoe UI typography, Game Pass brandi","colors":["#107C10","#0E8A0E","#10B910","#0A5D0A","#ffffff"],"category":"Gaming","domain":"xbox.com"},{"id":"xero","name":"Xero","tagline":"Friendly accounting-software design with small-business optimism and product-system rigor. Xero pairs bright sky-blue br","colors":["#13B5EA","#0E9DCD","#E8F8FD","#1F2A37","#334155"],"category":"Finance","domain":"xero.com"},{"id":"xiaomi","name":"Xiaomi","tagline":"Consumer technology at global scale with bold accessibility. Xiaomi's current public site combines bright white surfaces","colors":["#FFFFFF","#F5F6F8","#191919","#222222","#6B7280"],"category":"AI & Tech","domain":"xiaomi.com"},{"id":"zapier","name":"Zapier","tagline":"Automation software with a bold orange identity, practical workflow structure, and AI workflow emphasis. Zapier's public","colors":["#FF4F00","#FFE6DA","#FFFFFF","#FFF9F5","#191919"],"category":"SaaS","domain":"zapier.com"},{"id":"zendesk","name":"Zendesk","tagline":"Support-centric product design with restrained enterprise clarity. Garden’s neutral grays, kale depth, blue interaction ","colors":["#f8f9f9","#e8eaec","#d8dcde","#919ca5","#5c6970"],"category":"SaaS","domain":"zendesk.com"},{"id":"zillow","name":"Zillow","tagline":"Real-estate discovery with high-trust search flows and map-driven clarity. Zillow's public site uses a white and soft-bl","colors":["#006AFF","#0F4AA1","#FFFFFF","#F5F8FF","#1B1F23"],"category":"Commerce","domain":"zillow.com"},{"id":"zoom","name":"Zoom","tagline":"Communication software with a bright, approachable productivity frame. Zoom's current public site combines `Happy Displa","colors":["#0B5CFF","#FFFFFF","#0B1739","#F5F8FF","#101828"],"category":"SaaS","domain":"zoom.us"}];
+
+const CATS = [
+  {k:'Dev Tools',css:'DevTools'},{k:'AI & Tech',css:'AITech'},{k:'SaaS',css:'SaaS'},
+  {k:'Finance',css:'Finance'},{k:'Commerce',css:'Commerce'},{k:'Creative',css:'Creative'},
+  {k:'Social',css:'Social'},{k:'Gaming',css:'Gaming'},{k:'Media',css:'Media'},{k:'Education',css:'Education'}
+];
+
+const catCounts = {};
+DATA.forEach(d => { catCounts[d.category] = (catCounts[d.category]||0)+1; });
+
+function catCss(cat) { const m={};CATS.forEach(c=>m[c.k]=c.css);return m[cat]||'SaaS'; }
+
+// Build filter buttons
+const filterBar = document.getElementById('filter-bar');
+CATS.forEach(({k,css}) => {
+  if (!catCounts[k]) return;
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn';
+  btn.dataset.cat = k;
+  btn.innerHTML = k + ' <span class="filter-cnt">' + catCounts[k] + '</span>';
+  filterBar.appendChild(btn);
+});
+
+let activeFilter = 'all';
+let searchQuery = '';
+let currentId = null;
+
+function logoImg(domain, name, size) {
+  const init = name.replace(/[^A-Za-z0-9]/g,'').substring(0,2).toUpperCase();
+  return `<img src="https://logo.clearbit.com/${domain}?size=56" alt="${name}"
+    onload="this.style.display='block';this.nextSibling.style.display='none'"
+    onerror="this.style.display='none';this.nextSibling.style.display='flex'"
+    style="width:${size}px;height:${size}px;object-fit:contain;display:block">
+  <span class="co-initials" style="display:none">${init}</span>`;
+}
+
+function renderCards(items) {
+  const grid = document.getElementById('cards-grid');
+  const rl = document.getElementById('result-line');
+  rl.innerHTML = 'Showing <em>' + items.length + '</em> design system' + (items.length !== 1 ? 's' : '');
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/></svg><p>No results for "<em>' + searchQuery + '</em>"</p></div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(d => {
+    const dots = d.colors.slice(0,5).map(c =>
+      `<div class="cdot" style="background:${c}" title="${c}"></div>`
+    ).join('');
+    const tag = d.tagline || '';
+    const css = catCss(d.category);
+    return `<div class="card" data-id="${d.id}" onclick="openDrawer('${d.id}')">
+      <div class="card-top">
+        <div class="co-logo">${logoImg(d.domain, d.name, 24)}</div>
+        <div class="card-info">
+          <div class="card-name">${d.name}</div>
+          <span class="cat-pill c-${css}">${d.category}</span>
+        </div>
+      </div>
+      <div class="card-colors">${dots}</div>
+      <div class="card-tagline">${tag}</div>
+      <div class="card-bottom">
+        <span class="card-domain">${d.domain}</span>
+        <span class="card-arrow">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function applyFilters() {
+  const q = searchQuery.toLowerCase();
+  const filtered = DATA.filter(d => {
+    const catOk = activeFilter === 'all' || d.category === activeFilter;
+    const qOk = !q || d.name.toLowerCase().includes(q) || d.tagline.toLowerCase().includes(q) || d.id.includes(q) || d.domain.includes(q) || d.category.toLowerCase().includes(q);
+    return catOk && qOk;
+  });
+  renderCards(filtered);
+}
+
+filterBar.addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.cat;
+  applyFilters();
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  applyFilters();
+});
+
+// Drawer
+const overlay = document.getElementById('overlay');
+const drawer = document.getElementById('drawer');
+
+async function openDrawer(id) {
+  const d = DATA.find(x => x.id === id);
+  if (!d) return;
+  currentId = id;
+
+  document.getElementById('d-name').textContent = d.name;
+  document.getElementById('d-logo').innerHTML = logoImg(d.domain, d.name, 28);
+  document.getElementById('d-swatches').innerHTML = d.colors.slice(0,5).map(c =>
+    `<div class="d-swatch" style="background:${c}" title="${c}"></div>`
+  ).join('');
+
+  overlay.classList.add('open');
+  drawer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const mc = document.getElementById('md-content');
+  mc.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:20px 0">Loading...</p>';
+
+  try {
+    const r = await fetch('design-ai-main/design-md/' + id + '/DESIGN.md');
+    const txt = await r.text();
+    mc.innerHTML = marked.parse(txt);
+  } catch(e) {
+    mc.innerHTML = '<p style="color:var(--text3);font-size:13px">Failed to load.</p>';
+  }
+  drawer.querySelector('.d-body').scrollTop = 0;
+}
+
+function closeDrawer() {
+  overlay.classList.remove('open');
+  drawer.classList.remove('open');
+  document.body.style.overflow = '';
+  currentId = null;
+}
+
+overlay.addEventListener('click', closeDrawer);
+document.getElementById('close-btn').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+document.getElementById('copy-btn').addEventListener('click', () => {
+  if (!currentId) return;
+  const path = 'design-ai-main/design-md/' + currentId + '/DESIGN.md';
+  navigator.clipboard.writeText(path).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('ok');
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+    setTimeout(() => {
+      btn.classList.remove('ok');
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    }, 2000);
+  });
+});
+
+applyFilters();
+</script>
+</body>
+</html>

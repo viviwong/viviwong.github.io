@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>叩丁狼教育 · 从芯片到AI，全栈赋能</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── LINEAR DESIGN TOKENS ── */
+:root {
+  --bg0:#08090A; --bg1:#0F1011; --bg2:#141516; --bg3:#1C1C1F; --bg4:#232326; --bg5:#28282C;
+  --tx1:#F7F8F8; --tx2:#D0D6E0; --tx3:#8A8F98; --tx4:#62666D;
+  --bd1:#23252A; --bd2:#34343A; --bd3:#3E3E44;
+  --ind:#5E6AD2; --ind2:#7070FF; --ind3:#9ba3ff;
+  --ora:#FC7840; --tea:#00B8CC; --grn:#27A644;
+  --font:'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg0);color:var(--tx1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ══ INTRO ══ */
+#intro{position:fixed;inset:0;z-index:9999;background:#08090A;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .8s}
+#intro.out{opacity:0;pointer-events:none}
+#intro-canvas{position:absolute;inset:0}
+#intro-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(94,106,210,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(94,106,210,.05) 1px,transparent 1px);background-size:48px 48px;animation:gridMove 12s linear infinite}
+@keyframes gridMove{to{background-position:0 48px}}
+
+#offer-card{position:relative;z-index:10;background:rgba(28,28,31,.9);border:1px solid var(--bd2);border-radius:20px;padding:44px 52px;text-align:center;max-width:500px;width:90%;backdrop-filter:blur(24px);box-shadow:0 0 0 1px var(--bd1),0 40px 80px rgba(0,0,0,.6),0 0 80px rgba(94,106,210,.12);opacity:0;pointer-events:none;transform:translateY(32px);transition:opacity .7s cubic-bezier(.34,1.56,.64,1),transform .7s cubic-bezier(.34,1.56,.64,1)}
+#offer-card.visible{opacity:1;pointer-events:auto;transform:none}
+.offer-label{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ind3);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+.offer-label::before,.offer-label::after{content:'';width:24px;height:1px;background:var(--bd2)}
+.offer-title{font-size:24px;font-weight:700;color:var(--tx1);line-height:1.35;margin-bottom:6px}
+#offer-company{font-size:32px;font-weight:800;background:linear-gradient(90deg,var(--ind2),var(--tea));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;margin:8px 0 16px;min-height:44px}
+.offer-sub{font-size:13px;color:var(--tx3);line-height:1.75;margin-bottom:28px}
+#enter-btn{display:inline-flex;align-items:center;gap:10px;background:var(--ind);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 0 0 1px rgba(94,106,210,.3),0 4px 20px rgba(94,106,210,.3);white-space:nowrap}
+#enter-btn:hover{background:var(--ind2);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(112,112,255,.5),0 8px 28px rgba(94,106,210,.4)}
+
+/* ══ MAIN SITE ══ */
+#main-site{opacity:0;transition:opacity .7s}
+#main-site.visible{opacity:1}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;height:60px;padding:0 32px;display:flex;align-items:center;gap:20px;background:rgba(8,9,10,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd1)}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-size:16px;font-weight:700;color:var(--tx1);white-space:nowrap}
+.nav-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,var(--ind),var(--ind2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;letter-spacing:-1px;flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:8px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--tx3);text-decoration:none;padding:6px 11px;border-radius:6px;transition:all .15s}
+.nav-links a:hover{color:var(--tx1);background:rgba(255,255,255,.05)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nav-badge{font-size:11.5px;color:var(--tx3);border:1px solid var(--bd1);padding:3px 10px;border-radius:20px;background:var(--bg3)}
+.nav-cta{background:var(--ind);color:#fff;border:none;padding:7px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;box-shadow:0 2px 8px rgba(94,106,210,.3)}
+.nav-cta:hover{background:var(--ind2);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{min-height:calc(100vh - 60px);display:flex;align-items:center;position:relative;overflow:hidden;padding:80px 32px 64px}
+.hero-glow{position:absolute;pointer-events:none}
+.hero-glow.g1{width:600px;height:600px;background:radial-gradient(circle,rgba(94,106,210,.15),transparent 70%);top:-100px;right:-100px}
+.hero-glow.g2{width:400px;height:400px;background:radial-gradient(circle,rgba(0,184,204,.08),transparent 70%);bottom:-100px;left:0}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(94,106,210,.08);border:1px solid rgba(94,106,210,.2);color:var(--ind3);font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:20px;letter-spacing:.02em}
+.hero-kicker .dot{width:5px;height:5px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+.hero-h1{font-size:clamp(36px,4.5vw,58px);font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:20px;color:var(--tx1)}
+.hero-h1 em{font-style:normal;background:linear-gradient(90deg,var(--ind2),var(--tea));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:16px;color:var(--tx3);line-height:1.75;margin-bottom:32px;max-width:440px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:48px}
+.btn-primary{background:var(--ind);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 16px rgba(94,106,210,.3)}
+.btn-primary:hover{background:var(--ind2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(94,106,210,.4)}
+.btn-ghost{background:transparent;color:var(--tx2);border:1px solid var(--bd2);padding:11px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-ghost:hover{border-color:var(--bd3);background:rgba(255,255,255,.04);color:var(--tx1)}
+.hero-metrics{display:flex;gap:32px;flex-wrap:wrap}
+.hmet{border-left:2px solid var(--bd2);padding-left:16px}
+.hmet-num{font-size:26px;font-weight:800;color:var(--tx1);letter-spacing:-0.03em;line-height:1}
+.hmet-num sup{font-size:14px;font-weight:600;color:var(--ind3)}
+.hmet-lbl{font-size:12px;color:var(--tx4);margin-top:4px}
+
+/* hero right — floating cards */
+.hero-visual{position:relative;height:480px}
+.fc{position:absolute;background:var(--bg3);border:1px solid var(--bd2);border-radius:14px;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px var(--bd1);animation:float linear infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.fc-main{width:260px;top:40px;left:20px;animation-duration:4s}
+.fc-main .fc-icon{font-size:28px;margin-bottom:10px;display:block}
+.fc-title{font-size:14px;font-weight:600;color:var(--tx1);margin-bottom:5px}
+.fc-sub{font-size:12px;color:var(--tx3);line-height:1.55}
+.fc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.fc-tag{font-size:11px;color:var(--ind3);background:rgba(94,106,210,.1);border:1px solid rgba(94,106,210,.2);padding:2px 8px;border-radius:4px;font-weight:500}
+.fc-ai{width:180px;top:120px;right:0;animation-duration:5.5s;animation-delay:-.5s;text-align:center;padding:24px 16px}
+.ai-orb{font-size:36px;margin-bottom:10px}
+.fc-offer{width:220px;bottom:40px;left:60px;animation-duration:6s;animation-delay:-2s}
+.offer-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.offer-co-logo{width:32px;height:32px;border-radius:8px;background:var(--ind);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.offer-co-name{font-size:13px;font-weight:600;color:var(--tx1)}
+.offer-co-badge{font-size:10px;color:var(--grn);background:rgba(39,166,68,.1);border:1px solid rgba(39,166,68,.2);padding:1px 6px;border-radius:4px;font-weight:500;display:inline-block;margin-top:2px}
+.offer-salary{font-size:22px;font-weight:800;color:var(--ora);letter-spacing:-0.02em}
+.offer-salary-lbl{font-size:11px;color:var(--tx3)}
+.fc-stat{width:140px;top:280px;right:30px;animation-duration:7s;animation-delay:-3s;padding:16px}
+.stat-ring{width:48px;height:48px;border-radius:50%;border:3px solid var(--bd2);border-top-color:var(--grn);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--grn);margin:0 auto 8px;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── STATS BAR ── */
+.stats-bar{background:var(--bg1);border-top:1px solid var(--bd1);border-bottom:1px solid var(--bd1)}
+.stats-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{padding:28px 24px;border-right:1px solid var(--bd1);display:flex;align-items:center;gap:14px}
+.stat-item:last-child{border-right:none}
+.stat-icon-wrap{width:40px;height:40px;border-radius:9px;background:rgba(94,106,210,.08);border:1px solid rgba(94,106,210,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-num{font-size:22px;font-weight:800;color:var(--tx1);letter-spacing:-0.02em;line-height:1}
+.stat-num span{font-size:13px;font-weight:600;color:var(--ind3)}
+.stat-lbl{font-size:12px;color:var(--tx4);margin-top:3px}
+
+/* ── SECTION BASE ── */
+section{padding:96px 32px}
+.section-label{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ind3);margin-bottom:10px}
+.section-h2{font-size:clamp(26px,3vw,38px);font-weight:800;color:var(--tx1);letter-spacing:-0.025em;line-height:1.2;margin-bottom:12px}
+.section-sub{font-size:15px;color:var(--tx3);line-height:1.7;max-width:520px}
+.section-head{margin-bottom:52px}
+.s-inner{max-width:1200px;margin:0 auto}
+
+/* ── COURSES ── */
+#courses{background:var(--bg0)}
+.courses-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.course-card{background:var(--bg2);border:1px solid var(--bd1);border-radius:16px;padding:28px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s;cursor:pointer;text-decoration:none;display:block}
+.course-card:hover{border-color:var(--bd3);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.cc-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+.cc-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;margin-bottom:18px;letter-spacing:.04em}
+.cc-icon{font-size:32px;margin-bottom:14px;display:block}
+.cc-title{font-size:20px;font-weight:700;color:var(--tx1);margin-bottom:6px;letter-spacing:-0.02em}
+.cc-sub{font-size:13px;color:var(--tx3);line-height:1.65;margin-bottom:20px}
+.cc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:20px}
+.cc-tag{font-size:11px;color:var(--tx3);border:1px solid var(--bd2);background:var(--bg3);padding:3px 9px;border-radius:5px;font-weight:500}
+.cc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;padding-top:16px;border-top:1px solid var(--bd1)}
+.cc-met{text-align:center}
+.cc-met-val{font-size:18px;font-weight:800;color:var(--tx1);letter-spacing:-0.02em}
+.cc-met-lbl{font-size:11px;color:var(--tx4);margin-top:2px}
+.cc-link{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ind3);transition:gap .2s}
+.course-card:hover .cc-link{gap:10px}
+
+/* Accent colors per course */
+.cc-embed .cc-accent{background:var(--tea)}
+.cc-embed .cc-badge{background:rgba(0,184,204,.1);color:var(--tea);border:1px solid rgba(0,184,204,.2)}
+.cc-embed .cc-met-val{color:var(--tea)}
+.cc-embed .cc-link{color:var(--tea)}
+.cc-java .cc-accent{background:var(--ora)}
+.cc-java .cc-badge{background:rgba(252,120,64,.1);color:var(--ora);border:1px solid rgba(252,120,64,.2)}
+.cc-java .cc-met-val{color:var(--ora)}
+.cc-java .cc-link{color:var(--ora)}
+.cc-ui .cc-accent{background:var(--ind2)}
+.cc-ui .cc-badge{background:rgba(112,112,255,.1);color:var(--ind2);border:1px solid rgba(112,112,255,.2)}
+.cc-ui .cc-met-val{color:var(--ind2)}
+.cc-ui .cc-link{color:var(--ind2)}
+
+/* ── PARTNERS ── */
+#partners{background:var(--bg1);border-top:1px solid var(--bd1);border-bottom:1px solid var(--bd1);padding:64px 0}
+.marquee-wrap{overflow:hidden;position:relative}
+.marquee-wrap::before,.marquee-wrap::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
+.marquee-wrap::before{left:0;background:linear-gradient(to right,var(--bg1),transparent)}
+.marquee-wrap::after{right:0;background:linear-gradient(to left,var(--bg1),transparent)}
+.marquee-track{display:flex;gap:0;animation:marquee 28s linear infinite}
+.marquee-track:hover{animation-play-state:paused}
+.marquee-group{display:flex;gap:0;flex-shrink:0}
+.partner-chip{display:flex;align-items:center;gap:10px;padding:10px 24px;border-right:1px solid var(--bd1);white-space:nowrap;min-width:max-content;transition:background .15s;cursor:default}
+.partner-chip:hover{background:rgba(255,255,255,.02)}
+.p-logo{width:28px;height:28px;object-fit:contain;filter:brightness(0) invert(1);opacity:.5;flex-shrink:0;transition:opacity .15s}
+.partner-chip:hover .p-logo{opacity:.8}
+.p-logo-init{width:28px;height:28px;border-radius:6px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--tx3);flex-shrink:0}
+.p-name{font-size:13px;font-weight:500;color:var(--tx3);transition:color .15s}
+.partner-chip:hover .p-name{color:var(--tx2)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ── AI FEATURES ── */
+#ai-features{background:var(--bg0)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feat-card{background:var(--bg2);border:1px solid var(--bd1);border-radius:12px;padding:24px;transition:border-color .2s,background .2s}
+.feat-card:hover{border-color:var(--bd2);background:var(--bg3)}
+.feat-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;background:rgba(94,106,210,.08);border:1px solid rgba(94,106,210,.12)}
+.feat-title{font-size:15px;font-weight:600;color:var(--tx1);margin-bottom:6px}
+.feat-desc{font-size:13px;color:var(--tx3);line-height:1.65}
+
+/* ── LOCATION ── */
+#location{background:var(--bg1);border-top:1px solid var(--bd1);text-align:center}
+.loc-cities{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:28px}
+.loc-city{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx2);padding:7px 18px;border-radius:7px;font-size:13px;font-weight:500}
+
+/* ── CTA ── */
+#cta-section{background:var(--bg0);border-top:1px solid var(--bd1);padding:96px 32px;text-align:center}
+.cta-inner{max-width:560px;margin:0 auto}
+.cta-h2{font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-0.03em;color:var(--tx1);margin-bottom:14px;line-height:1.15}
+.cta-h2 em{font-style:normal;background:linear-gradient(90deg,var(--ind2),var(--tea));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta-sub{font-size:15px;color:var(--tx3);margin-bottom:36px;line-height:1.7}
+.cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta-primary{background:var(--ind);color:#fff;border:none;padding:13px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:8px;transition:all .2s;box-shadow:0 4px 20px rgba(94,106,210,.35)}
+.cta-primary:hover{background:var(--ind2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(94,106,210,.45)}
+.cta-secondary{background:transparent;color:var(--tx2);border:1px solid var(--bd2);padding:12px 26px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s}
+.cta-secondary:hover{border-color:var(--bd3);background:rgba(255,255,255,.04)}
+
+/* ── FOOTER ── */
+footer{background:var(--bg1);border-top:1px solid var(--bd1);padding:48px 32px 28px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:36px;border-bottom:1px solid var(--bd1);margin-bottom:24px}
+.footer-brand .brand-name{font-size:15px;font-weight:700;color:var(--tx1);margin-bottom:8px}
+.footer-brand p{font-size:13px;color:var(--tx4);line-height:1.7;max-width:240px;margin-bottom:16px}
+.footer-col-title{font-size:12px;font-weight:600;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.footer-links{display:flex;flex-direction:column;gap:9px}
+.footer-links a{font-size:13px;color:var(--tx4);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--tx2)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer-bottom p{font-size:12px;color:var(--tx4)}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:60px 20px;min-height:auto}
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .hero-visual{display:none}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .stat-item:nth-child(2){border-right:none}
+  section{padding:64px 20px}
+  .courses-grid,.features-grid{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr;gap:24px}
+  .footer-bottom{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ INTRO ══ -->
+<div id="intro">
+  <div id="intro-grid"></div>
+  <canvas id="intro-canvas"></canvas>
+  <div id="offer-card">
+    <div class="offer-label">Offer Incoming</div>
+    <div class="offer-title">恭喜！你收到了来自</div>
+    <span id="offer-company">华为</span>
+    <div class="offer-title" style="margin-bottom:14px">的 Offer 🎉</div>
+    <p class="offer-sub">每一份 Offer 背后，都是一段不凡的成长故事。<br>叩丁狼的学员，正在改变东北 IT 人才的格局。</p>
+    <button id="enter-btn" onclick="enterSite()">进入叩丁狼 <span>→</span></button>
+  </div>
+</div>
+
+<!-- ══ MAIN SITE ══ -->
+<div id="main-site">
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">叩</div>
+    叩丁狼教育
+  </a>
+  <div class="nav-links">
+    <a href="#courses">课程体系</a>
+    <a href="#partners">合作企业</a>
+    <a href="#ai-features">AI 赋能</a>
+    <a href="#location">关于我们</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge">东北 · 10年+</span>
+    <button class="nav-cta" onclick="document.getElementById('cta-section').scrollIntoView({behavior:'smooth'})">免费咨询</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow g1"></div>
+  <div class="hero-glow g2"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-kicker"><span class="dot"></span>东北最专注 AI 就业的技术培训机构</div>
+      <h1 class="hero-h1">从<em>芯片</em>到<em>AI</em><br>全栈赋能<br>每一个东北程序员</h1>
+      <p class="hero-desc">深耕东北 IT 教育十余年，聚焦嵌入式 AI、Java 全端、AIGC 设计三大方向，用持续自研的课程体系，让你在 AI 浪潮中站稳脚跟。</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="document.getElementById('courses').scrollIntoView({behavior:'smooth'})">探索课程体系 →</button>
+        <button class="btn-ghost" onclick="document.getElementById('cta-section').scrollIntoView({behavior:'smooth'})">免费咨询</button>
+      </div>
+      <div class="hero-metrics">
+        <div class="hmet"><div class="hmet-num">10<sup>年+</sup></div><div class="hmet-lbl">专注 IT 教育</div></div>
+        <div class="hmet"><div class="hmet-num">5<sup>万+</sup></div><div class="hmet-lbl">累计学员</div></div>
+        <div class="hmet"><div class="hmet-num">96<sup>%</sup></div><div class="hmet-lbl">平均就业率</div></div>
+        <div class="hmet"><div class="hmet-num">100<sup>+</sup></div><div class="hmet-lbl">合作企业</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="fc fc-main">
+        <span class="fc-icon">🤖</span>
+        <div class="fc-title">嵌入式 AI 就业班</div>
+        <div class="fc-sub">从芯片底层到 AI 应用，全栈式工程师培养路径</div>
+        <div class="fc-tags"><span class="fc-tag">STM32</span><span class="fc-tag">Linux</span><span class="fc-tag">RTOS</span><span class="fc-tag">LLM</span></div>
+      </div>
+      <div class="fc fc-ai">
+        <div class="ai-orb">🧠</div>
+        <div class="fc-title">AI 赋能</div>
+        <div class="fc-sub" style="font-size:11px">持续跟进 AI 最新进展</div>
+      </div>
+      <div class="fc fc-offer">
+        <div class="offer-row">
+          <div class="offer-co-logo">H</div>
+          <div><div class="offer-co-name">华为技术</div><span class="offer-co-badge">叩丁狼学员</span></div>
+        </div>
+        <div class="offer-salary">¥18,000<span class="offer-salary-lbl"> / 月</span></div>
+      </div>
+      <div class="fc fc-stat">
+        <div class="stat-ring">96%</div>
+        <div style="text-align:center;font-size:11px;color:var(--tx3)">平均就业率</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item reveal"><div class="stat-icon-wrap">🏆</div><div><div class="stat-num">10<span>年+</span></div><div class="stat-lbl">深耕东北 IT 教育</div></div></div>
+    <div class="stat-item reveal d1"><div class="stat-icon-wrap">👨‍💻</div><div><div class="stat-num">5<span>万+</span></div><div class="stat-lbl">累计培养学员</div></div></div>
+    <div class="stat-item reveal d2"><div class="stat-icon-wrap">🏢</div><div><div class="stat-num">100<span>+</span></div><div class="stat-lbl">合作就业企业</div></div></div>
+    <div class="stat-item reveal d3"><div class="stat-icon-wrap">📈</div><div><div class="stat-num">96<span>%</span></div><div class="stat-lbl">平均就业率</div></div></div>
+  </div>
+</div>
+
+<!-- COURSES -->
+<section id="courses">
+  <div class="s-inner">
+    <div class="section-head reveal">
+      <div class="section-label">Course System</div>
+      <h2 class="section-h2">三大核心方向<br>匹配你的职业目标</h2>
+      <p class="section-sub">从底层芯片到前沿 AI，每条赛道都有深度的课程体系和真实的就业支撑。</p>
+    </div>
+    <div class="courses-grid">
+      <a class="course-card cc-embed reveal" href="kdl-course-embedded.html">
+        <div class="cc-accent"></div>
+        <span class="cc-badge">● 嵌入式方向</span>
+        <span class="cc-icon">⚙️</span>
+        <div class="cc-title">嵌入式 AI 就业班</div>
+        <div class="cc-sub">从 C 语言到嵌入式 Linux、RTOS、驱动开发，最终接入 AI 视觉与大模型，培养真正的硬件 AI 工程师。</div>
+        <div class="cc-tags"><span class="cc-tag">C/C++</span><span class="cc-tag">Linux</span><span class="cc-tag">STM32</span><span class="cc-tag">RTOS</span><span class="cc-tag">LLM</span></div>
+        <div class="cc-metrics">
+          <div class="cc-met"><div class="cc-met-val">8月</div><div class="cc-met-lbl">课程时长</div></div>
+          <div class="cc-met"><div class="cc-met-val">12K+</div><div class="cc-met-lbl">起步薪资</div></div>
+        </div>
+        <div class="cc-link">查看详情 →</div>
+      </a>
+      <a class="course-card cc-java reveal d1" href="kdl-course-java.html">
+        <div class="cc-accent"></div>
+        <span class="cc-badge">● Java 全端方向</span>
+        <span class="cc-icon">☕</span>
+        <div class="cc-title">Java 全端 + AI 就业班</div>
+        <div class="cc-sub">Java 基础到 Spring 全家桶，前端 Vue3 到 AI 智能体开发，打造全链路工程师，适应互联网和大厂需求。</div>
+        <div class="cc-tags"><span class="cc-tag">Java</span><span class="cc-tag">Spring</span><span class="cc-tag">Vue3</span><span class="cc-tag">MySQL</span><span class="cc-tag">AI Agent</span></div>
+        <div class="cc-metrics">
+          <div class="cc-met"><div class="cc-met-val">10月</div><div class="cc-met-lbl">课程时长</div></div>
+          <div class="cc-met"><div class="cc-met-val">10K+</div><div class="cc-met-lbl">起步薪资</div></div>
+        </div>
+        <div class="cc-link">查看详情 →</div>
+      </a>
+      <a class="course-card cc-ui reveal d2" href="kdl-course-ui.html">
+        <div class="cc-accent"></div>
+        <span class="cc-badge">● UI 设计方向</span>
+        <span class="cc-icon">🎨</span>
+        <div class="cc-title">AIGC + UI 设计就业班</div>
+        <div class="cc-sub">从视觉基础到 UI 交互设计，结合 AIGC 工具链，打造能用 AI 提效的新时代设计师，横跨创意与技术边界。</div>
+        <div class="cc-tags"><span class="cc-tag">Figma</span><span class="cc-tag">UI设计</span><span class="cc-tag">AIGC</span><span class="cc-tag">动效</span><span class="cc-tag">用研</span></div>
+        <div class="cc-metrics">
+          <div class="cc-met"><div class="cc-met-val">8月</div><div class="cc-met-lbl">课程时长</div></div>
+          <div class="cc-met"><div class="cc-met-val">8K+</div><div class="cc-met-lbl">起步薪资</div></div>
+        </div>
+        <div class="cc-link">查看详情 →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<div id="partners">
+  <div class="s-inner" style="text-align:center;margin-bottom:32px">
+    <div class="section-label reveal">Hiring Partners</div>
+    <h2 class="section-h2 reveal" style="font-size:26px">100+ 家企业持续招募叩丁狼学员</h2>
+  </div>
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marquee-track"></div>
+  </div>
+</div>
+
+<!-- AI FEATURES -->
+<section id="ai-features">
+  <div class="s-inner">
+    <div class="section-head reveal">
+      <div class="section-label">AI First</div>
+      <h2 class="section-h2">AI 不是选修课<br>是每条赛道的核心</h2>
+      <p class="section-sub">我们在每个方向都深度嵌入 AI 内容，让你不只是学会工具，而是真正理解 AI 时代的工程思维。</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal"><div class="feat-icon">🤖</div><div class="feat-title">大模型实战应用</div><div class="feat-desc">LLM API 调用、Agent 架构设计、RAG 检索增强，从原理到项目落地全覆盖。</div></div>
+      <div class="feat-card reveal d1"><div class="feat-icon">👁️</div><div class="feat-title">AI 视觉与感知</div><div class="feat-desc">目标检测、图像分类、SLAM 定位，在嵌入式端部署真实视觉 AI 模型。</div></div>
+      <div class="feat-card reveal d2"><div class="feat-icon">🎨</div><div class="feat-title">AIGC 创作工具链</div><div class="feat-desc">Midjourney、Stable Diffusion、ControlNet，AI 辅助设计已经是行业刚需。</div></div>
+      <div class="feat-card reveal"><div class="feat-icon">⚡</div><div class="feat-title">持续课程迭代</div><div class="feat-desc">跟进最新 AI 进展，课程每季更新，确保你学到的是当下最前沿的技能栈。</div></div>
+      <div class="feat-card reveal d1"><div class="feat-icon">🏗️</div><div class="feat-title">真实项目驱动</div><div class="feat-desc">每个阶段配套真实企业项目，毕业即有作品集，面试不再空手而来。</div></div>
+      <div class="feat-card reveal d2"><div class="feat-icon">🎯</div><div class="feat-title">就业定向培养</div><div class="feat-desc">按岗位需求反推课程，专属就业辅导，一对一简历指导+模拟面试。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location">
+  <div class="s-inner" style="text-align:center">
+    <div class="section-label reveal">Location</div>
+    <h2 class="section-h2 reveal">深耕东北<br>辐射全国</h2>
+    <p class="section-sub reveal" style="margin:0 auto 0">总部位于沈阳，深耕东北 IT 人才市场超过十年，培养的学员分布在全国各大互联网和制造业企业。</p>
+    <div class="loc-cities reveal">
+      <span class="loc-city">沈阳 · 总部</span>
+      <span class="loc-city">大连</span>
+      <span class="loc-city">长春</span>
+      <span class="loc-city">哈尔滨</span>
+      <span class="loc-city">北京</span>
+      <span class="loc-city">深圳</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta-section">
+  <div class="cta-inner">
+    <h2 class="cta-h2 reveal">准备好开始你的<br><em>AI 时代</em>职业转型了吗？</h2>
+    <p class="cta-sub reveal">免费试听一周，和导师深入沟通，找到最适合你的成长路径。</p>
+    <div class="cta-btns reveal">
+      <button class="cta-primary">🎓 申请免费试听</button>
+      <button class="cta-secondary">💬 微信咨询顾问</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="brand-name">叩丁狼教育</div>
+        <p>东北最专注 AI 就业方向的 IT 技术培训机构，深耕嵌入式 AI、Java 全端、AIGC 设计三大方向，用专业的课程和真实的就业支撑，帮助东北程序员走向全国。</p>
+      </div>
+      <div>
+        <div class="footer-col-title">课程方向</div>
+        <div class="footer-links"><a href="kdl-course-embedded.html">嵌入式 AI 就业班</a><a href="kdl-course-java.html">Java 全端 + AI 就业班</a><a href="kdl-course-ui.html">AIGC + UI 设计就业班</a></div>
+      </div>
+      <div>
+        <div class="footer-col-title">关于我们</div>
+        <div class="footer-links"><a href="#">机构介绍</a><a href="#">师资力量</a><a href="#">学员成果</a><a href="#">校区地址</a></div>
+      </div>
+      <div>
+        <div class="footer-col-title">联系方式</div>
+        <div class="footer-links"><a href="#">微信公众号</a><a href="#">学习交流群</a><a href="#">在线咨询</a><a href="#">免费试听</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 叩丁狼教育 · 沈阳</p>
+      <p style="color:var(--tx4)">辽ICP备XXXXXXXX号</p>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /main-site -->
+
+<script>
+/* ══ OFFER RAIN ══ */
+const COMPANIES = ['华为','腾讯','百度','阿里','字节','大疆','美的','海康','中兴','小米','联想','OPPO'];
+const COLORS = ['#5E6AD2','#7070FF','#00B8CC','#FC7840','#27A644','#9ba3ff'];
+const canvas = document.getElementById('intro-canvas');
+const ctx = canvas.getContext('2d');
+let W = canvas.width = innerWidth, H = canvas.height = innerHeight;
+window.addEventListener('resize', () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; });
+
+const badges = Array.from({length:32}, () => ({
+  x: Math.random() * W, y: Math.random() * H - H,
+  vy: 1.2 + Math.random() * 2,
+  name: COMPANIES[Math.floor(Math.random() * COMPANIES.length)],
+  color: COLORS[Math.floor(Math.random() * COLORS.length)],
+  opacity: 0.3 + Math.random() * 0.5, size: 11 + Math.random() * 3
+}));
+
+let animId;
+function drawRain() {
+  ctx.clearRect(0,0,W,H);
+  badges.forEach(b => {
+    b.y += b.vy;
+    if (b.y > H + 40) { b.y = -40; b.x = Math.random() * W; }
+    ctx.save();
+    ctx.globalAlpha = b.opacity;
+    ctx.font = `600 ${b.size}px Inter, sans-serif`;
+    const tw = ctx.measureText(b.name).width;
+    const pw = tw + 20, ph = b.size + 12;
+    ctx.fillStyle = b.color + '18';
+    ctx.beginPath();
+    ctx.roundRect(b.x - pw/2, b.y - ph/2, pw, ph, 5);
+    ctx.fill();
+    ctx.strokeStyle = b.color + '40';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = b.color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(b.name, b.x, b.y);
+    ctx.restore();
+  });
+  animId = requestAnimationFrame(drawRain);
+}
+drawRain();
+
+/* Slow down after 2.8s, show card */
+let slowing = false;
+setTimeout(() => {
+  slowing = true;
+  cancelAnimationFrame(animId);
+  function slowDraw() {
+    badges.forEach(b => { b.vy *= 0.96; b.opacity *= 0.97; });
+    ctx.clearRect(0,0,W,H);
+    badges.forEach(b => {
+      ctx.save(); ctx.globalAlpha = b.opacity;
+      ctx.font = `600 ${b.size}px Inter,sans-serif`;
+      const tw = ctx.measureText(b.name).width, pw = tw+20, ph = b.size+12;
+      ctx.fillStyle = b.color+'18'; ctx.beginPath(); ctx.roundRect(b.x-pw/2,b.y-ph/2,pw,ph,5); ctx.fill();
+      ctx.strokeStyle = b.color+'40'; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle = b.color; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(b.name,b.x,b.y); ctx.restore();
+    });
+    if (badges[0].opacity > 0.01) requestAnimationFrame(slowDraw);
+  }
+  slowDraw();
+  const card = document.getElementById('offer-card');
+  card.classList.add('visible');
+  let ci = 0;
+  const el = document.getElementById('offer-company');
+  setInterval(() => { ci=(ci+1)%COMPANIES.length; el.style.opacity=0; setTimeout(()=>{el.textContent=COMPANIES[ci];el.style.opacity=1},200); }, 2200);
+}, 2800);
+
+function enterSite() {
+  document.getElementById('intro').classList.add('out');
+  setTimeout(() => { document.getElementById('intro').remove(); }, 900);
+  const main = document.getElementById('main-site');
+  main.classList.add('visible');
+}
+
+/* ══ PARTNERS MARQUEE ══ */
+const PARTNERS = [
+  {name:'华为',domain:'huawei.com'},{name:'腾讯',domain:'tencent.com'},
+  {name:'百度',domain:'baidu.com'},{name:'阿里巴巴',domain:'alibaba.com'},
+  {name:'字节跳动',domain:'bytedance.com'},{name:'大疆',domain:'dji.com'},
+  {name:'美的',domain:'midea.com'},{name:'海康威视',domain:'hikvision.com'},
+  {name:'中兴通讯',domain:'zte.com.cn'},{name:'小米',domain:'mi.com'},
+  {name:'联想',domain:'lenovo.com'},{name:'OPPO',domain:'oppo.com'},
+  {name:'vivo',domain:'vivo.com'},{name:'荣耀',domain:'honor.com'},
+  {name:'格力',domain:'gree.com'},{name:'三一重工',domain:'sany.com.cn'},
+];
+function buildChip(p) {
+  return `<div class="partner-chip">
+    <img class="p-logo" src="https://logo.clearbit.com/${p.domain}?size=40"
+      onerror="this.style.display='none';this.nextSibling.style.display='flex'" alt="${p.name}">
+    <div class="p-logo-init" style="display:none">${p.name[0]}</div>
+    <span class="p-name">${p.name}</span>
+  </div>`;
+}
+const html = PARTNERS.map(buildChip).join('');
+const track = document.getElementById('marquee-track');
+track.innerHTML = `<div class="marquee-group">${html}</div><div class="marquee-group">${html}</div>`;
+
+/* ══ SCROLL REVEAL ══ */
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
