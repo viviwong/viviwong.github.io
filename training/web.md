@@ -8,6 +8,7 @@ sidebar_position: 1
 
 ## 实训分数
 ### <a href="/web/107-叩丁狼课堂练习打分.html" target="_blank">叩丁狼课堂练习打分</a>
+### <a href="/web/108-lottery.html" target="_blank">叩丁狼幸运抽奖</a>
 
 ## 小程序和uniapp开发
 

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://sykdl.com/img/favicon.ico">
+<title>叩丁狼幸运大抽奖</title>
+<style>
+:root {
+    --primary:#6366f1; --gold:#f59e0b;
+    --success:#10b981; --danger:#ef4444;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+    font-family:'Microsoft YaHei','PingFang SC',sans-serif;
+    background:#07071a;
+    height:100vh; overflow:hidden;
+    color:#fff; user-select:none;
+}
+
+/* ── 星空 ── */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+/* ── 彩带 ── */
+#confetti{position:fixed;inset:0;z-index:9999;pointer-events:none;}
+/* ── Toast ── */
+.toast{
+    position:fixed;bottom:1.6rem;left:50%;
+    transform:translateX(-50%) translateY(10px);
+    background:rgba(5,4,20,.92);backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.15);border-radius:50px;
+    padding:.55rem 1.4rem;font-size:.83rem;
+    opacity:0;transition:all .3s;pointer-events:none;
+    z-index:9998;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── 结果遮罩 ── */
+.result-overlay{
+    position:fixed;inset:0;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    z-index:500;pointer-events:none;
+    opacity:0;transition:opacity .35s;
+}
+.result-overlay.show{opacity:1;}
+.result-name{
+    font-size:clamp(3.5rem,9vw,6.5rem);
+    font-weight:900;letter-spacing:.12em;
+    background:linear-gradient(135deg,#fff 0%,#a5b4fc 60%,#6366f1 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    filter:drop-shadow(0 0 32px rgba(99,102,241,.7));
+    animation:resultPop .52s cubic-bezier(.175,.885,.32,1.275) both;
+}
+@keyframes resultPop{
+    from{transform:scale(.25) rotate(-4deg);opacity:0;}
+    to  {transform:scale(1)   rotate(0deg); opacity:1;}
+}
+.result-sub{
+    margin-top:.9rem;font-size:1rem;letter-spacing:.3em;
+    color:rgba(255,255,255,.45);
+    animation:fadeUp .5s ease .3s both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ══ 侧边面板 ══ */
+.side-panel{
+    position:fixed;top:20px;right:20px;
+    width:268px;max-height:calc(100vh - 40px);
+    background:rgba(5,4,20,.84);backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    display:flex;flex-direction:column;
+    box-shadow:0 16px 50px rgba(0,0,0,.55);z-index:300;
+}
+.panel-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);
+    cursor:move;flex-shrink:0;
+}
+.panel-title{font-weight:700;font-size:.86rem;display:flex;align-items:center;gap:.4rem;}
+.panel-badge{background:var(--primary);color:#fff;border-radius:20px;padding:.06rem .5rem;font-size:.68rem;font-weight:700;}
+.panel-clr{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.73rem;padding:.15rem .45rem;border-radius:5px;transition:all .2s;font-family:inherit;}
+.panel-clr:hover{background:rgba(239,68,68,.18);color:#ef4444;}
+.panel-body{overflow-y:auto;flex:1;padding:.55rem;}
+.panel-body::-webkit-scrollbar{width:3px;}
+.panel-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px;}
+.panel-empty{text-align:center;color:rgba(255,255,255,.22);font-size:.78rem;padding:1.8rem 0;}
+.sel-item{
+    display:flex;align-items:center;
+    padding:.48rem .58rem;margin-bottom:.3rem;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:9px;transition:all .25s;animation:itemIn .25s ease;
+}
+@keyframes itemIn{from{transform:translateX(14px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.sel-item.passed {background:rgba(16,185,129,.28);border-color:rgba(16,185,129,.6);box-shadow:inset 3px 0 0 #10b981;}
+.sel-item.punished{background:rgba(239,68,68,.28); border-color:rgba(239,68,68,.6); box-shadow:inset 3px 0 0 #ef4444;}
+.sel-num{min-width:20px;height:20px;background:rgba(99,102,241,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;margin-right:.48rem;flex-shrink:0;}
+.sel-name{flex:1;font-size:.86rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sel-btns{display:flex;gap:.2rem;margin-left:.3rem;flex-shrink:0;}
+.sel-btn{padding:.14rem .4rem;border:none;border-radius:5px;color:#fff;cursor:pointer;font-size:.62rem;font-weight:700;transition:all .18s;font-family:inherit;}
+.sel-btn-pass  {background:rgba(16,185,129,.65);} .sel-btn-pass:hover  {background:#10b981;transform:scale(1.08);}
+.sel-btn-punish{background:rgba(239,68,68,.65);}  .sel-btn-punish:hover{background:#ef4444;transform:scale(1.08);}
+
+/* ══ 页面布局 ══ */
+.page{
+    position:relative;z-index:1;
+    display:flex;flex-direction:column;
+    height:100vh;align-items:center;
+}
+
+/* 顶栏 */
+.header{
+    display:flex;align-items:center;gap:1rem;
+    padding:1rem 2rem .5rem;flex-shrink:0;
+}
+.logo{width:44px;height:44px;border-radius:10px;box-shadow:0 0 18px rgba(99,102,241,.55);}
+.site-title{
+    font-size:2rem;font-weight:900;letter-spacing:3px;
+    background:linear-gradient(135deg,#fff 0%,#a5b4fc 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* 球体区域 */
+.sphere-area{
+    flex:1;min-height:0;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;width:100%;
+}
+/* 背景光晕 */
+.sphere-glow{
+    position:absolute;
+    width:640px;height:640px;border-radius:50%;
+    background:radial-gradient(circle,
+        rgba(99,102,241,.18) 0%,
+        rgba(139,92,246,.08) 40%,
+        rgba(99,102,241,.03) 60%,
+        transparent 72%);
+    pointer-events:none;transition:all .6s;
+}
+.sphere-glow.rolling{
+    background:radial-gradient(circle,
+        rgba(245,158,11,.22) 0%,
+        rgba(239,68,68,.08) 35%,
+        rgba(99,102,241,.04) 60%,
+        transparent 72%);
+    animation:glowBreath 1.2s ease infinite;
+}
+@keyframes glowBreath{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.09);opacity:1;}}
+
+/* 球体轨道圈（纯装饰） */
+.sphere-ring{
+    position:absolute;
+    border-radius:50%;border:1px solid rgba(99,102,241,.12);
+    pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.ring1{width:500px;height:500px;}
+.ring2{width:580px;height:580px;border-color:rgba(99,102,241,.06);}
+.ring3{width:420px;height:420px;border-color:rgba(165,180,252,.08);}
+
+/* 球体场景容器 */
+#scene{
+    position:relative;
+    width:560px;height:560px;
+    flex-shrink:0;
+}
+/* 空状态提示 */
+.sphere-hint{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;color:rgba(255,255,255,.22);
+    pointer-events:none;
+}
+.sphere-hint .hi{font-size:3rem;margin-bottom:.5rem;}
+.sphere-hint p{font-size:.85rem;line-height:1.6;}
+
+/* 名字标签（位置由JS控制） */
+.name-tag{
+    position:absolute;
+    white-space:nowrap;
+    cursor:default;pointer-events:none;
+    transform:translate(-50%,-50%);
+    will-change:opacity,font-size,left,top,color;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:.05em;
+}
+.name-tag.lit{
+    color:#fde68a !important;
+    text-shadow:
+        0 0 10px rgba(253,230,138,.9),
+        0 0 22px rgba(245,158,11,.7),
+        0 0 45px rgba(245,158,11,.35) !important;
+    font-weight:800 !important;
+}
+.name-tag.winner{
+    color:#fff !important;
+    text-shadow:
+        0 0 14px rgba(255,255,255,1),
+        0 0 30px rgba(165,180,252,.9),
+        0 0 60px rgba(99,102,241,.7) !important;
+    font-weight:900 !important;
+}
+
+/* ══ 底部控制栏 ══ */
+.bottom-bar{
+    flex-shrink:0;
+    width:100%;max-width:840px;
+    padding:.5rem 1.2rem 1.2rem;
+}
+
+/* 上传行 */
+.upload-row{
+    display:flex;align-items:center;gap:.6rem;
+    flex-wrap:wrap;margin-bottom:.75rem;
+}
+.upload-btn{
+    display:flex;align-items:center;gap:.45rem;
+    padding:.42rem 1rem;
+    background:rgba(255,255,255,.07);
+    border:1.5px dashed rgba(255,255,255,.22);
+    border-radius:9px;color:rgba(255,255,255,.7);
+    cursor:pointer;font-size:.82rem;font-family:inherit;
+    transition:all .25s;white-space:nowrap;flex-shrink:0;
+}
+.upload-btn:hover{border-color:var(--primary);background:rgba(99,102,241,.1);color:#fff;}
+.upload-btn.drag-on{
+    border-color:#a5b4fc;border-style:solid;
+    background:rgba(99,102,241,.15);
+    animation:chipPulse 1s ease infinite;
+}
+@keyframes chipPulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.4);}50%{box-shadow:0 0 0 6px rgba(99,102,241,0);}}
+
+/* 文件 chip */
+.file-chip{
+    display:flex;align-items:center;gap:.35rem;
+    padding:.26rem .68rem;
+    background:rgba(99,102,241,.18);
+    border:1px solid rgba(99,102,241,.38);
+    border-radius:20px;font-size:.76rem;color:#a5b4fc;
+    animation:chipIn .22s ease;
+}
+@keyframes chipIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+.chip-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chip-cnt{color:rgba(165,180,252,.6);font-size:.7rem;}
+.chip-del{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:.82rem;line-height:1;padding:0;transition:color .18s;}
+.chip-del:hover{color:#ef4444;}
+
+/* 控制行 */
+.ctrl-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.stats-strip{
+    display:flex;gap:1.1rem;margin-right:auto;
+    font-size:.8rem;color:rgba(255,255,255,.45);
+}
+.stats-strip strong{color:#fff;font-size:.95rem;}
+
+.btn{
+    padding:.6rem 1.7rem;border:none;border-radius:50px;
+    font-size:.92rem;font-weight:700;cursor:pointer;
+    font-family:inherit;transition:all .25s;letter-spacing:.5px;
+}
+.btn-primary{
+    background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;
+    box-shadow:0 4px 16px rgba(99,102,241,.4);
+}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.5);}
+.btn-primary.rolling{
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+    box-shadow:0 4px 16px rgba(239,68,68,.4);
+    animation:btnPulse .9s ease infinite;
+}
+@keyframes btnPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+.btn-primary:disabled{background:rgba(255,255,255,.1);color:rgba(255,255,255,.28);cursor:not-allowed;box-shadow:none;animation:none;transform:none!important;}
+.btn-ghost{background:rgba(255,255,255,.07);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.11);padding:.6rem 1.1rem;}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff;transform:translateY(-2px);}
+
+.opt-row{display:flex;align-items:center;gap:.42rem;font-size:.78rem;color:rgba(255,255,255,.4);}
+.toggle{position:relative;width:32px;height:18px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.16);border-radius:20px;cursor:pointer;transition:.3s;}
+.toggle-slider::before{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
+.toggle input:checked+.toggle-slider{background:var(--primary);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(14px);}
+.key-hint{font-size:.7rem;color:rgba(255,255,255,.2);}
+.kbd{display:inline-block;padding:.03rem .38rem;border:1px solid rgba(255,255,255,.16);border-radius:4px;font-size:.67rem;background:rgba(255,255,255,.06);}
+
+/* ══ 列选择器 ══ */
+.col-bar{
+    display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+    font-size:.78rem;color:rgba(255,255,255,.5);
+    margin-top:.5rem;
+}
+.col-tag{background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.38);border-radius:6px;padding:.06rem .5rem;color:#6ee7b7;font-size:.76rem;}
+.col-warn{color:#fcd34d;font-size:.74rem;}
+.col-chg{background:none;border:none;color:rgba(255,255,255,.32);font-size:.74rem;cursor:pointer;font-family:inherit;text-decoration:underline;transition:color .2s;padding:0;}
+.col-chg:hover{color:rgba(255,255,255,.7);}
+.col-picker{
+    background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);
+    border-radius:10px;padding:.7rem .9rem;
+    display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+    font-size:.78rem;color:rgba(255,255,255,.6);
+    margin-top:.5rem;
+}
+.col-select{
+    flex:1;min-width:160px;
+    background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);
+    border-radius:7px;color:#fff;font-size:.82rem;font-family:inherit;
+    padding:.38rem .65rem;cursor:pointer;outline:none;transition:border-color .2s;
+}
+.col-select:focus{border-color:var(--primary);}
+.col-select option{background:#302b63;color:#fff;}
+.col-ok{padding:.38rem 1rem;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:7px;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;}
+.col-ok:hover{filter:brightness(1.1);transform:translateY(-1px);}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+
+<!-- 结果遮罩 -->
+<div class="result-overlay" id="resultOverlay">
+    <div class="result-name" id="resultName"></div>
+    <div class="result-sub">✨ 恭喜抽中 ✨</div>
+</div>
+
+<!-- 侧边面板 -->
+<div class="side-panel" id="sidePanel">
+    <div class="panel-head" id="panelHead">
+        <div class="panel-title">🎯 已抽取名单 <span class="panel-badge" id="panelBadge">0</span></div>
+        <button class="panel-clr" onclick="clearPanel()">清空</button>
+    </div>
+    <div class="panel-body" id="panelBody">
+        <div class="panel-empty">暂无已抽取记录</div>
+    </div>
+</div>
+
+<!-- 主页面 -->
+<div class="page">
+    <div class="header">
+        <img src="pic/logo2.png" class="logo" alt="" onerror="this.style.display='none'">
+        <h1 class="site-title">叩丁狼幸运大抽奖</h1>
+    </div>
+
+    <!-- 球体 -->
+    <div class="sphere-area">
+        <div class="sphere-glow" id="sphereGlow"></div>
+        <div class="sphere-ring ring1"></div>
+        <div class="sphere-ring ring2"></div>
+        <div class="sphere-ring ring3"></div>
+        <div id="scene">
+            <div class="sphere-hint" id="sphereHint">
+                <div class="hi">🌐</div>
+                <p>上传 Excel 后<br>名字将组成旋转球体</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部控制栏 -->
+    <div class="bottom-bar">
+        <div class="upload-row" id="uploadRow">
+            <button class="upload-btn" id="uploadBtn" onclick="fileInput.click()">
+                📂 上传 Excel（可多选）
+            </button>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" multiple style="display:none">
+            <!-- chips 注入此处 -->
+        </div>
+        <div id="colWrap"></div>
+
+        <div class="ctrl-row">
+            <div class="stats-strip" id="statsStrip" style="display:none">
+                <div>总计 <strong id="sTotal">0</strong></div>
+                <div>已抽 <strong id="sDrawn">0</strong></div>
+                <div>剩余 <strong id="sRemain">0</strong></div>
+            </div>
+            <button class="btn btn-primary" id="startBtn" disabled onclick="toggleRolling()">开始抽取</button>
+            <button class="btn btn-ghost" onclick="resetDrawn()">↺ 重置</button>
+            <div class="opt-row">
+                <label class="toggle"><input type="checkbox" id="excludeToggle" checked><span class="toggle-slider"></span></label>
+                <span>排除已抽</span>
+            </div>
+            <div class="key-hint"><span class="kbd">空格</span></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  常量 & 状态
+// ═══════════════════════════════════════════════
+const SCENE   = 560;   // scene div 边长 px
+const R       = 235;   // 球半径 px
+const FOV     = 600;   // 透视焦距（越小透视感越强）
+const D2R     = Math.PI / 180;
+const CX = SCENE / 2, CY = SCENE / 2;
+
+// 名字色彩调色板（蓝紫青冷色系，与深色背景搭配）
+const TAG_COLORS = [
+    [200,220,255],  // 冷白
+    [165,180,252],  // 浅紫
+    [129,140,248],  // 中紫
+    [103,232,249],  // 青
+    [196,181,253],  // 淡紫
+    [147,197,253],  // 浅蓝
+    [167,243,208],  // 薄荷
+    [253,186,116],  // 暖橙（少量点缀）
+];
+
+let loadedFiles = [];  // [{id, filename, names[]}]
+let nameList    = [];  // 合并后去重名单
+let drawnSet    = new Set();
+let drawnCount  = 0;
+let isRolling   = false;
+let currentName = '';
+
+// 球体
+let tags       = [];     // [{el, name, x0,y0,z0}]
+let rotYDeg    = 0;
+const rotXDeg  = 11;
+let spinDeg    = 0.22;   // °/frame
+let targetSpd  = 0.22;
+let litSet     = new Set();
+let litTimer   = null;
+let frameN     = 0;
+let rafId      = null;
+
+// ═══════════════════════════════════════════════
+//  星空
+// ═══════════════════════════════════════════════
+(function(){
+    const cvs=document.getElementById('stars');
+    const ctx=cvs.getContext('2d');
+    let stars=[];
+
+    function init(){
+        cvs.width=innerWidth; cvs.height=innerHeight;
+        stars=[];
+        for(let i=0;i<180;i++){
+            stars.push({
+                x:Math.random()*cvs.width,
+                y:Math.random()*cvs.height,
+                r:Math.random()<0.08?1.6:Math.random()<0.3?1.0:0.55,
+                base:Math.random(),          // 基础亮度
+                speed:0.004+Math.random()*0.012,  // 闪烁速度
+                phase:Math.random()*Math.PI*2,
+            });
+        }
+    }
+
+    let t=0;
+    function draw(){
+        t+=0.016;
+        ctx.clearRect(0,0,cvs.width,cvs.height);
+        stars.forEach(s=>{
+            const a = s.base*0.4 + 0.3*Math.sin(t*s.speed*60+s.phase)*s.base + 0.1;
+            ctx.beginPath();
+            ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+            ctx.fillStyle=`rgba(255,255,255,${Math.min(1,Math.max(0,a))})`;
+            ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+
+    init();
+    window.addEventListener('resize',init);
+    draw();
+})();
+
+// ═══════════════════════════════════════════════
+//  面板拖拽
+// ═══════════════════════════════════════════════
+(function(){
+    const panel=document.getElementById('sidePanel');
+    const head =document.getElementById('panelHead');
+    let drag=false,ox=0,oy=0;
+    head.addEventListener('mousedown',e=>{
+        drag=true;
+        const r=panel.getBoundingClientRect();
+        ox=e.clientX-r.left; oy=e.clientY-r.top;
+        panel.style.transition='none';
+    });
+    document.addEventListener('mousemove',e=>{
+        if(!drag)return;
+        let x=Math.max(0,Math.min(innerWidth -panel.offsetWidth, e.clientX-ox));
+        let y=Math.max(0,Math.min(innerHeight-panel.offsetHeight,e.clientY-oy));
+        panel.style.right='auto'; panel.style.left=x+'px'; panel.style.top=y+'px';
+    });
+    document.addEventListener('mouseup',()=>{ drag=false; panel.style.transition=''; });
+})();
+
+// ═══════════════════════════════════════════════
+//  全页拖拽上传
+// ═══════════════════════════════════════════════
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+
+document.addEventListener('dragover', e => { e.preventDefault(); uploadBtn.classList.add('drag-on'); });
+document.addEventListener('dragleave', e => { if(!document.contains(e.relatedTarget)) uploadBtn.classList.remove('drag-on'); });
+document.addEventListener('drop', e => {
+    e.preventDefault(); uploadBtn.classList.remove('drag-on');
+    const files = [...e.dataTransfer.files].filter(f=>/\.(xlsx|xls)$/i.test(f.name));
+    if(!files.length){ showToast('⚠️ 请拖入 .xlsx 或 .xls 文件'); return; }
+    files.forEach(parseExcel);
+});
+fileInput.addEventListener('change', e => {
+    [...e.target.files].forEach(parseExcel);
+    fileInput.value='';
+});
+
+// ═══════════════════════════════════════════════
+//  多文件 Excel 解析
+// ═══════════════════════════════════════════════
+let _pendingWS=null, _pendingRange=null, _pendingFilename='';
+const NAME_KEYS=['姓名','名字','学生','姓氏','学员','称呼','name'];
+const CH_NAME  =/^[一-龥·•]{2,6}$/;
+
+function parseExcel(file){
+    const reader=new FileReader();
+    reader.onload=e=>{
+        try{
+            const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+            const ws=wb.Sheets[wb.SheetNames[0]];
+            const range=XLSX.utils.decode_range(ws['!ref']);
+            _pendingWS=ws; _pendingRange=range; _pendingFilename=file.name;
+            const {col,method,confidence}=detectCol(ws,range);
+            applyCol(col,method,confidence);
+        }catch(err){ showToast('❌ 解析失败：'+file.name); console.error(err); }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function detectCol(ws,range){
+    for(let c=range.s.c;c<=range.e.c;c++){
+        const cell=ws[XLSX.utils.encode_cell({r:range.s.r,c})];
+        if(cell && NAME_KEYS.some(k=>String(cell.v).toLowerCase().includes(k.toLowerCase())))
+            return {col:c,method:'keyword',confidence:1};
+    }
+    let bestCol=range.s.c,bestScore=-1;
+    const end=Math.min(range.e.r,range.s.r+30);
+    for(let c=range.s.c;c<=range.e.c;c++){
+        let hit=0,tot=0;
+        for(let r=range.s.r+1;r<=end;r++){
+            const cell=ws[XLSX.utils.encode_cell({r,c})];
+            if(!cell||!cell.v)continue; tot++;
+            if(CH_NAME.test(String(cell.v).trim()))hit++;
+        }
+        const ratio=tot>0?hit/tot:0;
+        if(ratio>bestScore){bestScore=ratio;bestCol=c;}
+    }
+    return {col:bestCol,method:'heuristic',confidence:bestScore};
+}
+
+function getHeaders(ws,range){
+    const h=[];
+    for(let c=range.s.c;c<=range.e.c;c++){
+        const cell=ws[XLSX.utils.encode_cell({r:range.s.r,c})];
+        h.push({col:c,label:cell?String(cell.v).trim():`第${c+1}列`});
+    }
+    return h;
+}
+
+function applyCol(col,method,confidence){
+    const ws=_pendingWS, range=_pendingRange, fn=_pendingFilename;
+    const names=[];
+    for(let r=range.s.r;r<=range.e.r;r++){
+        const cell=ws[XLSX.utils.encode_cell({r,c:col})];
+        if(!cell||!cell.v)continue;
+        const v=String(cell.v).trim();
+        if(v && !NAME_KEYS.some(k=>v.toLowerCase()===k.toLowerCase())) names.push(v);
+    }
+    if(!names.length){ showToast('⚠️ 该列无有效数据，请换列'); showColPicker(col); return; }
+
+    const id=Date.now()+'_'+Math.random().toString(36).slice(2);
+    loadedFiles.push({id,filename:fn,names,col,ws,range});
+    mergeNames();
+
+    const headers=getHeaders(ws,range);
+    const label=headers.find(h=>h.col===col)?.label||`第${col+1}列`;
+    renderChips();
+
+    if(confidence<0.5){ showToast('⚠️ 置信度低，请确认姓名列'); showColPicker(col,id); }
+    else { showToast(`✅ 已加载「${fn}」${names.length} 人（列：${label}）`); hideColWrap(); }
+}
+
+function showColPicker(currentCol, fileId){
+    const ws=_pendingWS, range=_pendingRange;
+    const headers=getHeaders(ws,range);
+    const opts=headers.map(h=>`<option value="${h.col}"${h.col===currentCol?' selected':''}>${h.label.length?'第'+(h.col+1)+'列：'+h.label:'第'+(h.col+1)+'列'}</option>`).join('');
+    document.getElementById('colWrap').innerHTML=`
+        <div class="col-picker">
+            📋 选择姓名列：
+            <select class="col-select" id="colSel">${opts}</select>
+            <button class="col-ok" onclick="confirmCol('${fileId||''}')">确认</button>
+        </div>`;
+}
+function hideColWrap(){ document.getElementById('colWrap').innerHTML=''; }
+function confirmCol(oldId){
+    const sel=document.getElementById('colSel'); if(!sel)return;
+    // 若已有这个文件的记录，先移除再重新添加
+    if(oldId) loadedFiles=loadedFiles.filter(f=>f.id!==oldId);
+    applyCol(parseInt(sel.value,10),'manual',1);
+}
+
+// ═══════════════════════════════════════════════
+//  合并名单 & 渲染
+// ═══════════════════════════════════════════════
+function mergeNames(){
+    const all=loadedFiles.flatMap(f=>f.names);
+    // 保持顺序，去重
+    nameList=[...new Set(all)];
+    drawnSet.clear(); drawnCount=0;
+    document.getElementById('panelBody').innerHTML='<div class="panel-empty">暂无已抽取记录</div>';
+    document.getElementById('panelBadge').textContent='0';
+    refreshStats();
+    buildSphere();
+    document.getElementById('startBtn').disabled=nameList.length===0;
+    if(nameList.length) updateNameDisplay('点击开始抽取');
+}
+
+function renderChips(){
+    const row=document.getElementById('uploadRow');
+    row.querySelectorAll('.file-chip').forEach(e=>e.remove());
+    loadedFiles.forEach(f=>{
+        const chip=document.createElement('div');
+        chip.className='file-chip';
+        chip.innerHTML=`<span class="chip-name" title="${f.filename}">${f.filename}</span><span class="chip-cnt">${f.names.length}人</span><button class="chip-del" onclick="removeFile('${f.id}')">×</button>`;
+        row.appendChild(chip);
+    });
+    document.getElementById('statsStrip').style.display=loadedFiles.length?'flex':'none';
+}
+
+function removeFile(id){
+    loadedFiles=loadedFiles.filter(f=>f.id!==id);
+    renderChips();
+    mergeNames();
+    showToast('已移除文件');
+}
+
+// ═══════════════════════════════════════════════
+//  球体构建
+// ═══════════════════════════════════════════════
+function buildSphere(){
+    const scene=document.getElementById('scene');
+    scene.querySelectorAll('.name-tag').forEach(e=>e.remove());
+    tags=[];
+    const hint=document.getElementById('sphereHint');
+    hint.style.display=nameList.length?'none':'block';
+    if(!nameList.length)return;
+
+    const N=Math.min(nameList.length,90);
+    // 基础字号：更大，保证可读
+    const baseFs = N<=12?26 : N<=20?22 : N<=35?18 : N<=55?15 : 13;
+    const golden=Math.PI*(3-Math.sqrt(5)); // 黄金角
+
+    for(let i=0;i<N;i++){
+        const y =1-(2*i+1)/N;
+        const rr=Math.sqrt(Math.max(0,1-y*y));
+        const th=golden*i;
+        const x0=Math.cos(th)*rr, z0=Math.sin(th)*rr, y0=y;
+
+        // 从调色板分配颜色（均匀分散）
+        const rgb = TAG_COLORS[i % TAG_COLORS.length];
+
+        const el=document.createElement('span');
+        el.className='name-tag';
+        el.textContent=nameList[i];
+        scene.appendChild(el);
+        tags.push({el, name:nameList[i], x0, y0, z0, baseFs, rgb});
+    }
+}
+
+// ═══════════════════════════════════════════════
+//  动画主循环
+// ═══════════════════════════════════════════════
+function tick(){
+    frameN++;
+    spinDeg += (targetSpd-spinDeg)*0.038;
+    rotYDeg += spinDeg;
+
+    const ry=rotYDeg*D2R, rx=rotXDeg*D2R;
+    const cosY=Math.cos(ry),sinY=Math.sin(ry);
+    const cosX=Math.cos(rx),sinX=Math.sin(rx);
+
+    // 每帧都更新（标签少，性能OK）
+    tags.forEach(t=>{
+        // 绕Y轴旋转
+        const x1= t.x0*cosY + t.z0*sinY;
+        const y1= t.y0;
+        const z1=-t.x0*sinY + t.z0*cosY;
+        // 绕X轴倾斜
+        const x2= x1;
+        const y2= y1*cosX - z1*sinX;
+        const z2= y1*sinX + z1*cosX;
+
+        // 透视投影
+        const scale = FOV/(FOV + z2*R);
+        const sx = CX + x2*R*scale;
+        const sy = CY + y2*R*scale;
+        const depth=(z2+1)/2; // 0=背面 1=正面
+
+        const isLit   = litSet.has(t.name);
+        const visible = depth > 0.08;
+
+        t.el.style.left   = sx+'px';
+        t.el.style.top    = sy+'px';
+        t.el.style.zIndex = visible ? Math.floor(depth*100) : '0';
+
+        // 深度驱动的字号：正面最大，背面最小，视觉纵深感强
+        const dynFs = (t.baseFs * (0.45 + 0.75 * depth)).toFixed(1);
+
+        if(!visible){
+            t.el.style.opacity='0';
+            t.el.style.fontSize = dynFs+'px';
+        } else if(isLit){
+            t.el.style.opacity='1';
+            t.el.style.fontSize = (t.baseFs*1.2).toFixed(1)+'px';
+            // color & shadow handled by .lit class
+        } else {
+            // 深度驱动透明度：背面更暗
+            const op = Math.min(1, 0.08 + 0.92*depth);
+            t.el.style.opacity = op.toFixed(3);
+            t.el.style.fontSize = dynFs+'px';
+
+            // 深度驱动字重
+            t.el.style.fontWeight = depth > 0.75 ? '700' : depth > 0.45 ? '500' : '400';
+
+            // 彩色 + 深度亮度：正面亮，背面暗淡
+            const [r,g,b] = t.rgb;
+            const bright = 0.25 + 0.75*depth;  // 正面接近原色，背面偏暗
+            t.el.style.color = `rgb(${Math.round(r*bright)},${Math.round(g*bright)},${Math.round(b*bright)})`;
+
+            // 正面发光：分三档
+            if(depth > 0.85){
+                t.el.style.textShadow =
+                    `0 0 10px rgba(${r},${g},${b},.85),`+
+                    `0 0 22px rgba(${r},${g},${b},.45),`+
+                    `0 0 40px rgba(${r},${g},${b},.2)`;
+            } else if(depth > 0.60){
+                t.el.style.textShadow = `0 0 8px rgba(${r},${g},${b},.5)`;
+            } else {
+                t.el.style.textShadow = 'none';
+            }
+        }
+    });
+
+    rafId=requestAnimationFrame(tick);
+}
+
+// 启动/停止循环
+function startLoop(){ if(!rafId) rafId=requestAnimationFrame(tick); }
+function stopLoop() { if(rafId){cancelAnimationFrame(rafId);rafId=null;} }
+startLoop();
+
+// ═══════════════════════════════════════════════
+//  抽取逻辑
+// ═══════════════════════════════════════════════
+function getPool(){
+    const excl=document.getElementById('excludeToggle').checked;
+    return excl && drawnSet.size<nameList.length
+        ? nameList.filter(n=>!drawnSet.has(n))
+        : nameList;
+}
+
+function toggleRolling(){
+    if(document.getElementById('startBtn').disabled)return;
+    isRolling?stopRolling():startRolling();
+}
+
+function startRolling(){
+    const pool=getPool();
+    if(!pool.length){ showToast('🎉 全部抽完！请重置'); return; }
+    isRolling=true;
+    const btn=document.getElementById('startBtn');
+    btn.textContent='停 止'; btn.classList.add('rolling');
+    document.getElementById('sphereGlow').classList.add('rolling');
+    targetSpd=1.6; // 加速旋转
+
+    // 随机点亮名字
+    function flashNames(){
+        if(!isRolling)return;
+        litSet.clear();
+        tags.forEach(t=>t.el.classList.remove('lit'));
+        const pick=shuffle([...tags]).slice(0,Math.min(3,tags.length));
+        pick.forEach(t=>{ litSet.add(t.name); t.el.classList.add('lit'); });
+        currentName=pick[0]?.name||pool[0];
+        litTimer=setTimeout(flashNames,120);
+    }
+    flashNames();
+}
+
+function stopRolling(){
+    isRolling=false;
+    clearTimeout(litTimer);
+    const btn=document.getElementById('startBtn');
+    btn.classList.remove('rolling');
+    document.getElementById('sphereGlow').classList.remove('rolling');
+    targetSpd=0.22; // 减速
+
+    // 清除高亮
+    litSet.clear();
+    tags.forEach(t=>t.el.classList.remove('lit'));
+
+    // 减速缓停：2步
+    const pool=getPool();
+    const steps=[160,340];
+    let i=0;
+    function settle(){
+        if(i<steps.length){
+            currentName=pool[Math.floor(Math.random()*pool.length)];
+            setTimeout(settle,steps[i++]);
+        } else { onResult(); }
+    }
+    settle();
+}
+
+function onResult(){
+    const btn=document.getElementById('startBtn');
+    btn.textContent='再抽一次';
+
+    // 高亮中奖者
+    tags.forEach(t=>{
+        t.el.classList.remove('lit','winner');
+        if(t.name===currentName) t.el.classList.add('winner');
+    });
+
+    // 结果大字
+    showResult(currentName);
+    launchConfetti();
+
+    drawnSet.add(currentName);
+    drawnCount++;
+    refreshStats();
+    addToPanel(currentName,drawnCount);
+
+    setTimeout(()=>{
+        hideResult();
+        tags.forEach(t=>t.el.classList.remove('winner'));
+    },2400);
+}
+
+// ── 结果遮罩 ──
+function showResult(name){
+    const ov=document.getElementById('resultOverlay');
+    const nm=document.getElementById('resultName');
+    nm.style.animation='none'; void nm.offsetWidth;
+    nm.style.animation='resultPop .52s cubic-bezier(.175,.885,.32,1.275) both';
+    nm.textContent=name;
+    ov.classList.add('show');
+}
+function hideResult(){ document.getElementById('resultOverlay').classList.remove('show'); }
+
+// ── 辅助 ──
+function updateNameDisplay(txt){}  // 保留接口，球体模式下不需要文字显示
+
+function resetDrawn(){
+    drawnSet.clear(); refreshStats();
+    showToast('✅ 已重置，可重新抽全部');
+}
+
+function refreshStats(){
+    document.getElementById('sTotal') .textContent=nameList.length;
+    document.getElementById('sDrawn') .textContent=drawnSet.size;
+    document.getElementById('sRemain').textContent=Math.max(0,nameList.length-drawnSet.size);
+}
+
+// ═══════════════════════════════════════════════
+//  侧边面板
+// ═══════════════════════════════════════════════
+function addToPanel(name,num){
+    const body=document.getElementById('panelBody');
+    const emp=body.querySelector('.panel-empty');
+    if(emp)emp.remove();
+    const el=document.createElement('div');
+    el.className='sel-item';
+    el.innerHTML=`<div class="sel-num">${num}</div><div class="sel-name">${name}</div><div class="sel-btns"><button class="sel-btn sel-btn-pass" onclick="markItem(this,'passed')">✓</button><button class="sel-btn sel-btn-punish" onclick="markItem(this,'punished')">✗</button></div>`;
+    body.prepend(el);
+    document.getElementById('panelBadge').textContent=drawnCount;
+}
+function markItem(btn,cls){
+    const it=btn.closest('.sel-item');
+    it.classList.remove('passed','punished'); it.classList.add(cls);
+    showToast(cls==='passed'?'✅ 标记通过':'❌ 标记惩罚');
+}
+function clearPanel(){
+    document.getElementById('panelBody').innerHTML='<div class="panel-empty">暂无已抽取记录</div>';
+    document.getElementById('panelBadge').textContent='0';
+    drawnCount=0; drawnSet.clear(); refreshStats();
+    showToast('已清空记录');
+}
+
+// ═══════════════════════════════════════════════
+//  彩带
+// ═══════════════════════════════════════════════
+(function(){
+    const cvs=document.getElementById('confetti');
+    const ctx=cvs.getContext('2d');
+    let pts=[],raf2=null;
+    function resize(){ cvs.width=innerWidth; cvs.height=innerHeight; }
+    resize(); window.addEventListener('resize',resize);
+    const COLS=['#6366f1','#f59e0b','#10b981','#ef4444','#ec4899','#3b82f6','#a5b4fc','#fcd34d'];
+    window.launchConfetti=function(){
+        const cx=cvs.width/2, cy=cvs.height*.42;
+        for(let i=0;i<130;i++){
+            const a=Math.random()*Math.PI*2, sp=Math.random()*9+3;
+            pts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,
+                color:COLS[Math.floor(Math.random()*COLS.length)],
+                w:Math.random()*9+4,h:Math.random()*5+3,
+                rot:Math.random()*360,rs:(Math.random()-.5)*12,
+                life:1,decay:Math.random()*.013+.008,rect:Math.random()>.45});
+        }
+        if(!raf2)go();
+    };
+    function go(){
+        ctx.clearRect(0,0,cvs.width,cvs.height);
+        pts=pts.filter(p=>p.life>0);
+        pts.forEach(p=>{
+            p.x+=p.vx;p.y+=p.vy;p.vy+=.22;p.vx*=.99;p.rot+=p.rs;p.life-=p.decay;
+            ctx.save();ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;
+            ctx.translate(p.x,p.y);ctx.rotate(p.rot*D2R);
+            if(p.rect) ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+            else{ctx.beginPath();ctx.ellipse(0,0,p.w/2,p.h/2,0,0,Math.PI*2);ctx.fill();}
+            ctx.restore();
+        });
+        raf2=pts.length?requestAnimationFrame(go):null;
+        if(!raf2) ctx.clearRect(0,0,cvs.width,cvs.height);
+    }
+})();
+
+// ═══════════════════════════════════════════════
+//  Toast & 工具
+// ═══════════════════════════════════════════════
+function showToast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(t._t);
+    t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a; }
+
+// ═══════════════════════════════════════════════
+//  键盘快捷键
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+    if((e.code==='Space'||e.code==='Enter')&&e.target===document.body){
+        e.preventDefault();
+        if(!document.getElementById('startBtn').disabled) toggleRolling();
+    }
+});
+</script>
+</body>
+</html>
