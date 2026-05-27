@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
+<title>STM32 智慧垃圾桶实训教学文档 · 沈阳航空航天大学</title>
+<style>
+:root{
+  --blue:#1976D2;--blue-light:#E3F2FD;--green:#388E3C;--green-light:#E8F5E9;
+  --orange:#F57C00;--orange-light:#FFF3E0;--red:#C62828;--red-light:#FFEBEE;
+  --purple:#6A1B9A;--purple-light:#F3E5F5;--teal:#00796B;--teal-light:#E0F2F1;
+  --gray:#455A64;--gray-light:#ECEFF1;--bg:#F5F7FA;--white:#fff;
+  --shadow:0 2px 12px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft YaHei',Arial,sans-serif;background:var(--bg);color:#263238;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#1565C0,#0D47A1);color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,.25);gap:16px}
+nav .logo{font-size:16px;font-weight:700;white-space:nowrap;flex-shrink:0}
+nav .tabs{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav .tabs button{background:transparent;border:none;color:rgba(255,255,255,.75);padding:8px 13px;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;transition:.2s;font-family:inherit}
+nav .tabs button.active,nav .tabs button:hover{background:rgba(255,255,255,.18);color:#fff}
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);padding:24px;margin-bottom:20px}
+.card h2{font-size:19px;color:var(--blue);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h3{font-size:15px;color:var(--gray);margin:16px 0 10px;font-weight:700}
+.hero{background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 40%,#388E3C 100%);color:#fff;border-radius:16px;padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-50px;top:-50px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.9;max-width:660px;line-height:1.8}
+.hero .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.hero .tag{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:12px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:8px;font-size:13px;font-weight:600}
+.badge.blue{background:var(--blue-light);color:var(--blue)}
+.badge.green{background:var(--green-light);color:var(--green)}
+.badge.orange{background:var(--orange-light);color:var(--orange)}
+.badge.red{background:var(--red-light);color:var(--red)}
+.badge.purple{background:var(--purple-light);color:var(--purple)}
+.badge.teal{background:var(--teal-light);color:var(--teal)}
+.badge.gray{background:var(--gray-light);color:var(--gray)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th{background:var(--blue);color:#fff;padding:10px 12px;text-align:left}
+td{padding:9px 12px;border-bottom:1px solid #e8ecf0;vertical-align:top}
+tr:nth-child(even) td{background:#f7f9fc}
+tr:hover td{background:var(--blue-light)}
+.tip{border-left:4px solid;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:14px;line-height:1.7}
+.tip.blue{border-color:var(--blue);background:var(--blue-light)}
+.tip.green{border-color:var(--green);background:var(--green-light)}
+.tip.orange{border-color:var(--orange);background:var(--orange-light)}
+.tip.red{border-color:var(--red);background:var(--red-light)}
+.tip.purple{border-color:var(--purple);background:var(--purple-light)}
+.tip.teal{border-color:var(--teal);background:var(--teal-light)}
+.tip strong{display:block;margin-bottom:4px}
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:14px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-num{counter-increment:step;min-width:34px;height:34px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-num::before{content:counter(step)}
+.step-body{flex:1;padding-top:4px}
+.step-body h4{font-size:14px;font-weight:700;margin-bottom:4px;color:#1a237e}
+.step-body p{font-size:13px;color:#546e7a}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.mini-card{background:var(--white);border:1px solid #e0e0e0;border-radius:10px;padding:16px}
+.mini-card h4{font-size:14px;font-weight:700;margin-bottom:8px}
+.progress-bar{background:#e0e0e0;border-radius:10px;height:8px;margin:6px 0}
+.progress-bar .fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--green))}
+.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.day-tab{padding:8px 18px;border:2px solid var(--blue);border-radius:8px;background:#fff;color:var(--blue);cursor:pointer;font-weight:600;font-size:13px;transition:.2s;font-family:inherit}
+.day-tab.active{background:var(--blue);color:#fff}
+.day-tab:hover:not(.active){background:var(--blue-light)}
+.day-content{display:none}
+.day-content.active{display:block}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:14px 0}
+.flow-node{background:var(--blue);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;min-width:88px;line-height:1.4}
+.flow-node.green{background:var(--green)}
+.flow-node.orange{background:var(--orange)}
+.flow-node.purple{background:var(--purple)}
+.flow-node.red{background:var(--red)}
+.flow-node.teal{background:var(--teal)}
+.flow-node.gray{background:var(--gray)}
+.flow-arrow{padding:0 8px;color:#90A4AE;font-size:20px;font-weight:700}
+/* 练习卡片 */
+.hw-card{border:2px solid var(--orange);border-radius:10px;padding:18px;margin:12px 0;background:#FFFDE7}
+.hw-card h4{color:var(--orange);font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.hw-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #FFE082;font-size:14px}
+.hw-item:last-child{border-bottom:none}
+.hw-badge{min-width:52px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;text-align:center;flex-shrink:0;margin-top:2px}
+.hw-badge.basic{background:#C8E6C9;color:#1B5E20}
+.hw-badge.advance{background:#BBDEFB;color:#0D47A1}
+.hw-badge.challenge{background:#F8BBD9;color:#880E4F}
+/* 知识点标签 */
+.kp-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.kp-tag{background:var(--blue-light);color:var(--blue);border:1px solid #90CAF9;border-radius:6px;padding:5px 12px;font-size:13px}
+/* 状态机图 */
+.state-box{background:var(--white);border:2px solid;border-radius:10px;padding:12px 16px;text-align:center;min-width:120px}
+.state-box.idle{border-color:var(--blue);color:var(--blue)}
+.state-box.open{border-color:var(--green);color:var(--green)}
+.state-box.full{border-color:var(--red);color:var(--red)}
+.state-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+/* 接线表 */
+.wire-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #e8ecf0;font-size:14px}
+.wire-row .module{font-weight:700;min-width:100px}
+.wire-row .pin-tag{background:#1E2A3A;color:#64B5F6;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:13px}
+.wire-row .stm-tag{background:#1B5E20;color:#A5D6A7;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:13px}
+/* 评分表 */
+.score-bar{height:20px;border-radius:4px;display:flex;align-items:center;padding-left:8px;color:#fff;font-size:12px;font-weight:700;margin:4px 0}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🗑️ STM32 智慧垃圾桶实训</div>
+  <div class="tabs">
+    <button class="active" onclick="showSection('overview',this)">🏠 课程总览</button>
+    <button onclick="showSection('plan',this)">📅 教学计划</button>
+    <button onclick="showSection('hardware',this)">🔧 硬件连接</button>
+    <button onclick="showSection('project',this)">🗑️ 项目说明</button>
+    <button onclick="showSection('defense',this)">🎤 答辩要求</button>
+    <button onclick="showSection('tips',this)">💡 教学建议</button>
+  </div>
+</nav>
+
+<!-- ══════════════ OVERVIEW ══════════════ -->
+<div id="section-overview" class="section active">
+<div class="container">
+
+<div class="hero">
+  <h1>🗑️ STM32F407 智慧垃圾桶 · 嵌入式实训课程</h1>
+  <p>从零开始，纯手敲标准库代码，10天掌握嵌入式开发核心技能，完成具有传感器感知、PWM控制、串口通信的智能垃圾桶项目。</p>
+  <div class="tags">
+    <span class="tag">⚙️ STM32F407ZET6</span>
+    <span class="tag">📚 标准库开发</span>
+    <span class="tag">🖊️ 纯手敲代码</span>
+    <span class="tag">🦾 舵机 SG90</span>
+    <span class="tag">📡 HC-SR04 超声波</span>
+    <span class="tag">🧍 PIR 人体感应</span>
+    <span class="tag">📶 USART 串口</span>
+    <span class="tag">⚡ PWM 控制</span>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="card">
+    <h2>🎯 课程目标</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>GPIO 数字输入输出</h4><p>LED 驱动、按键消抖、模块化驱动架构</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>中断与定时器</h4><p>EXTI 外部中断、TIM6 定时中断、NVIC 配置</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>串口通信</h4><p>USART 收发、printf 重定向、命令解析</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>PWM 与执行器</h4><p>硬件 PWM、舵机控制、蜂鸣器</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>传感器集成</h4><p>PIR 人体感应、HC-SR04 超声波测距</p></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📅 学习路径</h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day1 GPIO · LED 入门</span><span style="color:var(--blue)">基础</span></div><div class="progress-bar"><div class="fill" style="width:100%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day2 模块化驱动 · 延时</span><span style="color:var(--blue)">基础</span></div><div class="progress-bar"><div class="fill" style="width:100%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day3 按键输入 · 消抖</span><span style="color:var(--green)">基础</span></div><div class="progress-bar"><div class="fill" style="width:80%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day4 密码锁 · SysTick</span><span style="color:var(--green)">进阶</span></div><div class="progress-bar"><div class="fill" style="width:80%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day5 EXTI 外部中断</span><span style="color:var(--orange)">进阶</span></div><div class="progress-bar"><div class="fill" style="width:60%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day6 USART 串口通信</span><span style="color:var(--orange)">进阶</span></div><div class="progress-bar"><div class="fill" style="width:60%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day7 定时器 TIM6</span><span style="color:var(--purple)">核心</span></div><div class="progress-bar"><div class="fill" style="width:40%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day8 硬件PWM · 舵机</span><span style="color:var(--purple)">核心</span></div><div class="progress-bar"><div class="fill" style="width:40%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day9 传感器 · 系统集成</span><span style="color:var(--red)">综合</span></div><div class="progress-bar"><div class="fill" style="width:20%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day10 项目答辩</span><span style="color:var(--red)">综合</span></div><div class="progress-bar"><div class="fill" style="width:20%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🧰 硬件清单</h2>
+    <table>
+      <tr><th>模块</th><th>用途</th></tr>
+      <tr><td>STM32F407ZET6</td><td>主控芯片</td></tr>
+      <tr><td>LED × 4</td><td>状态指示灯</td></tr>
+      <tr><td>轻触按键 × 4</td><td>手动控制输入</td></tr>
+      <tr><td>SG90 舵机</td><td>桶盖开关</td></tr>
+      <tr><td>HC-SR04</td><td>超声波测距（满桶检测）</td></tr>
+      <tr><td>HC-SR501 PIR</td><td>人体红外感应</td></tr>
+      <tr><td>蜂鸣器</td><td>满桶报警</td></tr>
+      <tr><td>USB-TTL 模块</td><td>串口调试</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🔄 系统功能流程</h2>
+  <div style="overflow-x:auto;padding:8px 0">
+    <div class="flow" style="min-width:700px;flex-wrap:nowrap;justify-content:center">
+      <div class="flow-node purple">🧍 PIR<br><small>人体感应</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">⚙️ STM32<br><small>判断状态</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">🦾 舵机<br><small>开盖 180°</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node orange">⏱️ 等待<br><small>3 秒</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node teal">🦾 舵机<br><small>关盖 0°</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node gray">📡 超声波<br><small>测垃圾量</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node red">🔔 满桶<br><small>报警</small></div>
+    </div>
+  </div>
+  <div class="tip blue" style="margin-top:12px"><strong>💡 项目核心逻辑</strong>空闲时LED呼吸灯待机 → 检测到人自动开盖 → 关盖后超声波检测垃圾量 → 满桶时蜂鸣器报警并锁定（不响应人体感应）→ 按键手动清空解锁。串口实时输出垃圾桶状态。</div>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ PLAN ══════════════ -->
+<div id="section-plan" class="section">
+<div class="container">
+
+<div class="card">
+  <h2>📅 十天教学计划</h2>
+  <div class="day-tabs">
+    <button class="day-tab active" onclick="showDay('d1',this)">Day 1</button>
+    <button class="day-tab" onclick="showDay('d2',this)">Day 2</button>
+    <button class="day-tab" onclick="showDay('d3',this)">Day 3</button>
+    <button class="day-tab" onclick="showDay('d4',this)">Day 4</button>
+    <button class="day-tab" onclick="showDay('d5',this)">Day 5</button>
+    <button class="day-tab" onclick="showDay('d6',this)">Day 6</button>
+    <button class="day-tab" onclick="showDay('d7',this)">Day 7</button>
+    <button class="day-tab" onclick="showDay('d8',this)">Day 8</button>
+    <button class="day-tab" onclick="showDay('d9',this)">Day 9</button>
+    <button class="day-tab" onclick="showDay('d10',this)">Day 10</button>
+  </div>
+
+  <!-- ── DAY 1 ── -->
+  <div id="day-d1" class="day-content active">
+    <div class="badge-row">
+      <span class="badge blue">Day 1</span>
+      <span class="badge green">🎯 STM32 入门 · GPIO 输出 · LED 闪烁</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解 STM32F407ZET6 芯片命名规则和核心参数</li>
+          <li>完成 Keil MDK 工程创建（含标准库配置）</li>
+          <li>理解 RCC 时钟使能的含义和必要性</li>
+          <li>掌握 GPIO_InitTypeDef 三要素：Pin、Mode、OType</li>
+          <li>独立编写 LED 闪烁程序并下载验证</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>STM32 简介、芯片命名、Keil 工程创建全流程</td></tr>
+          <tr><td>上午 2h</td><td>RCC 时钟系统、GPIO 工作模式讲解</td></tr>
+          <tr><td>下午 2h</td><td>手敲 LED 闪烁代码、编译下载、排查错误</td></tr>
+          <tr><td>下午 2h</td><td>课堂练习 + 讲解常见错误</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">芯片命名规则</span>
+          <span class="kp-tag">AHB1 总线</span>
+          <span class="kp-tag">RCC_AHB1PeriphClockCmd</span>
+          <span class="kp-tag">GPIO_Mode_OUT</span>
+          <span class="kp-tag">GPIO_OType_PP 推挽</span>
+          <span class="kp-tag">GPIO_SetBits / ResetBits</span>
+          <span class="kp-tag">while(1) 主循环</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① LED1 以约 500ms 间隔规律闪烁<br>
+          ② 代码能重新编译、下载，板子重启后自动运行<br>
+          ③ 能说出：为什么使用 GPIO 前要先调用 RCC 函数？
+        </div>
+        <h3>⚠️ 常见错误提示</h3>
+        <div class="tip orange">
+          <strong>老师重点讲解</strong>
+          · 工程路径含中文 → 编译报奇怪错误<br>
+          · 宏定义 <code>STM32F40_41xxx</code> 漏写 → 头文件找不到<br>
+          · startup 文件选错型号 → 程序无法运行<br>
+          · 忘记 RCC 时钟使能 → GPIO 配置无效
+        </div>
+        <h3>💡 教学建议</h3>
+        <div class="tip blue">
+          先演示老师已做好的完整效果（LED 闪烁），再倒回来讲原理。学生有了感性认识，听理论更专注。Keil 工程创建步骤投影到屏幕逐步操作，学生同步跟做。
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：四灯同步</strong> — 修改代码，让 LED1、2、3、4 同时亮灭，间隔 300ms</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：快慢双灯</strong> — LED1 每 200ms 闪一次，LED2 每 1000ms 闪一次（在一个 while 循环里实现，思考为什么难以精确？）</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：SOS 求救灯</strong> — 用三短三长三短的闪烁模式模拟摩尔斯电码 SOS（· · · — — — · · ·）</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>思考题</strong> — 如果要让 4 个 LED 以不同频率独立闪烁，只用 while(1) + delay 能实现吗？说说你的想法，这个问题在 Day 7 学定时器后会有答案。</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 2 ── -->
+  <div id="day-d2" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 2</span>
+      <span class="badge green">🎯 模块化驱动 · .c/.h 分层 · 延时函数</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解 User / Drivers / System 三层工程架构</li>
+          <li>掌握头文件防重复包含（ifndef / define / endif）</li>
+          <li>用宏定义集中管理引脚信息（换板只改 .h 文件）</li>
+          <li>编写 LED_init()、LED1(x) 操作宏</li>
+          <li>实现流水灯、跑马灯效果函数</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>工程分层思想，创建 LED.c / LED.h 文件</td></tr>
+          <tr><td>上午 2h</td><td>宏定义引脚、操作宏 LED1(x) 讲解</td></tr>
+          <tr><td>下午 2h</td><td>流水灯函数实现，软件延时分析</td></tr>
+          <tr><td>下午 2h</td><td>练习：跑马灯 + 讨论软件延时的缺点</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">#ifndef 防重复包含</span>
+          <span class="kp-tag">#define 宏替换</span>
+          <span class="kp-tag">函数声明 vs 定义</span>
+          <span class="kp-tag">GPIO_ToggleBits</span>
+          <span class="kp-tag">软件延时原理</span>
+          <span class="kp-tag">三层架构思想</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① LED.c / LED.h 文件结构完整，能独立编译<br>
+          ② 流水灯效果在实物上运行正常<br>
+          ③ 能回答：为什么要把引脚定义写在 .h 文件里？
+        </div>
+        <div class="tip orange">
+          <strong>重点强调</strong>
+          宏定义 <code>LED1(x)</code> 是三目运算符的应用：<code>x ? SetBits : ResetBits</code>。调用时 <code>LED1(1)</code> 亮、<code>LED1(0)</code> 灭，像控制一个开关一样直观。
+        </div>
+        <div class="tip blue">
+          <strong>引导讨论</strong>
+          软件 delay 有什么问题？（答：精度差、阻塞 CPU、受编译优化影响）→ 埋下 Day4 学 SysTick 的伏笔。
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：完善 LED 驱动</strong> — 在 LED.c 中实现 LED_liushui()（流水灯）和 LED_paoma()（跑马灯）两个函数，在 main.c 中轮流调用</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：全灭初始化</strong> — LED_init() 结束后确保 4 个 LED 全部熄灭，这是良好的驱动设计习惯</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：换板验证</strong> — 假设把 LED1 从 PG14 改到 PF10，你需要改几行代码、改哪个文件？动手实际修改并验证</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：心跳灯</strong> — 实现"双闪"效果（快闪两次后长暗），模拟心跳节奏，并封装成 LED_heartbeat() 函数</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 3 ── -->
+  <div id="day-d3" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 3</span>
+      <span class="badge green">🎯 按键输入 · GPIO 输入模式 · 软件消抖</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解 GPIO 输入模式与上拉电阻的作用</li>
+          <li>理解机械按键抖动现象和危害</li>
+          <li>掌握"判断→延时→再判断→等待释放"消抖模板</li>
+          <li>实现 4 个按键分别控制 4 个 LED 翻转</li>
+          <li>用 switch-case 简化多键处理逻辑</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>GPIO 输入模式、上拉/下拉原理、读引脚函数</td></tr>
+          <tr><td>上午 2h</td><td>按键抖动演示（示波器/逻辑分析仪），消抖原理</td></tr>
+          <tr><td>下午 2h</td><td>KEY_init() + KEY_scan() 驱动手敲</td></tr>
+          <tr><td>下午 2h</td><td>4键4灯练习，排查接线问题</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">GPIO_Mode_IN</span>
+          <span class="kp-tag">GPIO_PuPd_UP 上拉</span>
+          <span class="kp-tag">GPIO_ReadInputDataBit</span>
+          <span class="kp-tag">按下=低电平（0）</span>
+          <span class="kp-tag">消抖 10ms delay</span>
+          <span class="kp-tag">等待释放 while(!KEY)</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① 按下 KEY1 → LED1 翻转，4 个按键各自控制对应 LED<br>
+          ② 快速按多次，只触发一次（消抖有效）<br>
+          ③ 能画出消抖流程图（5个步骤）
+        </div>
+        <div class="tip orange">
+          <strong>重点强调消抖 5 步套路</strong>
+          ① 检测低电平 → ② 等 10ms → ③ 再次确认 → ④ 执行动作 → ⑤ 等待松手 → ⑥ 再等 10ms。这个套路整个课程都在用，必须背下来！
+        </div>
+        <div class="tip red">
+          <strong>接线注意</strong>
+          按键一端接 GPIO 引脚，另一端接 GND。GPIO 配置上拉输入，空闲时为高电平（1），按下后被 GND 拉低为（0）。接反则无法工作！
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：4 键 4 灯</strong> — KEY1~4 分别控制 LED1~4 翻转，每次按下必须消抖处理</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：组合控制</strong> — KEY1 控制 LED1/LED2，KEY2 控制 LED3/LED4，KEY3 熄灭所有 LED，KEY4 点亮所有 LED</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：长按短按</strong> — 区分 KEY1 的短按（&lt;500ms）和长按（≥500ms）：短按翻转 LED1，长按让所有 LED 闪3次</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：计数器</strong> — KEY1 每按一次，让 LED 用二进制方式显示按了几次（4个LED表示0~15，LED1=最低位），超过15后归零</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 4 ── -->
+  <div id="day-d4" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 4</span>
+      <span class="badge green">🎯 密码锁设计 · SysTick 精确延时</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解 SysTick 定时器原理，实现 delay_us / delay_ms</li>
+          <li>用数组存储 4 位按键密码序列</li>
+          <li>实现密码正确→双闪解锁，密码错误→长亮报错</li>
+          <li>理解状态机的基本概念（等待输入 / 验证 / 反馈）</li>
+          <li>修复原课程密码逻辑 BUG（KEY3/4 未赋值问题）</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>SysTick 原理、delay_us / delay_ms 实现</td></tr>
+          <tr><td>上午 2h</td><td>用数组存密码序列、逐位收集输入</td></tr>
+          <tr><td>下午 2h</td><td>密码验证逻辑 + LED 反馈效果</td></tr>
+          <tr><td>下午 2h</td><td>练习 + BUG 修复讨论</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">SysTick 24位递减计数</span>
+          <span class="kp-tag">SystemCoreClock</span>
+          <span class="kp-tag">delay_us / delay_ms</span>
+          <span class="kp-tag">数组存密码序列</span>
+          <span class="kp-tag">if-else if 完整赋值</span>
+          <span class="kp-tag">状态机初步</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① delay_ms(1000) 实测约 1 秒（手表计时验证）<br>
+          ② 按正确密码序列 → LED 双闪后解锁<br>
+          ③ 按错误密码 → LED 长亮 2 秒提示错误<br>
+          ④ KEY1/2/3/4 的值被正确存入 arr[i]（0/1/2/3）
+        </div>
+        <div class="tip red">
+          <strong>⚠️ 必须修正的 BUG</strong>
+          原课程密码代码只赋值了 KEY1→0，KEY2→1，KEY3 和 KEY4 按下时 arr[i] 未赋值，相当于都是 0，导致密码混乱。本次必须用 if-else if 把 4 个键都赋值！
+        </div>
+        <div class="tip blue">
+          <strong>知识延伸</strong>
+          SysTick 是 Cortex-M 内核自带的，不属于 STM32 外设，所以不需要 RCC 时钟使能。它每隔 1/SystemCoreClock 秒计数一次。
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：密码验证</strong> — 实现 4 位密码锁（KEY1=0, KEY2=1, KEY3=2, KEY4=3），默认密码为 1-0-1-0，正确双闪解锁，错误长亮报错</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：SysTick 测时</strong> — 用 delay_ms(500) 实现精确 500ms 闪烁，并和 Day1 的软件 delay 对比，说出差异</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：密码修改功能</strong> — 解锁成功后，再按 KEY4 进入"设置新密码"模式，输入 4 位新密码并保存（存入全局数组），实现动态修改密码</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：3次错误锁定</strong> — 密码连续输错 3 次后，LED 快闪 5 次并进入锁定状态，锁定期间按任何键无效，等待 10 秒后自动解除锁定</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 5 ── -->
+  <div id="day-d5" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 5</span>
+      <span class="badge green">🎯 EXTI 外部中断 · NVIC 优先级 · volatile</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解轮询（Polling）vs 中断（Interrupt）的本质区别</li>
+          <li>掌握 NVIC 优先级组的正确配置方式</li>
+          <li>掌握 EXTI 四步配置法（GPIO→映射→EXTI参数→NVIC）</li>
+          <li>理解 ISR 编写规范：确认→清除→动作</li>
+          <li>用 volatile 全局变量实现 ISR 与主循环的安全通信</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>中断概念、NVIC 优先级组讲解</td></tr>
+          <tr><td>上午 2h</td><td>EXTI 四步配置手敲</td></tr>
+          <tr><td>下午 2h</td><td>ISR 编写、volatile 关键字讲解</td></tr>
+          <tr><td>下午 2h</td><td>练习：中断驱动 LED，对比轮询方式</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">NVIC_PriorityGroupConfig</span>
+          <span class="kp-tag">SYSCFG_EXTILineConfig</span>
+          <span class="kp-tag">EXTI_Trigger_Falling</span>
+          <span class="kp-tag">EXTI_GetITStatus</span>
+          <span class="kp-tag">EXTI_ClearITPendingBit</span>
+          <span class="kp-tag">volatile uint8_t flag</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① 按 KEY1 触发 EXTI2 中断，LED1 翻转<br>
+          ② ISR 中正确清除中断标志（否则反复触发）<br>
+          ③ 主循环同时做其他事（如流水灯），按键打断后继续<br>
+          ④ 能解释：为什么 ISR 中的变量必须加 volatile？
+        </div>
+        <div class="tip red">
+          <strong>⚠️ 修正原课程的错误</strong>
+          原版 EXTI 代码 ISR 里的动作代码全被注释掉了，中断没有任何效果！本次必须在 ISR 里加入 <code>g_flag = 1</code>，并在 main 循环中检测 flag 响应。
+        </div>
+        <div class="tip orange">
+          <strong>必须在 main() 最开头调用一次</strong>
+          NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2)，配置抢占优先级和子优先级各占 2 位。整个程序只能调用一次，且必须在所有中断配置之前！
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：中断翻转灯</strong> — KEY1 接 EXTI2，按下时 LED1 翻转。主循环同时让 LED2 以 200ms 慢闪，观察 LED2 不受按键影响</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：双边沿检测</strong> — 改成同时检测上升沿和下降沿（EXTI_Trigger_Rising_Falling），按下点亮 LED1，松开熄灭 LED1，实现"按住亮"效果</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：中断计数</strong> — 用中断统计 KEY1 被按了多少次，每按 4 次，LED 全部闪烁 2 次庆祝；次数用 printf 输出到串口（串口初始化可参考 Day6）</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：中断优先级实验</strong> — 配置两个 EXTI（KEY1 和 KEY2），分别设置不同抢占优先级。在 KEY1 的 ISR 里加入 2 秒延时，观察 KEY2 能否打断 KEY1 的处理</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 6 ── -->
+  <div id="day-d6" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 6</span>
+      <span class="badge green">🎯 USART 串口通信 · printf 重定向 · 命令解析</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解 UART 协议：波特率、数据位、停止位、校验位</li>
+          <li>掌握 GPIO 复用模式（AF）配置，重定向 printf</li>
+          <li>实现 USART1 中断接收，字符串缓冲区管理</li>
+          <li>用 '.' 或 '\n' 作结束符实现命令帧解析</li>
+          <li>串口发送 "LED1." / "LED2." 控制对应 LED</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>UART 协议讲解，GPIO 复用模式，printf 重定向</td></tr>
+          <tr><td>上午 2h</td><td>Usart1_init() 手敲，串口助手联调</td></tr>
+          <tr><td>下午 2h</td><td>USART 中断接收，缓冲区字符串收集</td></tr>
+          <tr><td>下午 2h</td><td>命令解析函数，串口控制 LED 练习</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">波特率 115200</span>
+          <span class="kp-tag">GPIO_Mode_AF</span>
+          <span class="kp-tag">GPIO_PinAFConfig</span>
+          <span class="kp-tag">fputc 重定向</span>
+          <span class="kp-tag">USART_IT_RXNE</span>
+          <span class="kp-tag">strcmp 命令解析</span>
+          <span class="kp-tag">Use MicroLIB</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① 开机串口打印 "系统启动成功"<br>
+          ② 串口助手发送 "LED1." → LED1 翻转<br>
+          ③ 发送 "LED2." → LED2 翻转，发送 "ALL." → 4灯全翻<br>
+          ④ 发送错误命令 → 串口回复 "未知命令: xxx"
+        </div>
+        <div class="tip red">
+          <strong>⚠️ 修正原课程错误</strong>
+          原课程 USART1_IRQHandler() 函数体为空，学生看不到接收处理逻辑！本次必须完整演示：收到字符存入缓冲区数组，遇到 '.' 后置零并设 cmd_ready=1，主循环调用 parse() 解析。
+        </div>
+        <div class="tip blue">
+          <strong>Keil 配置提醒</strong>
+          Options → Target → 勾选 <strong>Use MicroLIB</strong>，否则 printf 无法重定向。这是最容易忘记的一步！
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：串口控制 LED</strong> — 发送 "LED1." "LED2." "LED3." "LED4." 分别翻转对应 LED；发送 "ALL." 翻转全部</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：状态查询</strong> — 发送 "STATUS." 后，串口返回当前 4 个 LED 的亮灭状态（如 "LED:1010" 表示1亮2灭3亮4灭）</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：串口密码</strong> — 通过串口发送 "PWD:1010." 来解锁（密码正确 LED 双闪，错误单闪）。结合 Day4 的密码锁功能</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：帮助菜单</strong> — 发送 "HELP." 后，串口打印所有支持的命令列表及说明（格式整齐美观，用 \t 对齐），体验"命令行界面"的感觉</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 7 ── -->
+  <div id="day-d7" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 7</span>
+      <span class="badge green">🎯 定时器 TIM6 · 非阻塞定时 · 中断驱动</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解定时器三要素：PSC 预分频、ARR 自动重装、CNT 计数</li>
+          <li>掌握中断频率计算公式（必背！）</li>
+          <li>配置 TIM6 实现 1Hz（每秒一次）更新中断</li>
+          <li>用定时器中断驱动 LED，主循环同时处理其他逻辑</li>
+          <li>理解"非阻塞"设计的重要性</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>定时器原理、PSC/ARR 计算公式推导</td></tr>
+          <tr><td>上午 2h</td><td>TIM6_init() 手敲，NVIC 配置</td></tr>
+          <tr><td>下午 2h</td><td>TIM6_DAC_IRQHandler 编写，1Hz LED 验证</td></tr>
+          <tr><td>下午 2h</td><td>练习：非阻塞多任务（定时器灯 + 串口同时工作）</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">TIM6 在 APB1（84MHz）</span>
+          <span class="kp-tag">频率 = 84M÷(PSC+1)÷(ARR+1)</span>
+          <span class="kp-tag">TIM_IT_Update</span>
+          <span class="kp-tag">TIM_GetITStatus</span>
+          <span class="kp-tag">TIM_ClearITPendingBit</span>
+          <span class="kp-tag">非阻塞设计思想</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① LED1 以精确 1Hz 翻转（串口打印计数验证）<br>
+          ② 主循环同时处理串口命令，两者互不干扰<br>
+          ③ 能推导：PSC=8399, ARR=9999 时的中断频率
+        </div>
+        <div class="tip blue">
+          <strong>⭐ 关键公式（必须记住）</strong><br>
+          中断频率 = TIM时钟 ÷ (PSC＋1) ÷ (ARR＋1)<br>
+          TIM6 时钟：APB1 = 42MHz，但定时器时钟 × 2 = <strong>84MHz</strong><br>
+          84,000,000 ÷ 8400 ÷ 10000 = <strong>1 Hz</strong> ✓
+        </div>
+        <div class="tip orange">
+          <strong>与 Day1 的对比</strong>
+          Day1 用 delay 实现 LED 闪烁，主循环被卡死。今天用定时器中断，LED 由硬件定时翻转，主循环可以自由处理其他事情——这就是"非阻塞"设计！
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：精准 1Hz</strong> — TIM6 产生 1Hz 中断，每次中断翻转 LED1，同时串口打印 "秒数: X"</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：改变频率</strong> — 修改 PSC 或 ARR，让 LED 以 2Hz（每秒闪2次）或 0.5Hz（2秒闪1次）闪烁，验证公式正确</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：定时流水灯</strong> — 每次定时器中断，流水灯前进一格（LED1→2→3→4→1→…），不用任何 delay，主循环同时响应串口命令</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：秒表功能</strong> — 串口发送 "START." 启动秒表计时，每秒打印当前秒数；发送 "STOP." 暂停；发送 "RESET." 清零。结合 TIM6 中断和串口命令</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 8 ── -->
+  <div id="day-d8" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 8</span>
+      <span class="badge purple">🎯 硬件 PWM · SG90 舵机控制 · 蜂鸣器 ⭐新增</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>理解 PWM 的三要素：频率、占空比、脉冲宽度</li>
+          <li>掌握 TIM3 PWM 输出模式（OC 输出比较）配置</li>
+          <li>计算 50Hz 舵机 PWM 参数，用 CCR 值控制角度</li>
+          <li>实现舵机 0°（关盖）和 180°（开盖）两个位置切换</li>
+          <li>用 PWM 控制蜂鸣器频率实现报警音</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>PWM 原理、TIM 输出比较模式讲解</td></tr>
+          <tr><td>上午 2h</td><td>舵机参数计算、Servo_init() 手敲</td></tr>
+          <tr><td>下午 2h</td><td>舵机角度控制验证，调 CCR 值看舵机转动</td></tr>
+          <tr><td>下午 2h</td><td>蜂鸣器 PWM 配置，练习</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">PWM 占空比</span>
+          <span class="kp-tag">TIM_OCMode_PWM1</span>
+          <span class="kp-tag">TIM_OC1Init</span>
+          <span class="kp-tag">TIM_SetCompare1（CCR）</span>
+          <span class="kp-tag">SG90 50Hz = 20ms</span>
+          <span class="kp-tag">CCR:500=0°,1500=90°,2500=180°</span>
+        </div>
+      </div>
+      <div>
+        <h3>✅ 课堂验收标准</h3>
+        <div class="tip green">
+          <strong>下课前必须完成</strong>
+          ① 舵机 Servo_open() → 转到 180°（开盖位置）<br>
+          ② 舵机 Servo_close() → 转回 0°（关盖位置）<br>
+          ③ 按 KEY1 开盖，按 KEY2 关盖，动作平滑<br>
+          ④ 蜂鸣器能发出报警音（按 KEY3 触发）
+        </div>
+        <div class="tip red">
+          <strong>⚠️ 为什么不能用软件PWM控制舵机</strong>
+          原课程呼吸灯用 delay_us 循环模拟 PWM，这是软件 PWM，频率不准且阻塞 CPU。舵机 SG90 需要精确 50Hz（20ms周期），只有硬件 PWM 才能保证，否则舵机会抖动或不响应！
+        </div>
+        <div class="tip blue">
+          <strong>SG90 角度与 CCR 对照（必背）</strong><br>
+          参数：TIM3，PSC=83，ARR=19999，TIM时钟=1MHz<br>
+          0°（关盖）→ CCR = 500（0.5ms）<br>
+          90°（半开）→ CCR = 1500（1.5ms）<br>
+          180°（全开）→ CCR = 2500（2.5ms）<br>
+          ⚠️ 实际值可能因舵机个体差异需微调 ±100
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：开盖关盖</strong> — KEY1 按下 → 舵机转到 180°（开盖），等待 3 秒后自动转回 0°（关盖）</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：报警音</strong> — 蜂鸣器以 2000Hz 响起（有节奏的"嘟嘟嘟"），可用 TIM4 PWM 或 GPIO 快速翻转实现</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：渐进开盖</strong> — 舵机不是瞬间跳到 180°，而是从 0° 逐渐增加到 180°（每次加 10°，间隔 20ms），模拟真实桶盖缓慢打开的效果</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习4：串口控制舵机</strong> — 串口发送 "OPEN." 开盖，"CLOSE." 关盖，"ANGLE:90." 转到指定角度，结合 Day6 串口命令解析实现</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习5：PWM 呼吸灯</strong> — 用硬件 PWM（TIM3 另一个通道）实现 LED 呼吸灯效果，在定时器中断里每次微调 CCR 值，不用任何 delay</div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 9 ── -->
+  <div id="day-d9" class="day-content">
+    <div class="badge-row">
+      <span class="badge blue">Day 9</span>
+      <span class="badge purple">🎯 传感器集成 · 状态机设计 · 完整项目实现 ⭐新增</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 教学目标</h3>
+        <ul style="font-size:14px;padding-left:20px;line-height:2.2">
+          <li>掌握 PIR 人体传感器（HC-SR501）的读取方式</li>
+          <li>掌握 HC-SR04 超声波测距时序，实现距离读取</li>
+          <li>理解超声波距离公式（距离 = 时间 / 58 cm）</li>
+          <li>设计并实现三状态垃圾桶状态机</li>
+          <li>联调所有模块，完成完整项目代码</li>
+        </ul>
+        <h3>⏰ 时间分配</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午 2h</td><td>PIR 传感器讲解接线，超声波时序讲解</td></tr>
+          <tr><td>上午 2h</td><td>HC-SR04 驱动实现，距离测试验证</td></tr>
+          <tr><td>下午 3h</td><td>状态机设计 + 系统集成联调</td></tr>
+          <tr><td>下午 1h</td><td>功能测试、BUG 修复、串口输出完善</td></tr>
+        </table>
+        <h3>🧩 核心知识点</h3>
+        <div class="kp-grid">
+          <span class="kp-tag">PIR 高电平=检测到人</span>
+          <span class="kp-tag">TRIG ≥10μs 脉冲触发</span>
+          <span class="kp-tag">ECHO 高电平时间</span>
+          <span class="kp-tag">距离 = 时间(μs) / 58</span>
+          <span class="kp-tag">enum 枚举定义状态</span>
+          <span class="kp-tag">switch-case 状态机</span>
+        </div>
+      </div>
+      <div>
+        <h3>🔄 三状态机设计</h3>
+        <div style="margin:12px 0">
+          <div class="state-row">
+            <div class="state-box idle"><strong>IDLE</strong><br><small>空闲待机</small><br><small>呼吸灯</small></div>
+            <div style="font-size:12px;color:var(--green);text-align:center">→ 检测到人<br>或 KEY1</div>
+            <div class="state-box open"><strong>OPEN</strong><br><small>已开盖</small><br><small>LED全亮</small></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin:8px 0;font-size:12px">
+            <span style="color:var(--gray)">OPEN 等待3秒 →</span>
+            <div class="state-box" style="border-color:var(--teal);color:var(--teal);min-width:80px;padding:8px"><strong>CHECK</strong><br><small>关盖测距</small></div>
+            <span style="color:var(--red)">→ 距离&lt;5cm</span>
+            <div class="state-box full"><strong>FULL</strong><br><small>满桶报警</small><br><small>蜂鸣器响</small></div>
+          </div>
+        </div>
+        <div class="tip green">
+          <strong>验收标准</strong>
+          ① PIR 检测到人 → 舵机自动开盖<br>
+          ② 3 秒后关盖，超声波测距<br>
+          ③ 距离 &lt; 5cm → 蜂鸣器报警 + LED 闪烁<br>
+          ④ 满桶时 PIR 不再触发开盖<br>
+          ⑤ KEY3 清空确认 → 解除报警<br>
+          ⑥ 串口实时输出状态和距离数据
+        </div>
+      </div>
+    </div>
+    <div class="hw-card">
+      <h4>✏️ 课堂练习 &amp; 作业</h4>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习1：超声波测距</strong> — HC-SR04 每 500ms 测一次距离，用串口打印 "距离: XX cm"，用手在传感器前遮挡验证数据变化</div></div>
+      <div class="hw-item"><span class="hw-badge basic">基础</span><div><strong>练习2：PIR 触发</strong> — PIR 传感器检测到人时 LED1 亮，无人时 LED1 灭；同时串口打印 "人体检测: 有人 / 无人"</div></div>
+      <div class="hw-item"><span class="hw-badge advance">进阶</span><div><strong>练习3：联调状态机</strong> — 完整实现三状态机：IDLE→OPEN（PIR触发）→CHECK（关盖测距）→IDLE 或 FULL，所有模块协同工作</div></div>
+      <div class="hw-item"><span class="hw-badge challenge">挑战</span><div><strong>练习4：串口实时面板</strong> — 在状态机运行时，每 1 秒通过串口打印一次完整状态面板，格式如：<br><code>[状态:IDLE] [距离:12cm] [LED:呼吸灯] [蜂鸣器:OFF]</code></div></div>
+    </div>
+  </div>
+
+  <!-- ── DAY 10 ── -->
+  <div id="day-d10" class="day-content">
+    <div class="badge-row">
+      <span class="badge red">Day 10</span>
+      <span class="badge green">🎤 项目答辩 · 功能演示 · 代码讲解</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>📋 答辩流程</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div class="step-body"><h4>准备就绪（答辩前）</h4><p>接好线、烧录程序、串口助手打开，确认系统正常启动</p></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body"><h4>功能演示（5 分钟）</h4><p>现场逐项演示：人感开盖→超声波测距→满桶报警→按键手动控制→串口输出</p></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body"><h4>代码讲解（5 分钟）</h4><p>选 2~3 个核心模块，讲清初始化逻辑、关键参数含义、状态机设计</p></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body"><h4>问答环节（5 分钟）</h4><p>每位同学至少回答 1 个问题（见右侧常见问题准备）</p></div></div>
+        </div>
+        <h3>⏰ 时间安排</h3>
+        <table>
+          <tr><th>时段</th><th>内容</th></tr>
+          <tr><td>上午</td><td>各组自由调试，老师巡回指导</td></tr>
+          <tr><td>下午 1~5 点</td><td>按组顺序答辩（每组约 15 分钟）</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>🎯 评分标准（100分）</h3>
+        <div style="margin:12px 0">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:2px"><span>功能完整性</span><span>40分</span></div>
+          <div class="score-bar" style="background:var(--blue);width:40%">40分</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:2px;margin-top:8px"><span>代码质量</span><span>25分</span></div>
+          <div class="score-bar" style="background:var(--green);width:25%">25分</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:2px;margin-top:8px"><span>演示效果</span><span>20分</span></div>
+          <div class="score-bar" style="background:var(--orange);width:20%">20分</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:2px;margin-top:8px"><span>个人答辩</span><span>15分</span></div>
+          <div class="score-bar" style="background:var(--purple);width:15%">15分</div>
+        </div>
+        <div class="tip orange">
+          <strong>答辩前一晚必做清单</strong>
+          ☐ 代码编译无报错<br>
+          ☐ 所有功能在实物验证通过<br>
+          ☐ 串口波特率 115200，输出正常<br>
+          ☐ 每人能讲清自己负责的模块<br>
+          ☐ 准备好回答下方 5 道常见问题
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end card -->
+</div>
+</div>
+
+<!-- ══════════════ HARDWARE ══════════════ -->
+<div id="section-hardware" class="section">
+<div class="container">
+<div class="card">
+  <h2>🔧 硬件连接总表</h2>
+  <div class="tip blue"><strong>接线原则</strong>按照此表接线，如果板子上的引脚标注和表中不同，以实际板子丝印为准。所有 GND 共地！</div>
+  <table>
+    <tr><th>模块</th><th>模块引脚</th><th>STM32 引脚</th><th>说明</th></tr>
+    <tr><td rowspan="4"><strong>LED × 4</strong></td><td>LED1 阳极</td><td>PG14</td><td rowspan="4">阴极接 GND，串 330Ω 限流电阻</td></tr>
+    <tr><td>LED2 阳极</td><td>PG13</td></tr>
+    <tr><td>LED3 阳极</td><td>PG6</td></tr>
+    <tr><td>LED4 阳极</td><td>PG11</td></tr>
+    <tr><td rowspan="4"><strong>按键 × 4</strong></td><td>KEY1 一端</td><td>PG2</td><td rowspan="4">另一端接 GND，GPIO 配置上拉输入</td></tr>
+    <tr><td>KEY2 一端</td><td>PG3</td></tr>
+    <tr><td>KEY3 一端</td><td>PG4</td></tr>
+    <tr><td>KEY4 一端</td><td>PG5</td></tr>
+    <tr><td rowspan="3"><strong>SG90 舵机</strong></td><td>棕色（GND）</td><td>GND</td><td rowspan="3">信号线接 TIM3_CH1 复用引脚</td></tr>
+    <tr><td>红色（VCC）</td><td>5V</td></tr>
+    <tr><td>橙色（信号）</td><td>PA6（TIM3_CH1）</td></tr>
+    <tr><td rowspan="4"><strong>HC-SR04 超声波</strong></td><td>VCC</td><td>5V</td><td rowspan="4">⚠️ ECHO 输出 5V，需分压到 3.3V（2KΩ+1KΩ）再接 STM32</td></tr>
+    <tr><td>GND</td><td>GND</td></tr>
+    <tr><td>TRIG（触发）</td><td>PB9（输出）</td></tr>
+    <tr><td>ECHO（回波）</td><td>PB10（输入）⚠️分压！</td></tr>
+    <tr><td rowspan="3"><strong>HC-SR501 PIR</strong></td><td>VCC</td><td>5V</td><td rowspan="3">GPIO 配置下拉输入，HIGH = 检测到人</td></tr>
+    <tr><td>GND</td><td>GND</td></tr>
+    <tr><td>OUT（信号）</td><td>PB8（输入）</td></tr>
+    <tr><td rowspan="2"><strong>蜂鸣器</strong></td><td>正极（+）</td><td>PB6（TIM4_CH1）</td><td rowspan="2">无源蜂鸣器用 PWM；有源蜂鸣器直接 GPIO 高电平</td></tr>
+    <tr><td>负极（-）</td><td>GND</td></tr>
+    <tr><td rowspan="3"><strong>USB-TTL 串口</strong></td><td>TX（模块发）</td><td>PA10（USART1_RX）</td><td rowspan="3">波特率 115200，TX/RX 交叉连接</td></tr>
+    <tr><td>RX（模块收）</td><td>PA9（USART1_TX）</td></tr>
+    <tr><td>GND</td><td>GND</td></tr>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>⚠️ 关键注意事项</h2>
+    <div class="tip red"><strong>HC-SR04 ECHO 引脚 5V 电压！</strong>必须通过分压电阻降至 3.3V 后才能接 STM32 GPIO，否则可能损坏芯片。分压方案：ECHO → 2KΩ → PB10，同时 PB10 通过 1KΩ 下拉到 GND。</div>
+    <div class="tip orange"><strong>舵机电流需求</strong>SG90 工作电流约 150~300mA，空载峰值可达 600mA。建议使用独立 5V 电源为舵机供电，与开发板共 GND 即可，不要用开发板的 5V 引脚直接驱动多个舵机。</div>
+    <div class="tip blue"><strong>所有模块共 GND</strong>不同电源的模块（5V 模块和 3.3V STM32）之间必须共地，否则信号无法正常传输。</div>
+  </div>
+  <div class="card">
+    <h2>📁 推荐工程文件结构</h2>
+    <table>
+      <tr><th>文件夹</th><th>文件</th><th>职责</th></tr>
+      <tr><td>User/</td><td>main.c</td><td>主程序，状态机逻辑</td></tr>
+      <tr><td rowspan="6">Drivers/</td><td>LED.c / LED.h</td><td>LED 驱动</td></tr>
+      <tr><td>KEY.c / KEY.h</td><td>按键驱动</td></tr>
+      <tr><td>USART.c / USART.h</td><td>串口驱动</td></tr>
+      <tr><td>SERVO.c / SERVO.h</td><td>舵机 PWM 驱动</td></tr>
+      <tr><td>PIR.c / PIR.h</td><td>人体传感器</td></tr>
+      <tr><td>HCSR04.c / HCSR04.h</td><td>超声波驱动</td></tr>
+      <tr><td rowspan="2">System/</td><td>delay.c / delay.h</td><td>SysTick 延时</td></tr>
+      <tr><td>TIM.c / TIM.h</td><td>TIM6 定时中断</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════ PROJECT ══════════════ -->
+<div id="section-project" class="section">
+<div class="container">
+<div class="card">
+  <h2>🗑️ 项目功能需求说明</h2>
+  <div class="badge-row">
+    <span class="badge green">3~4 人小组</span>
+    <span class="badge blue">实物 + 代码展示</span>
+    <span class="badge orange">必须实现 ≥ 4 项基础功能</span>
+  </div>
+  <table>
+    <tr><th>#</th><th>功能</th><th>涉及技术</th><th>难度</th><th>分值</th></tr>
+    <tr><td>1</td><td>🧍 人体感应自动开盖</td><td>PIR 传感器 + 舵机 PWM</td><td><span class="badge green">基础</span></td><td>8分</td></tr>
+    <tr><td>2</td><td>📏 超声波满桶检测</td><td>HC-SR04 时序测距</td><td><span class="badge green">基础</span></td><td>8分</td></tr>
+    <tr><td>3</td><td>🔔 满桶蜂鸣器报警</td><td>GPIO / PWM 蜂鸣器</td><td><span class="badge green">基础</span></td><td>6分</td></tr>
+    <tr><td>4</td><td>💡 LED 状态指示</td><td>GPIO 输出，多种模式</td><td><span class="badge green">基础</span></td><td>6分</td></tr>
+    <tr><td>5</td><td>🎮 按键手动控制</td><td>GPIO 输入 + 消抖</td><td><span class="badge green">基础</span></td><td>6分</td></tr>
+    <tr><td>6</td><td>📡 串口实时状态输出</td><td>USART printf</td><td><span class="badge blue">进阶</span></td><td>8分</td></tr>
+    <tr><td>7</td><td>🌬️ LED 呼吸灯空闲效果</td><td>硬件 PWM / 软件模拟</td><td><span class="badge blue">进阶</span></td><td>6分</td></tr>
+    <tr><td>8</td><td>⌨️ 串口命令控制 LED 模式</td><td>USART 接收 + 字符串解析</td><td><span class="badge purple">挑战</span></td><td>6分</td></tr>
+    <tr><td>9</td><td>⏱️ 定时器驱动 LED 动效</td><td>TIM6 中断，非阻塞</td><td><span class="badge purple">挑战</span></td><td>6分</td></tr>
+    <tr><td>10</td><td>🔒 满桶时禁止人感开盖</td><td>状态机逻辑设计</td><td><span class="badge purple">挑战</span></td><td>6分</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>🔄 完整系统状态机说明</h2>
+  <table>
+    <tr><th>状态</th><th>条件（进入）</th><th>执行动作</th><th>条件（退出）</th></tr>
+    <tr><td><strong>IDLE 空闲</strong></td><td>系统启动 / 垃圾清空后</td><td>LED 呼吸灯效果，等待事件</td><td>检测到人 或 KEY1 手动</td></tr>
+    <tr><td><strong>OPEN 已开盖</strong></td><td>PIR 检测到人 或 KEY1</td><td>舵机转 180°，LED 全亮</td><td>等待 3 秒后自动</td></tr>
+    <tr><td><strong>CHECKING 检测中</strong></td><td>OPEN 状态 3 秒后</td><td>舵机关盖，超声波测距</td><td>测距完成后进入 IDLE 或 FULL</td></tr>
+    <tr><td><strong>FULL 满桶</strong></td><td>超声波距离 &lt; 5cm</td><td>蜂鸣器报警，LED 快闪，锁定开盖</td><td>KEY3 按下确认清空</td></tr>
+  </table>
+  <div class="tip orange"><strong>注意：满桶状态下，即使 PIR 检测到人也不会开盖！</strong>只有按下 KEY3（清空确认键）才能解除满桶锁定，恢复正常工作。这个逻辑必须通过状态机变量来实现，不能只靠 if-else。</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════ DEFENSE ══════════════ -->
+<div id="section-defense" class="section">
+<div class="container">
+<div class="card">
+  <h2>🎤 答辩要求 &amp; 评分标准</h2>
+  <div class="grid-2">
+    <div>
+      <h3>📊 评分细则</h3>
+      <table>
+        <tr><th>维度</th><th>分值</th><th>评分细则</th></tr>
+        <tr><td><strong>功能完整性</strong></td><td>40分</td><td>基础功能每项 6~8 分，进阶每项 6~8 分，满分 40</td></tr>
+        <tr><td><strong>代码质量</strong></td><td>25分</td><td>模块化架构 10 分，命名规范 5 分，注释 5 分，无明显 BUG 5 分</td></tr>
+        <tr><td><strong>演示效果</strong></td><td>20分</td><td>功能稳定运行 10 分，串口输出清晰 5 分，接线整洁 5 分</td></tr>
+        <tr><td><strong>个人答辩</strong></td><td>15分</td><td>能讲清自己负责模块 10 分，回答老师提问 5 分</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>🗣️ 答辩常见问题（提前准备！）</h3>
+      <div class="tip blue"><strong>Q1：为什么 GPIO 要配置为 AF 模式才能用 USART？</strong><br>USART 外设直接驱动引脚，配置 AF 后控制权交给 USART，GPIO 普通输出无法实现串口时序。</div>
+      <div class="tip blue"><strong>Q2：TIM6 的中断频率怎么计算？PSC 和 ARR 是什么？</strong><br>频率 = TIM时钟 ÷ (PSC+1) ÷ (ARR+1)。PSC 是预分频降频，ARR 是计满多少次触发一次中断。</div>
+      <div class="tip blue"><strong>Q3：ISR 里的变量为什么要加 volatile？</strong><br>防止编译器把变量缓存在寄存器，导致主循环读不到 ISR 修改后的值。</div>
+      <div class="tip blue"><strong>Q4：HC-SR04 超声波距离怎么计算？为什么除以 58？</strong><br>声速 340m/s = 0.034cm/μs，往返÷2，所以距离(cm) = 时间(μs) × 0.034 / 2 ≈ 时间/58。</div>
+      <div class="tip blue"><strong>Q5：舵机 SG90 为什么需要 50Hz PWM？CCR=1500 是多少度？</strong><br>SG90 标准要求 20ms 周期（50Hz）。CCR=1500 代表 1.5ms 脉冲，对应 90° 中间位置。</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════ TIPS ══════════════ -->
+<div id="section-tips" class="section">
+<div class="container">
+<div class="card">
+  <h2>💡 互动教学建议</h2>
+  <div class="grid-2">
+    <div>
+      <h3>🏆 提升参与感的方法</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body"><h4>积分排行榜</h4><p>每天设置抢答和最快完成练习积分，黑板实时更新排名，前 3 名给予实物奖励</p></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body"><h4>每日"点灯挑战"（5分钟）</h4><p>开课前 5 分钟出一道用已学知识修改代码的小任务，比赛谁先在板子上跑通，第一名得积分</p></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body"><h4>"BUG 医生"环节</h4><p>下午拿出一段故意写错的代码投影，让全班找 BUG，第一个找到的得分。培养主动看代码的习惯</p></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body"><h4>串口截图晒成果</h4><p>每实现一个功能，让学生把串口输出截图发到群里。老师点评，好的截图被展示，形成正向竞争</p></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body"><h4>功能解锁任务卡</h4><p>设计任务卡：LED → 按键 → USART → PWM → 传感器，每解锁一个打印一张"勋章卡"发给学生</p></div></div>
+      </div>
+    </div>
+    <div>
+      <h3>📝 教师备课建议</h3>
+      <div class="tip green">
+        <strong>先演示效果，再讲原理</strong>
+        每个新模块，先把完整程序下载到板子，让学生看到舵机转动、串口输出、LED 效果，再倒回来讲"这是怎么实现的"。有了目标感，理论课更专注。
+      </div>
+      <div class="tip blue">
+        <strong>代码分"框架版"和"完整版"</strong>
+        课前准备好空白框架（函数签名已写，函数体为空），上课时现场手敲填充。框架版让学生明确每步写什么，完整版课后发给学生参考。
+      </div>
+      <div class="tip orange">
+        <strong>Day 8 舵机调试放下午</strong>
+        舵机 CCR 值调整（0°/90°/180°）让学生自己改数值观察效果，这个过程极有成就感。预留充足时间让每个人都动手试。
+      </div>
+      <div class="tip purple">
+        <strong>答辩前晚开放实验室</strong>
+        答辩前一天晚上开放实验室 2 小时，学生自由调试，老师轮流巡回指导，大幅降低答辩当天翻车概率。
+      </div>
+      <div class="tip teal">
+        <strong>结对编程 + 互审代码</strong>
+        两人一组，一人口述逻辑一人打代码，每天换角色。下午增加 5 分钟互相 review 代码，找出对方一个可改进的地方。
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  document.querySelectorAll('nav .tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function showDay(id, btn) {
+  document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+  document.getElementById('day-' + id).classList.add('active');
+  document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

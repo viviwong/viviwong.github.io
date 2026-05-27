@@ -24,4 +24,11 @@ sidebar_position: 1
 * <a href="/web/105-databinding-interactive.html" target="_blank">10-动态数据绑定</a>
 
 
+## 嵌入式AI实训
+
+* <a href="/web/201-STM32智慧垃圾桶教学文档.html" target="_blank">21-STM32智慧垃圾桶教学文档</a>
+
+
+
+
 
