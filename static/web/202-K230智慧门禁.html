@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link data-rh="true" rel="icon" href="https://sykdl.com/img/favicon.ico">
+<title>AI 门禁 × 蓝牙智慧家居 · 三天实训完整方案升级版 v2.0</title>
+<style>
+:root{
+  --blue:#1976D2;--blue-light:#E3F2FD;--green:#388E3C;--green-light:#E8F5E9;
+  --orange:#F57C00;--orange-light:#FFF3E0;--red:#C62828;--red-light:#FFEBEE;
+  --purple:#6A1B9A;--purple-light:#F3E5F5;--teal:#00796B;--teal-light:#E0F2F1;
+  --indigo:#3949AB;--indigo-light:#E8EAF6;--pink:#AD1457;--pink-light:#FCE4EC;
+  --cyan:#0097A7;--cyan-light:#E0F7FA;
+  --gray:#455A64;--gray-light:#ECEFF1;--bg:#F5F7FA;--white:#fff;
+  --shadow:0 2px 12px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft YaHei',Arial,sans-serif;background:var(--bg);color:#263238;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#1A237E,#0D47A1);color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,.25);gap:16px}
+nav .logo{font-size:16px;font-weight:700;white-space:nowrap;flex-shrink:0}
+nav .tabs{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav .tabs button{background:transparent;border:none;color:rgba(255,255,255,.75);padding:8px 13px;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;transition:.2s;font-family:inherit}
+nav .tabs button.active,nav .tabs button:hover{background:rgba(255,255,255,.18);color:#fff}
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);padding:24px;margin-bottom:20px}
+.card h2{font-size:19px;color:var(--blue);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h3{font-size:15px;color:var(--gray);margin:16px 0 10px;font-weight:700}
+.hero{background:linear-gradient(135deg,#0D1B4B 0%,#1A3A6E 40%,#1565C0 100%);color:#fff;border-radius:16px;padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-50px;top:-50px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.9;max-width:680px;line-height:1.8}
+.hero .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.hero .tag{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;font-size:12px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:8px;font-size:13px;font-weight:600}
+.badge.blue{background:var(--blue-light);color:var(--blue)}
+.badge.green{background:var(--green-light);color:var(--green)}
+.badge.orange{background:var(--orange-light);color:var(--orange)}
+.badge.red{background:var(--red-light);color:var(--red)}
+.badge.purple{background:var(--purple-light);color:var(--purple)}
+.badge.teal{background:var(--teal-light);color:var(--teal)}
+.badge.gray{background:var(--gray-light);color:var(--gray)}
+.badge.indigo{background:var(--indigo-light);color:var(--indigo)}
+.badge.pink{background:var(--pink-light);color:var(--pink)}
+.badge.cyan{background:var(--cyan-light);color:var(--cyan)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th{background:var(--blue);color:#fff;padding:10px 12px;text-align:left}
+td{padding:9px 12px;border-bottom:1px solid #e8ecf0;vertical-align:top}
+tr:nth-child(even) td{background:#f7f9fc}
+tr:hover td{background:var(--blue-light)}
+code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;font-family:'Courier New',monospace;font-size:12px;color:#1565C0}
+.tip{border-left:4px solid;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:14px;line-height:1.7}
+.tip.blue{border-color:var(--blue);background:var(--blue-light)}
+.tip.green{border-color:var(--green);background:var(--green-light)}
+.tip.orange{border-color:var(--orange);background:var(--orange-light)}
+.tip.red{border-color:var(--red);background:var(--red-light)}
+.tip.purple{border-color:var(--purple);background:var(--purple-light)}
+.tip.teal{border-color:var(--teal);background:var(--teal-light)}
+.tip.indigo{border-color:var(--indigo);background:var(--indigo-light)}
+.tip.pink{border-color:var(--pink);background:var(--pink-light)}
+.tip strong{display:block;margin-bottom:4px}
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:14px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-num{counter-increment:step;min-width:34px;height:34px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-num::before{content:counter(step)}
+.step-body{flex:1;padding-top:4px}
+.step-body h4{font-size:14px;font-weight:700;margin-bottom:4px;color:#1a237e}
+.step-body p{font-size:13px;color:#546e7a}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.progress-bar{background:#e0e0e0;border-radius:10px;height:8px;margin:6px 0}
+.progress-bar .fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--teal))}
+.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.day-tab{padding:8px 18px;border:2px solid var(--blue);border-radius:8px;background:#fff;color:var(--blue);cursor:pointer;font-weight:600;font-size:13px;transition:.2s;font-family:inherit}
+.day-tab.active{background:var(--blue);color:#fff}
+.day-tab:hover:not(.active){background:var(--blue-light)}
+.day-content{display:none}
+.day-content.active{display:block}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:14px 0}
+.flow-node{background:var(--blue);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;min-width:88px;line-height:1.4}
+.flow-node.green{background:var(--green)}.flow-node.orange{background:var(--orange)}.flow-node.purple{background:var(--purple)}
+.flow-node.red{background:var(--red)}.flow-node.teal{background:var(--teal)}.flow-node.gray{background:var(--gray)}
+.flow-node.indigo{background:var(--indigo)}.flow-node.pink{background:var(--pink)}.flow-node.cyan{background:var(--cyan)}
+.flow-arrow{padding:0 8px;color:#90A4AE;font-size:20px;font-weight:700}
+.role-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.role-prep{background:#FFF8E1;color:#E65100;border:1px solid #FFE082}
+.role-teach{background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9}
+.role-do{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7}
+.role-vibe{background:#FCE4EC;color:#AD1457;border:1px solid #F48FB1}
+.role-all{background:#E0F7FA;color:#00695C;border:1px solid #80CBC4}
+.session-header{display:flex;align-items:center;gap:10px;margin:20px 0 10px;font-weight:700;font-size:14px}
+.session-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.am{background:#FFF8E1;color:#E65100;border:1px solid #FFE082}
+.pm{background:#E0F7FA;color:#00695C;border:1px solid #80CBC4}
+.prep-note{background:#FFFDE7;border:1px solid #FFE082;border-left:3px solid var(--orange);border-radius:8px;padding:12px 16px;font-size:13px;color:#5D4037;margin-top:12px}
+.prep-note .prep-label{color:var(--orange);font-weight:700;font-size:12px;margin-bottom:4px}
+.day-theme{background:var(--white);border:1px solid #e0e0e0;border-radius:10px;padding:14px 18px;margin-bottom:16px}
+.accordion{border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;margin-bottom:10px}
+.accordion-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;cursor:pointer;transition:background .2s;font-weight:600;font-size:14px}
+.accordion-head:hover{background:var(--bg)}.accordion-head.open{background:var(--blue-light)}
+.accordion-head .arr{transition:transform .2s;color:#90A4AE;font-size:12px}
+.accordion-head.open .arr{transform:rotate(180deg)}
+.accordion-body{display:none;padding:16px 18px;background:#fff;border-top:1px solid #e0e0e0}
+.accordion-body.open{display:block}
+.arch-box{background:#1E2A3A;border-radius:10px;padding:24px;font-family:'Courier New',monospace;font-size:12.5px;color:#64B5F6;overflow-x:auto;line-height:1.7;white-space:pre}
+.proto-format{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:768px){.proto-format{grid-template-columns:1fr}}
+.proto-card{background:var(--white);border:1px solid #e0e0e0;border-radius:10px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.proto-card .label{font-size:11px;color:#78909C;margin-bottom:8px}
+.proto-card code{font-size:13px;color:var(--orange);font-weight:700;background:none;border:none;padding:0}
+.hw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.hw-card-item{background:var(--white);border:1px solid #e0e0e0;border-radius:10px;padding:14px;transition:border-color .2s}
+.hw-card-item:hover{border-color:var(--cyan)}.hw-card-item .hw-name{font-weight:700;font-size:13px;margin-bottom:4px}
+.hw-card-item .hw-model{font-size:12px;color:var(--teal);margin-bottom:4px}
+.hw-card-item .hw-use{font-size:12px;color:#78909C}
+.hw-card-item .hw-qty{display:inline-block;background:var(--gray-light);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--orange);margin-top:6px}
+.sw-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.sw-card{background:var(--white);border:1px solid #e0e0e0;border-radius:10px;padding:18px;transition:border-color .2s,transform .2s}
+.sw-card:hover{border-color:var(--blue);transform:translateY(-2px)}.sw-card .sw-icon{font-size:24px;margin-bottom:10px}
+.sw-card h4{font-size:13px;font-weight:700;margin-bottom:8px}
+.sw-card p{font-size:12px;color:#78909C;line-height:1.6}
+.kp-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.kp-tag{background:var(--blue-light);color:var(--blue);border:1px solid #90CAF9;border-radius:6px;padding:5px 12px;font-size:13px}
+.stars{color:var(--orange);font-size:13px}
+.resume-block{background:var(--white);border:1px solid #e0e0e0;border-left:3px solid var(--blue);border-radius:8px;padding:20px 22px 20px;font-family:'Courier New',monospace;font-size:13px;line-height:1.9;white-space:pre-wrap;color:#455A64;position:relative}
+.copy-btn{position:absolute;top:12px;right:12px;background:var(--gray-light);border:1px solid #e0e0e0;color:#455A64;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;transition:.2s}
+.copy-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.checklist{list-style:none}
+.checklist li{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--white);border:1px solid #e0e0e0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.2s;font-size:14px}
+.checklist li:hover{border-color:var(--blue);background:var(--blue-light)}
+.checklist li.done{opacity:.55}
+.checklist li.done .check-box{background:var(--green);border-color:var(--green)}
+.checklist li.done .check-box::after{opacity:1}
+.checklist li.done .check-text{text-decoration:line-through;color:#90A4AE}
+.check-box{width:20px;height:20px;border:2px solid #e0e0e0;border-radius:6px;flex-shrink:0;margin-top:1px;position:relative;transition:.2s}
+.check-box::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;opacity:0;transition:opacity .2s}
+.check-progress{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:13px;color:#546e7a}
+.progress-fill-bar{flex:1;height:6px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:99px;transition:width .3s ease}
+#toTop{position:fixed;bottom:28px;right:28px;width:40px;height:40px;background:var(--blue);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:18px;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow);transition:.2s;z-index:999}
+#toTop:hover{transform:translateY(-3px)}
+#toTop.show{display:flex}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🏠 AI门禁 × 智慧家居实训 v2.0</div>
+  <div class="tabs">
+    <button class="active" onclick="showSection('overview',this)">🏠 课程总览</button>
+    <button onclick="showSection('arch',this)">🗺️ 系统架构</button>
+    <button onclick="showSection('protocol',this)">📡 协议设计</button>
+    <button onclick="showSection('schedule',this)">📅 课程安排</button>
+    <button onclick="showSection('tasks',this)">✅ 任务分工</button>
+    <button onclick="showSection('resources',this)">🔩 资源 &amp; 验收</button>
+  </div>
+</nav>
+
+<!-- ══════════════ OVERVIEW ══════════════ -->
+<div id="section-overview" class="section active">
+<div class="container">
+
+<div class="hero">
+  <h1>🏠 AI 门禁 × 蓝牙智慧家居 · AIoT 综合实训（升级版 v2.0）</h1>
+  <p>基于<strong>已完整落地的真实项目代码</strong>（K210 边缘人脸识别 + STM32F407 下位机 + DX-BT24 BLE 微信小程序 + PySide6 考勤上位机，共 114 项已实现功能）开展的三天 AIoT 全栈实训。<br>
+     学员：23级大三电子信息（已有 C 下位机 + PySide6 + OpenCV 基础），重点在四端集成联调与 Vibe Coding。</p>
+  <div class="tags">
+    <span class="tag">🤖 K210 边缘 AI 人脸识别</span>
+    <span class="tag">⚙️ STM32F407ZET6 标准库</span>
+    <span class="tag">📱 微信小程序 BLE</span>
+    <span class="tag">🔵 DX-BT24（FFE0/FFE1）</span>
+    <span class="tag">🖥️ PySide6 考勤上位机</span>
+    <span class="tag">🌡️ DHT11 温湿度</span>
+    <span class="tag">⚡ Vibe Coding</span>
+    <span class="tag">📡 pyserial</span>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="card">
+    <h2>🎯 三天课程目标</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day 1 · 下位机 + 边缘端打通</h4><p>三串口架构讲解、Keil 编译烧录、串口指令控制 LED/蜂鸣器、K210 人脸注册与 USART3 联调、pyserial 解析帧</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day 2 · 小程序 + 上位机双线</h4><p>小程序 BLE 控制（Vibe Coding）、温湿度折线图、HMI 仪表盘扫描动画与 10 秒在场打卡机制</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>Day 3 · 四端集成演示</h4><p>上班/下班场景模式、陌生人报警全链路、考勤规则与 CSV 导出、打包部署、完整演示颁证</p></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><h4>综合能力提升</h4><p>AIoT 四端全栈思维、AI 辅助开发体验、串口/BLE 联调方法论、防误触发的工程化思维</p></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📅 三天进度路径</h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day1 上午 · 架构 + 烧录 + 串口控制</span><span style="color:var(--blue)">打通</span></div><div class="progress-bar"><div class="fill" style="width:100%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day1 下午 · K210 联调 + pyserial</span><span style="color:var(--blue)">基础</span></div><div class="progress-bar"><div class="fill" style="width:100%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day2 上午 · 小程序 BLE（Vibe）</span><span style="color:var(--green)">进阶</span></div><div class="progress-bar"><div class="fill" style="width:80%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day2 下午 · HMI 考勤核心逻辑</span><span style="color:var(--green)">进阶</span></div><div class="progress-bar"><div class="fill" style="width:80%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day3 上午 · 场景模式 + 全链路联调</span><span style="color:var(--orange)">综合</span></div><div class="progress-bar"><div class="fill" style="width:60%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Day3 下午 · 演示验收 + 打包颁证</span><span style="color:var(--red)">收尾</span></div><div class="progress-bar"><div class="fill" style="width:40%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>👥 课堂角色图例</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+      <div style="display:flex;align-items:center;gap:10px"><span class="role-tag role-prep">🔧 提前准备</span><span style="color:#546e7a">老师课前完成，学员直接用</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="role-tag role-teach">📖 老师讲授</span><span style="color:#546e7a">知识点讲解与演示</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="role-tag role-do">✍️ 学员动手</span><span style="color:#546e7a">学员独立编写代码</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="role-tag role-vibe">🤖 Vibe Coding</span><span style="color:#546e7a">AI 辅助开发（Cursor/Claude）</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="role-tag role-all">🔗 全员联调</span><span style="color:#546e7a">全员参与系统集成联调</span></div>
+    </div>
+    <div class="tip blue" style="margin-top:14px"><strong>💡 v2.0 升级要点</strong>全部教学内容以已验证落地的项目代码为蓝本（非纸面设计）：K210 替代 K230、DX-BT24 替代 HM-10、考勤打卡业务替代简单门禁，每个验收项都对应一条真实跑通过的数据链路。</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🔄 系统数据流总览（共 9 条端到端链路）</h2>
+  <div style="overflow-x:auto;padding:8px 0">
+    <div class="flow" style="min-width:860px;flex-wrap:nowrap;justify-content:center">
+      <div class="flow-node purple">🧠 K210<br><small>人脸识别</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">⚙️ F407<br><small>USART3 收帧</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">💡 LED+蜂鸣<br><small>常亮/爆闪 3s</small></div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-node indigo">🖥️ USART1<br><small>→HMI 打卡</small></div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-node orange">📡 USART2<br><small>→BLE 推送</small></div>
+    </div>
+    <div class="flow" style="min-width:860px;flex-wrap:nowrap;justify-content:center;margin-top:10px">
+      <div class="flow-node pink">📱 小程序<br><small>CMD 指令</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node cyan">🔵 DX-BT24<br><small>BLE 透传</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">⚙️ F407<br><small>USART2 解析</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">💡 LED 6模式<br><small>+蜂鸣器</small></div>
+      <div class="flow-arrow">|</div>
+      <div class="flow-node teal">🌡️ DHT11<br><small>每5s上报→小程序</small></div>
+    </div>
+  </div>
+  <div class="tip blue" style="margin-top:12px"><strong>💡 架构核心</strong>F407 是三串口路由中枢：USART1（115200）连 PC 上位机做考勤与日志、USART2（9600）连 DX-BT24 蓝牙模块与小程序双向透传、USART3（115200）接收 K210 人脸识别帧。人脸事件同时分发到本地效果（LED/蜂鸣器）、HMI（10 秒在场打卡）和小程序（考勤页实时刷新），三端状态一致。</div>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ ARCH ══════════════ -->
+<div id="section-arch" class="section">
+<div class="container">
+
+<div class="card">
+  <h2>🗺️ 系统架构总览（与实际代码一致）</h2>
+  <div class="arch-box">                ┌─────────────┐
+                │  K210 边缘  │  人脸检测/识别/注册（BOOT 键）
+                │  计算板     │  输出 face_index + score
+                └──────┬──────┘
+                       │ USART3 115200（PB10/PB11）
+                       │ FACE:person0:96.8\r\n · REG:person0\r\n
+                       ↓
+┌──────────────────────────────────────────────────┐
+│              STM32F407ZET6 下位机 v2.0            │
+│  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐  │
+│  │  LED   │  │ Buzzer │  │ DHT11  │  │  KEY   │  │
+│  │ 6 模式 │  │ 蜂鸣器 │  │ 温湿度 │  │ 4 按键 │  │
+│  │ TIM4   │  │        │  │ PG9    │  │        │  │
+│  └────────┘  └────────┘  └────────┘  └────────┘  │
+│        BLE 环形缓冲 256B + 主循环轮询组帧          │
+└───────┬────────────────────────┬──────────────────┘
+        │ USART1 115200          │ USART2 9600
+        │ PA9/PA10 日志+考勤帧   │ PA2/PA3 BLE 双向
+        ↓                        ↓
+┌───────────────┐        ┌────────────────┐
+│  PySide6 HMI  │        │ DX-BT24 BLE    │
+│  考勤上位机   │        │ Service FFE0   │
+│  · 仪表盘扫描 │        │ Char    FFE1   │
+│  · 10s 在场打卡│       └───────┬────────┘
+│  · 人员管理   │                │ BLE Notify / Write
+│  · 考勤+CSV   │                ↓
+└───────────────┘       ┌─────────────────┐
+                        │  微信小程序      │
+                        │  首页·控制·考勤  │
+                        │  ·设置 4 页暗色  │
+                        └─────────────────┘</div>
+</div>
+
+<div class="card">
+  <h2>⚙️ 各端功能详解（已实现 114 项功能）</h2>
+
+  <div class="accordion">
+    <div class="accordion-head open" onclick="toggleAccordion(this)">
+      <span>🧠 K210 边缘 AI 计算板（7 项功能）</span>
+      <span class="arr">▼</span>
+    </div>
+    <div class="accordion-body open">
+      <table>
+        <thead><tr><th>功能模块</th><th>功能细节</th></tr></thead>
+        <tbody>
+          <tr><td><strong>人脸检测/识别</strong></td><td>摄像头实时帧分析，与已注册人员比对，输出 face_index + 置信度</td></tr>
+          <tr><td><strong>人脸注册</strong></td><td>按 BOOT 键现场注册，按 person0/person1… 序号递增建库，支持多人</td></tr>
+          <tr><td><strong>陌生人识别</strong></td><td>未注册人员输出 <code>FACE:unknown:0.0</code></td></tr>
+          <tr><td><strong>识别结果帧</strong></td><td><code>FACE:person&lt;N&gt;:&lt;score&gt;\r\n</code> 经 UART 发给 F407</td></tr>
+          <tr><td><strong>注册成功帧</strong></td><td><code>REG:person&lt;N&gt;\r\n</code>，F407 本地打印不透传，HMI 据此更新注册状态</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="accordion-head" onclick="toggleAccordion(this)">
+      <span>🔌 STM32F407ZET6 下位机（34 项功能）</span>
+      <span class="arr">▼</span>
+    </div>
+    <div class="accordion-body">
+      <table>
+        <thead><tr><th>功能模块</th><th>功能细节</th></tr></thead>
+        <tbody>
+          <tr><td><strong>USART1（调试/考勤口）</strong></td><td>PA9/PA10，115200，所有模块日志 printf 回显（[SYS]/[BLE]/[K210]/[DHT11]/[KEY]），HMI 从此口取 FACE/REG 帧</td></tr>
+          <tr><td><strong>USART2（BLE 口）</strong></td><td>PA2/PA3，9600，连 DX-BT24 透传；256B 环形缓冲 + <code>BLE_Poll()</code> 主循环以 <code>\n</code> 组帧</td></tr>
+          <tr><td><strong>USART3（K210 口）</strong></td><td>PB10/PB11，115200，接收 FACE/REG 帧</td></tr>
+          <tr><td><strong>DHT11 温湿度</strong></td><td>PG9 单总线 + 4.7kΩ 上拉，40bit 读取期间 <code>__disable_irq()</code> 防 TIM4 干扰，校验和验证，每 5s 上报 + 上电立即上报</td></tr>
+          <tr><td><strong>LED 6 模式驱动</strong></td><td>TIM4 1kHz <code>LED_Tick()</code>：全灭/呼吸（默认）/跑马/流水/爆闪/常亮</td></tr>
+          <tr><td><strong>蜂鸣器</strong></td><td><code>CMD:BEEP</code> 短鸣 200ms；陌生人报警长鸣 3s</td></tr>
+          <tr><td><strong>K210 事件响应</strong></td><td>识别成功→LED 常亮 3s；陌生人→爆闪+蜂鸣 3s；超时基于 <code>g_sys_ms</code> 恢复呼吸灯</td></tr>
+          <tr><td><strong>BLE 指令解析</strong></td><td>7 条 <code>CMD:*</code> 指令，收到任意 CMD 清除 K210 效果锁（<code>s_k210_active=0</code>）</td></tr>
+          <tr><td><strong>按键本地调试</strong></td><td>KEY1 流水 / KEY2 跑马 / KEY3 蜂鸣+爆闪 / KEY4 恢复呼吸灯</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="accordion-head" onclick="toggleAccordion(this)">
+      <span>🖥️ PySide6 HMI 考勤上位机（31 项功能）</span>
+      <span class="arr">▼</span>
+    </div>
+    <div class="accordion-body">
+      <table>
+        <thead><tr><th>功能模块</th><th>功能细节</th></tr></thead>
+        <tbody>
+          <tr><td><strong>系统基础</strong></td><td>暗色主题桌面应用（1200×740），左侧导航 4 页，QThread 串口线程不阻塞 UI，SerialWorker 信号驱动解析 FACE/REG 帧</td></tr>
+          <tr><td><strong>仪表盘</strong></td><td>QPainter 扫描线动画（30ms 刷新）、在场计时黄色进度条（0~10s）、识别成功绿色/陌生人红色状态淡出、今日统计卡片、打卡记录表、部门出勤率、连接状态指示</td></tr>
+          <tr><td><strong>核心打卡逻辑 ⭐</strong></td><td><strong>10 秒连续在场才打卡</strong>（防误触发）；离开超 4s 重新计时（<code>PRESENCE_GAP=4</code>）；60 秒防重复打卡；正常/迟到/早退状态判定；陌生人自动写考勤记录</td></tr>
+          <tr><td><strong>人员管理</strong></td><td>工号/姓名/部门/face_index 列表，新增自动分配 face_index，编辑/删除（二次确认），照片上传，REG 帧到来后更新注册状态</td></tr>
+          <tr><td><strong>考勤记录</strong></td><td>日历按日查看、状态颜色区分（绿/黄/橙/红）、今日汇总、导出 CSV</td></tr>
+          <tr><td><strong>设置</strong></td><td>串口扫描+连接/断开、实时日志滚动、上下班/迟到/早退时间规则配置</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="accordion-head" onclick="toggleAccordion(this)">
+      <span>📱 微信小程序（42 项功能，4 页暗色主题）</span>
+      <span class="arr">▼</span>
+    </div>
+    <div class="accordion-body">
+      <table>
+        <thead><tr><th>页面</th><th>功能细节</th></tr></thead>
+        <tbody>
+          <tr><td><strong>全局</strong></td><td>暗色主题、自定义 TabBar（emoji 图标）、globalData 状态、wx.setStorageSync 本地持久化、启动恢复历史</td></tr>
+          <tr><td><strong>首页</strong></td><td>实时温度/湿度/舒适度三色卡片、Canvas 2D 温湿度折线图（最近 20 点）、超标 Toast 报警、最近 5 条门禁事件预览、陌生人震动提醒</td></tr>
+          <tr><td><strong>控制页</strong></td><td>上班模式（全亮）/下班模式（呼吸灯）、4 种灯光模式按钮（2×2）、全亮/全灭快捷键、蜂鸣器短鸣（含手机振动）、三组按钮激活互斥、未连接跳转设置页</td></tr>
+          <tr><td><strong>考勤页</strong></td><td>统计条（成功/陌生人/总数）、过滤 Tab、事件列表（最多 50 条）、彩色竖线状态标识、清空记录（二次确认）、实时刷新</td></tr>
+          <tr><td><strong>设置页</strong></td><td>BLE 扫描（15s 自动停止）、设备名称搜索过滤、一键连接/断开、温湿度上限 Slider、Service/Char UUID 可配置（默认 FFE0/FFE1）、清除历史</td></tr>
+          <tr><td><strong>BLE 通信层</strong></td><td>UUID 自动发现（子串匹配，大小写不敏感）、Notify 被动接收、<code>_rxBuf</code> + <code>\n</code> 分帧粘包处理、writeNoResponse 自动降级、意外断开检测</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ PROTOCOL ══════════════ -->
+<div id="section-protocol" class="section">
+<div class="container">
+
+<div class="card">
+  <h2>📡 串口通信协议设计（固件 v2.0 实测协议）</h2>
+  <div class="proto-format">
+    <div class="proto-card">
+      <div class="label">⬇️ 下行指令<br>（小程序 → BLE → F407）</div>
+      <code>CMD:&lt;操作&gt;\r\n</code>
+    </div>
+    <div class="proto-card">
+      <div class="label">⬆️ 温湿度上报<br>（F407 → BLE → 小程序，每 5s）</div>
+      <code>DATA:TEMP:26.0:HUM:58.0\r\n</code>
+    </div>
+    <div class="proto-card">
+      <div class="label">🧠 人脸结果<br>（K210 → F407 → HMI / 小程序）</div>
+      <code>FACE:&lt;name&gt;:&lt;score&gt;\r\n</code>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>帧示例</th><th>含义</th><th>方向</th></tr></thead>
+    <tbody>
+      <tr><td><code>CMD:LED_ALL_ON</code></td><td>LED 全部常亮（<code>LED_MODE_ON</code>）</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>CMD:LED_ALL_OFF</code></td><td>LED 全部关灭（<code>LED_MODE_OFF</code>）</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>CMD:MODE_BREATH</code></td><td>呼吸灯模式（上电默认 / 下班模式）</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>CMD:MODE_FLOW</code></td><td>流水灯模式</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>CMD:MODE_RUNNING</code></td><td>跑马灯模式</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>CMD:MODE_FLASH</code></td><td>爆闪模式</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>CMD:BEEP</code></td><td>蜂鸣器短鸣 200ms</td><td style="color:var(--blue)">小程序 → F407</td></tr>
+      <tr><td><code>DATA:TEMP:26.0:HUM:58.0</code></td><td>温湿度上报，上电立即一次 + 每 5s 一次</td><td style="color:var(--green)">F407 → 小程序</td></tr>
+      <tr><td><code>FACE:person0:96.8</code></td><td>已注册人脸识别成功（face_index=0），LED 常亮 3s</td><td style="color:var(--orange)">K210 → F407 → HMI/小程序</td></tr>
+      <tr><td><code>FACE:unknown:0.0</code></td><td>陌生人，爆闪 + 蜂鸣 3s，HMI/小程序标红报警</td><td style="color:var(--red)">K210 → F407 → HMI/小程序</td></tr>
+      <tr><td><code>REG:person0</code></td><td>K210 注册成功帧，F407 本地打印（不透传 BLE），HMI 更新注册状态</td><td style="color:var(--teal)">K210 → F407 → HMI</td></tr>
+    </tbody>
+  </table>
+  <div class="tip orange" style="margin-top:16px"><strong>⚠️ 协议要点</strong>所有帧以 <code>\r\n</code> 结束、接收端以 <code>\n</code> 为分帧符。F407 端用 256B 环形缓冲（ISR 写、<code>BLE_Poll()</code> 主循环组帧）防丢帧；小程序端用 <code>_rxBuf</code> 拼接处理 BLE 粘包；收到任意 <code>CMD:*</code> 会清除 K210 触发的 LED 效果锁。这三处是联调时最常见的坑，课上重点讲。</div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>🔧 F407 串口分工</h2>
+    <table>
+      <thead><tr><th>串口</th><th>引脚</th><th>波特率</th><th>对端 / 职责</th></tr></thead>
+      <tbody>
+        <tr><td><strong>USART1</strong></td><td>PA9/PA10</td><td>115200</td><td>PC（CH340）：日志回显 + HMI 考勤帧来源</td></tr>
+        <tr><td><strong>USART2</strong></td><td>PA2/PA3</td><td>9600</td><td>DX-BT24 BLE：小程序双向透传（FFE0/FFE1）</td></tr>
+        <tr><td><strong>USART3</strong></td><td>PB10/PB11</td><td>115200</td><td>K210：接收 FACE / REG 帧</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>💡 F407 关键外设配置</h2>
+    <table>
+      <thead><tr><th>外设</th><th>用途</th><th>关键参数</th></tr></thead>
+      <tbody>
+        <tr><td><strong>TIM4</strong></td><td><code>g_sys_ms</code> 时间戳 + <code>LED_Tick()</code> 动效</td><td>1kHz（1ms 中断）</td></tr>
+        <tr><td><strong>PG9</strong></td><td>DHT11 单总线</td><td>4.7kΩ 上拉，读取时关中断</td></tr>
+        <tr><td><strong>板载 LED</strong></td><td>6 模式动效</td><td>呼吸/跑马/流水/爆闪/常亮/全灭</td></tr>
+        <tr><td><strong>蜂鸣器</strong></td><td>短鸣 / 陌生人报警</td><td>200ms / 3000ms</td></tr>
+        <tr><td><strong>KEY1~4</strong></td><td>本地调试</td><td>流水/跑马/爆闪+蜂鸣/恢复默认</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🧪 调试命令速查（XCOM / SSCOM，勾选发送新行 \r\n）</h2>
+  <div class="kp-grid">
+    <span class="kp-tag">CMD:LED_ALL_ON</span>
+    <span class="kp-tag">CMD:LED_ALL_OFF</span>
+    <span class="kp-tag">CMD:MODE_BREATH</span>
+    <span class="kp-tag">CMD:MODE_FLOW</span>
+    <span class="kp-tag">CMD:MODE_RUNNING</span>
+    <span class="kp-tag">CMD:MODE_FLASH</span>
+    <span class="kp-tag">CMD:BEEP</span>
+  </div>
+  <div class="tip teal"><strong>💡 两条调试路径</strong>① 手机 BLE 调试 App（或小程序设置页）连 DX-BT24 直接下发，走 USART2 真实链路；② 串口助手连 USART1 观察 <code>[BLE]/[K210]/[DHT11]</code> 日志验证执行结果。Day1 上午先用这两条路径建立"指令→现象→日志"的闭环直觉。</div>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ SCHEDULE ══════════════ -->
+<div id="section-schedule" class="section">
+<div class="container">
+
+<div class="card">
+  <h2>📅 三天课程详细安排</h2>
+  <div class="day-tabs">
+    <button class="day-tab active" onclick="showDay('d1',this)">📅 Day 1 · 下位机 + K210 打通</button>
+    <button class="day-tab" onclick="showDay('d2',this)">📅 Day 2 · 小程序 + HMI 考勤</button>
+    <button class="day-tab" onclick="showDay('d3',this)">📅 Day 3 · 四端集成演示</button>
+  </div>
+
+  <!-- ── DAY 1 ── -->
+  <div id="day-d1" class="day-content active">
+    <div class="day-theme">
+      <strong style="color:var(--blue)">主题：从零到"刷脸有反应"</strong>
+      <span style="color:#546e7a;font-size:13px;margin-left:10px;">第一天就让学员看到自己的脸触发 LED 和蜂鸣器，建立成就感</span>
+    </div>
+    <div class="badge-row">
+      <span class="badge blue">Day 1</span>
+      <span class="badge green">🎯 三串口架构 · 烧录调试 · K210 注册联调 · pyserial 解析</span>
+    </div>
+
+    <div class="session-header"><span class="session-badge am">上午 9:00 – 12:00</span></div>
+    <table>
+      <thead><tr><th>时间</th><th>内容</th><th>分工</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:00</td>
+          <td>项目总体介绍：四端架构图讲解，<strong>老师演示最终效果</strong>（刷脸打卡 + 小程序控灯 + HMI 仪表盘扫描动画）</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:30</td>
+          <td>K210 边缘 AI 介绍：KPU 是什么，为什么本地推理不联网；BOOT 键注册机制与 face_index 设计</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">10:00</td>
+          <td>F407 固件 v2.0 代码讲解：USART1/2/3 分工、BLE 环形缓冲 + <code>BLE_Poll()</code> 组帧、TIM4 1kHz LED 驱动、主循环时序</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">10:30</td>
+          <td>学员环境搭建：Keil 工程打开、编译（0 error 0 warning）、ST-Link 烧录，USART1 看到 <code>[SYS]</code> 启动广播</td>
+          <td><span class="role-tag role-do">✍️ 学员动手</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">11:00</td>
+          <td>指令控制实验：手机 BLE 调试 App 连 DX-BT24 发 <code>CMD:MODE_FLOW</code>/<code>CMD:BEEP</code> 等 7 条指令，观察 LED/蜂鸣器响应 + USART1 日志；按 KEY1~4 体验本地调试</td>
+          <td><span class="role-tag role-do">✍️ 学员动手</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">11:30</td>
+          <td>协议详解：<code>\r\n</code> 帧定界、CMD/DATA/FACE/REG 四类帧、环形缓冲为什么能防丢帧、BLE 粘包成因</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="prep-note">
+      <div class="prep-label">🔧 提前准备</div>
+      F407 完整固件 v2.0（三串口 + DHT11 + LED 6 模式 + 蜂鸣器 + 按键）已编译好 .hex；DX-BT24 已配好 9600 透传；烧录好备用板一块
+    </div>
+
+    <div class="session-header"><span class="session-badge pm">下午 14:00 – 18:00</span></div>
+    <table>
+      <thead><tr><th>时间</th><th>内容</th><th>分工</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">14:00</td>
+          <td>K210 演示：现场按 BOOT 键注册人脸，串口助手看 <code>REG:person0</code> 和 <code>FACE:person0:96.8</code> 输出</td>
+          <td><span class="role-tag role-teach">📖 老师演示</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">14:30</td>
+          <td>K210 × F407 USART3 联调：识别成功 → LED 常亮 3s；陌生人 → 爆闪 + 蜂鸣 3s 后自动恢复呼吸灯</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">15:00</td>
+          <td>Python 串口通信：pyserial 打开 USART1、按行读取、解析 <code>FACE:name:score</code> 与 <code>DATA:TEMP</code> 帧并打印</td>
+          <td><span class="role-tag role-do">✍️ 学员写</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">15:30</td>
+          <td>HMI 框架讲解：PySide6 暗色主窗口 + 左侧导航、QThread SerialWorker、信号槽把帧送进 UI</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">16:00</td>
+          <td>学员填写框架：设置页串口扫描/连接/断开 + 实时日志滚动面板（填空式骨架代码）</td>
+          <td><span class="role-tag role-do">✍️ 学员动手</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">17:00</td>
+          <td>联调验证：摄像头前刷脸，HMI 日志面板实时显示 FACE 帧；DHT11 温湿度日志每 5s 滚动</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">17:30</td>
+          <td>Day 1 总结 + 布置预习：微信小程序 BLE API（wx.createBLEConnection / Notify / 粘包）</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="prep-note">
+      <div class="prep-label">🔧 提前准备</div>
+      HMI 骨架代码（暗色主窗口 + 4 页导航 + SerialWorker 线程框架，函数签名已写，业务逻辑留空）；K210 人脸识别程序已刷好开箱即用
+    </div>
+    <div class="tip green" style="margin-top:16px"><strong>✅ Day 1 验收标准</strong>
+    ① BLE 发 <code>CMD:MODE_FLOW</code> / <code>CMD:BEEP</code> → LED/蜂鸣器响应，USART1 有对应日志 ✓<br>
+    ② K210 刷已注册人脸 → LED 常亮 3s；陌生人 → 爆闪 + 蜂鸣 ✓<br>
+    ③ 自己写的 pyserial 程序能解析并打印 FACE 帧和 DATA 温湿度帧 ✓</div>
+  </div>
+
+  <!-- ── DAY 2 ── -->
+  <div id="day-d2" class="day-content">
+    <div class="day-theme">
+      <strong style="color:var(--pink)">主题：Vibe Coding 写小程序，亲手写考勤核心逻辑</strong>
+      <span style="color:#546e7a;font-size:13px;margin-left:10px;">AI 辅助开发主战日，UI 交给 AI，业务逻辑自己写</span>
+    </div>
+    <div class="badge-row">
+      <span class="badge blue">Day 2</span>
+      <span class="badge purple">🤖 小程序 BLE 四页 · HMI 仪表盘 · 10 秒在场打卡机制</span>
+    </div>
+
+    <div class="session-header"><span class="session-badge am">上午 9:00 – 12:00</span></div>
+    <table>
+      <thead><tr><th>时间</th><th>内容</th><th>分工</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:00</td>
+          <td>小程序开发环境：微信开发者工具、wxml/wxss/js 结构、自定义 TabBar 与暗色主题方案</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:20</td>
+          <td>BLE 速览：Service/Characteristic/Notify 概念，DX-BT24 的 FFE0/FFE1，UUID 子串匹配自动发现</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:30</td>
+          <td><strong>Vibe Coding 启动</strong>：基于封装好的 <code>ble.js</code> 生成设置页（扫描 15s 自动停止 + 名称过滤 + 一键连接）</td>
+          <td><span class="role-tag role-vibe">🤖 Vibe Coding</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">10:00</td>
+          <td>老师带学员 Review：Notify 注册流程、<code>_rxBuf</code> 粘包分帧、writeNoResponse 降级逻辑</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">10:30</td>
+          <td><strong>Vibe Coding</strong>：生成控制页（上班/下班模式 + 2×2 灯光模式按钮 + 全亮/全灭 + 蜂鸣，三组按钮激活互斥）</td>
+          <td><span class="role-tag role-vibe">🤖 Vibe Coding</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">11:00</td>
+          <td>小程序 → DX-BT24 → USART2 完整链路联调：点按钮 → LED 模式切换 + 手机振动 + USART1 日志</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">11:30</td>
+          <td>验证闭环：首页接收 <code>DATA:TEMP:HUM</code> 帧，温湿度三色卡片实时更新</td>
+          <td><span class="role-tag role-do">✍️ 学员验证</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="prep-note">
+      <div class="prep-label">🔧 提前准备</div>
+      小程序 BLE 底层封装 <code>ble.js</code>（适配器初始化/扫描/连接/UUID 发现/Notify/分帧全封装），学员专注业务页面而非 BLE 细节；测试号 AppID 备好
+    </div>
+
+    <div class="session-header"><span class="session-badge pm">下午 14:00 – 18:00</span></div>
+    <table>
+      <thead><tr><th>时间</th><th>内容</th><th>分工</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">14:00</td>
+          <td><strong>Vibe Coding</strong>：小程序首页温湿度折线图（Canvas 2D 最近 20 点）+ 考勤页事件列表（过滤 Tab + 彩色竖线）</td>
+          <td><span class="role-tag role-vibe">🤖 Vibe Coding</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">14:40</td>
+          <td>HMI 仪表盘：QPainter 扫描线动画原理讲解，学员接入 FACE 帧驱动绿色成功/红色陌生人状态显示</td>
+          <td><span class="role-tag role-teach">📖 老师讲思路</span>&nbsp;<span class="role-tag role-do">✍️ 学员写</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">15:30</td>
+          <td><strong>核心业务 ⭐ 10 秒在场打卡机制</strong>：连续在场 10s 才打卡、离开超 4s 重新计时、60s 防重复——学员亲手实现这套防误触发状态机（本日最重要的代码）</td>
+          <td><span class="role-tag role-do">✍️ 学员写</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">16:30</td>
+          <td>人员管理页：新增人员自动分配 face_index，与 K210 BOOT 键注册顺序对应；REG 帧到来更新注册状态</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span>&nbsp;<span class="role-tag role-do">✍️ 学员写</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">17:15</td>
+          <td>全链路验证：刷脸 → 仪表盘黄色进度条走满 10s → 写入考勤记录 → 小程序考勤页同步出现该事件</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">17:45</td>
+          <td>Day 2 总结 + 课后任务：每人注册自己的人脸并在人员管理里建档，明早直接刷脸打卡</td>
+          <td><span class="role-tag role-do">✍️ 课后任务</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip purple" style="margin-top:16px"><strong>✅ Day 2 验收标准</strong>
+    ① 小程序四页可用：BLE 连接、控制页 7 条指令有效、首页温湿度实时刷新 ✓<br>
+    ② HMI 仪表盘扫描动画 + 在场进度条 + 10 秒打卡机制工作正常 ✓<br>
+    ③ 刷脸事件在 HMI 考勤记录与小程序考勤页双端同步出现 ✓</div>
+  </div>
+
+  <!-- ── DAY 3 ── -->
+  <div id="day-d3" class="day-content">
+    <div class="day-theme">
+      <strong style="color:var(--green)">主题：9 条数据链路全部打通，打磨细节，完整演示</strong>
+      <span style="color:#546e7a;font-size:13px;margin-left:10px;">收尾日，颁证日</span>
+    </div>
+    <div class="badge-row">
+      <span class="badge blue">Day 3</span>
+      <span class="badge teal">🎯 场景模式 · 考勤规则 · 全系统集成 · 演示验收 · 颁证</span>
+    </div>
+
+    <div class="session-header"><span class="session-badge am">上午 9:00 – 12:00</span></div>
+    <table>
+      <thead><tr><th>时间</th><th>内容</th><th>分工</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:00</td>
+          <td>晨间真实打卡：全员用昨晚注册的人脸刷脸上班打卡，验证迟到/正常状态判定与 60s 防重复</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">9:30</td>
+          <td><strong>Vibe Coding</strong>：小程序上班/下班场景模式打磨（一键全亮/呼吸灯 + 激活态动画）—— 学员自己写 Prompt</td>
+          <td><span class="role-tag role-vibe">🤖 Vibe Coding</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">10:00</td>
+          <td>陌生人报警全链路：未注册人脸 → F407 爆闪+蜂鸣 → HMI 红色警告+陌生人考勤记录 → 小程序震动+Toast</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">10:30</td>
+          <td>考勤收尾功能：时间规则配置（上下班/迟到/早退阈值）、按日历查记录、导出 CSV、部门出勤率</td>
+          <td><span class="role-tag role-do">✍️ 学员写</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">11:00</td>
+          <td>效果锁专项调试：K210 触发 LED 效果期间小程序下发 CMD 应立即接管（<code>s_k210_active=0</code>），验证两路控制不打架</td>
+          <td><span class="role-tag role-all">🔗 全员联调</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">11:30</td>
+          <td>分组排查 Bug，老师巡场（重点：BLE 断线重连、粘包丢帧、打卡重复计时、DHT11 读取超时）</td>
+          <td><span class="role-tag role-do">✍️ 学员自查</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="session-header"><span class="session-badge pm">下午 14:00 – 17:30</span></div>
+    <table>
+      <thead><tr><th>时间</th><th>内容</th><th>分工</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">14:00</td>
+          <td>各组完整演示：刷脸打卡 + 陌生人报警 + 小程序控灯 + HMI 全程可见（按验收清单逐项演示）</td>
+          <td><span class="role-tag role-do">✍️ 分组演示</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">14:45</td>
+          <td><strong>Vibe Coding 专题</strong>：现场用 AI 给系统加一个学员自定义功能（现场提需求 → 生成 → Review → 演示）</td>
+          <td><span class="role-tag role-vibe">🤖 Vibe Coding</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">15:30</td>
+          <td>打包 + 部署：小程序体验版发布扫码可用</td>
+          <td><span class="role-tag role-teach">📖 老师演示</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">16:00</td>
+          <td>项目复盘：114 项功能盘点、技术亮点总结、AIoT 全栈简历怎么写、职业路径展望</td>
+          <td><span class="role-tag role-teach">📖 老师讲</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">16:30</td>
+          <td>自由时间：互相体验对方系统，录制演示视频留档（B站/简历用）</td>
+          <td><span class="role-tag role-do">✍️ 自由</span></td>
+        </tr>
+        <tr>
+          <td style="white-space:nowrap;color:#546e7a">17:00</td>
+          <td>🎉 颁发结业证书 + 合影留念</td>
+          <td><span style="font-size:18px">🎓</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip green" style="margin-top:16px"><strong>✅ Day 3 验收标准</strong>
+    见"资源 &amp; 验收"页的完整演示清单（10 项），完成 ≥ 8 项可获结业证书，全部 10 项完成颁发"AIoT 全栈达人"特别奖章。</div>
+  </div>
+
+</div>
+</div>
+</div>
+
+<!-- ══════════════ TASKS ══════════════ -->
+<div id="section-tasks" class="section">
+<div class="container">
+
+<div class="card">
+  <h2>🔧 提前准备（老师完成，学员直接用）</h2>
+  <div class="tip orange"><strong>准备原则</strong>凡是与本次实训核心技能无关的底层细节（BLE 协议层、K210 模型推理、串口线程框架），均提前封装好。升级版的最大优势：所有准备物均为已落地项目的真实代码，零纸面风险。</div>
+  <table>
+    <thead><tr><th>模块</th><th>内容</th><th>完成度</th></tr></thead>
+    <tbody>
+      <tr><td><strong>F407 固件 v2.0</strong></td><td>三串口 + BLE 环形缓冲 + DHT11 + LED 6 模式 + 蜂鸣器 + 按键 + K210 事件响应（34 项功能全实现）</td><td><span style="color:var(--green)">●●●●● 100%</span></td></tr>
+      <tr><td><strong>K210 程序</strong></td><td>人脸检测/识别/BOOT 键注册 + FACE/REG 串口帧输出（开箱即用）</td><td><span style="color:var(--green)">●●●●● 100%</span></td></tr>
+      <tr><td><strong>HMI 骨架</strong></td><td>暗色主窗口 + 4 页导航 + SerialWorker 线程 + 帧解析（仪表盘动画与打卡状态机留空给学员）</td><td><span style="color:var(--orange)">●●●○○ 60%</span></td></tr>
+      <tr><td><strong>小程序 BLE 底层</strong></td><td><code>ble.js</code>：适配器/扫描/连接/UUID 自动发现/Notify/分帧粘包全封装</td><td><span style="color:var(--green)">●●●●● 100%</span></td></tr>
+      <tr><td><strong>小程序参考实现</strong></td><td>完整 4 页参考版（学员卡住时对照，不直接发放）</td><td><span style="color:var(--green)">●●●●● 100%</span></td></tr>
+      <tr><td><strong>协议/接口文档</strong></td><td>21-下位机数据接口文件 + 26-完整功能清单（即本文档配套资料）</td><td><span style="color:var(--green)">●●●●● 100%</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>✍️ 学员动手编写内容</h2>
+  <table>
+    <thead><tr><th>内容</th><th>难度</th><th>课时</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>BLE App 发 7 条 <code>CMD:*</code> 指令控制 LED/蜂鸣器，对照 USART1 日志</td>
+        <td><span class="stars">★</span><span style="color:#e0e0e0">★★</span></td>
+        <td>Day1 上午</td>
+      </tr>
+      <tr>
+        <td>pyserial 读 USART1 + 解析 <code>FACE</code>/<code>DATA</code> 帧 + 实时打印</td>
+        <td><span class="stars">★★</span><span style="color:#e0e0e0">★</span></td>
+        <td>Day1 下午</td>
+      </tr>
+      <tr>
+        <td>HMI 设置页：串口扫描/连接/断开 + 实时日志滚动</td>
+        <td><span class="stars">★★</span><span style="color:#e0e0e0">★</span></td>
+        <td>Day1 下午</td>
+      </tr>
+      <tr>
+        <td>HMI 仪表盘：FACE 帧驱动成功/陌生人状态显示 + 淡出动画</td>
+        <td><span class="stars">★★</span><span style="color:#e0e0e0">★</span></td>
+        <td>Day2 下午</td>
+      </tr>
+      <tr>
+        <td><strong>⭐ 10 秒在场打卡状态机</strong>（连续在场 / 4s 离开重置 / 60s 防重复）</td>
+        <td><span class="stars">★★★</span></td>
+        <td>Day2 下午</td>
+      </tr>
+      <tr>
+        <td>人员管理：face_index 自动分配 + REG 帧更新注册状态</td>
+        <td><span class="stars">★★</span><span style="color:#e0e0e0">★</span></td>
+        <td>Day2 下午</td>
+      </tr>
+      <tr>
+        <td>考勤规则配置 + 日历查询 + CSV 导出</td>
+        <td><span class="stars">★★</span><span style="color:#e0e0e0">★</span></td>
+        <td>Day3 上午</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>🤖 Vibe Coding 任务（AI 辅助生成）</h2>
+  <div class="tip purple"><strong>Vibe Coding 原则</strong>AI 生成代码不是"拿来就用"。每次生成后，老师带学员 Review 关键 API 和数据流。UI 层交给 AI，核心业务逻辑（打卡状态机、帧解析）必须学员自己写——这是"会用 AI"和"被 AI 用"的分界线。</div>
+  <table>
+    <thead><tr><th>生成内容</th><th>推荐工具</th><th>课时</th></tr></thead>
+    <tbody>
+      <tr><td>小程序设置页（BLE 扫描 15s + 名称过滤 + 一键连接/断开）</td><td>Cursor</td><td>Day2 上午</td></tr>
+      <tr><td>小程序控制页（上班/下班模式 + 2×2 灯光按钮 + 互斥激活态）</td><td>Cursor</td><td>Day2 上午</td></tr>
+      <tr><td>小程序首页温湿度折线图（Canvas 2D 最近 20 点）</td><td>Cursor / Claude</td><td>Day2 下午</td></tr>
+      <tr><td>小程序考勤页（统计条 + 过滤 Tab + 事件列表）</td><td>Cursor</td><td>Day2 下午</td></tr>
+      <tr><td>小程序场景模式打磨（激活态动画）—— 学员自己写 Prompt</td><td>Cursor</td><td>Day3 上午</td></tr>
+      <tr><td>HMI 界面美化（统计卡片 / 部门出勤率进度条）</td><td>Cursor / Claude</td><td>Day3 上午</td></tr>
+      <tr><td>学员自定义功能（自由发挥，现场 Demo）</td><td style="color:var(--pink)">任意 AI</td><td>Day3 下午</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ RESOURCES ══════════════ -->
+<div id="section-resources" class="section">
+<div class="container">
+
+<div class="card">
+  <h2>🔩 硬件清单（与实际项目一致）</h2>
+  <div class="hw-grid">
+    <div class="hw-card-item">
+      <div class="hw-name">主控开发板</div>
+      <div class="hw-model">STM32F407ZET6</div>
+      <div class="hw-use">三串口路由中枢（标准库 V1.8）</div>
+      <span class="hw-qty">每组 1 块</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">边缘 AI 计算板</div>
+      <div class="hw-model">K210（KPU）</div>
+      <div class="hw-use">本地人脸识别，BOOT 键注册</div>
+      <span class="hw-qty">每组 1 块</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">BLE 蓝牙模块</div>
+      <div class="hw-model">DX-BT24</div>
+      <div class="hw-use">9600 透传，FFE0/FFE1</div>
+      <span class="hw-qty">每组 1 块</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">温湿度传感器</div>
+      <div class="hw-model">DHT11</div>
+      <div class="hw-use">PG9 单总线，每 5s 上报</div>
+      <span class="hw-qty">每组 1 个</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">上拉电阻</div>
+      <div class="hw-model">4.7 kΩ</div>
+      <div class="hw-use">DHT11 数据线上拉至 3.3V</div>
+      <span class="hw-qty">每组 1 个</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">LED 灯组</div>
+      <div class="hw-model">板载/外接 LED</div>
+      <div class="hw-use">6 模式动效演示</div>
+      <span class="hw-qty">每组 1 套</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">有源蜂鸣器</div>
+      <div class="hw-model">5V 有源</div>
+      <div class="hw-use">短鸣反馈 + 陌生人报警</div>
+      <span class="hw-qty">每组 1 个</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">USB-TTL 转换</div>
+      <div class="hw-model">CH340</div>
+      <div class="hw-use">USART1 连接 PC / HMI</div>
+      <span class="hw-qty">每组 1 个</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">按键</div>
+      <div class="hw-model">板载 KEY1~4</div>
+      <div class="hw-use">本地调试 LED 模式</div>
+      <span class="hw-qty">板载</span>
+    </div>
+    <div class="hw-card-item">
+      <div class="hw-name">仿真器</div>
+      <div class="hw-model">ST-Link V2</div>
+      <div class="hw-use">Keil 烧录调试</div>
+      <span class="hw-qty">每组 1 个</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>💻 软件环境</h2>
+  <div class="sw-cards">
+    <div class="sw-card">
+      <div class="sw-icon">🖥️</div>
+      <h4>PC 端（提前装好）</h4>
+      <p style="font-family:'Courier New',monospace;color:var(--teal);font-size:12px;margin-top:8px;line-height:2">
+        pip install pyside6<br>
+        pip install pyserial
+      </p>
+    </div>
+    <div class="sw-card">
+      <div class="sw-icon">📱</div>
+      <h4>小程序端</h4>
+      <p>微信开发者工具（最新稳定版）<br>测试号 AppID（提前备好）<br>Cursor 编辑器（Vibe Coding 主力）<br>Claude（辅助 Review 与修复）</p>
+    </div>
+    <div class="sw-card">
+      <div class="sw-icon">🧠</div>
+      <h4>K210 端</h4>
+      <p>MaixPy 固件（已刷好）<br>人脸识别程序（开箱即用）<br>BOOT 键注册，无需 IDE<br>MobaXterm / SSCOM（串口观察）</p>
+    </div>
+    <div class="sw-card">
+      <div class="sw-icon">⚙️</div>
+      <h4>STM32 端</h4>
+      <p>Keil MDK 5（已配置 F4 Pack）<br>STM32F4xx 标准库 V1.8.0<br>ST-Link 驱动（已安装）<br>XCOM 串口调试助手</p>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📋 项目技术亮点（简历用）</h2>
+  <div class="resume-block">
+    <button class="copy-btn" onclick="copyResume()">📋 复制</button>
+项目名称：基于 K210 边缘算力的 AI 门禁考勤 × 蓝牙智慧家居系统
+
+技术栈：STM32F407（标准库）· K210 KPU 边缘推理 · 微信小程序 BLE · PySide6 · pyserial
+
+项目描述：
+  · 设计并实现四端架构：K210 UART → STM32F407 三串口路由 → BLE 小程序 / PySide6 考勤上位机，共 9 条端到端数据链路、114 项功能
+  · K210 KPU 本地人脸识别（无需联网），识别/陌生人事件经 F407 分发驱动 LED 报警、HMI 考勤与小程序推送三端联动
+  · F407 端实现 256B 环形缓冲 + 主循环组帧的 BLE 收包机制，DHT11 单总线读取采用关中断保护时序，TIM4 1kHz 驱动 6 种 LED 动效
+  · 独立设计"10 秒连续在场打卡"防误触发状态机（离开 4s 重置 / 60s 防重复 / 迟到早退判定），完成人员管理与 CSV 导出
+  · 微信小程序 4 页暗色应用：BLE UUID 自动发现、Notify 粘包分帧、Canvas 温湿度折线图、考勤事件实时同步
+  · 采用 Vibe Coding（Cursor + Claude）完成小程序约 70% UI 代码，核心业务逻辑手写，具备 Review AI 代码能力</div>
+</div>
+
+<div class="card">
+  <h2>🎯 最终演示验收清单（对应 9 条真实数据链路）</h2>
+  <div class="check-progress">
+    <span id="checkCount">0 / 10 完成</span>
+    <div class="progress-fill-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <button onclick="resetChecklist()" style="background:var(--gray-light);border:1px solid #e0e0e0;color:#546e7a;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;">重置</button>
+  </div>
+  <ul class="checklist" id="checklist">
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">📱 小程序设置页扫描并连接 DX-BT24，状态显示"已连接"，断开有二次确认</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">💡 小程序控制页 7 条指令全部有效：4 种灯光模式 + 全亮/全灭 + 蜂鸣（手机同步振动），按钮激活态互斥正确</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">🌡️ 小程序首页温湿度卡片每 5s 刷新，折线图滚动更新，超标弹 Toast</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">🧠 K210 BOOT 键注册新人脸 → F407 打印 REG 帧 → HMI 人员管理注册状态更新</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">✅ 已注册人脸识别成功 → LED 常亮 3s → HMI 绿色状态 + 小程序考勤页新增"通过"事件</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">🚨 陌生人出现 → LED 爆闪 + 蜂鸣 3s → HMI 红色警告 + 陌生人考勤记录 → 小程序震动提醒</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">⏱️ 在场 10 秒打卡机制：黄色进度条走满才写考勤；中途离开超 4s 重新计时；60s 内不重复打卡</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">📊 HMI 考勤记录按日历可查、迟到/早退状态颜色正确、当日记录可导出 CSV</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">🔀 效果锁验证：K210 触发 LED 效果期间，小程序下发 CMD 能立即接管控制权</span>
+    </li>
+    <li onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <span class="check-text">📦 小程序体验版扫码可用</span>
+    </li>
+  </ul>
+  <div class="tip green" style="margin-top:12px"><strong>🎓 通过标准</strong>完成 ≥ 8 项视为通过，颁发结业证书。全部 10 项完成为优秀，颁发"AIoT 全栈开发达人"特别奖章。</div>
+</div>
+
+</div>
+</div>
+
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  document.querySelectorAll('nav .tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function showDay(id, btn) {
+  document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+  document.getElementById('day-' + id).classList.add('active');
+  document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function toggleAccordion(head) {
+  head.classList.toggle('open');
+  const body = head.nextElementSibling;
+  body.classList.toggle('open');
+}
+function toggleCheck(li) {
+  li.classList.toggle('done');
+  updateProgress();
+}
+function updateProgress() {
+  const items = document.querySelectorAll('#checklist li');
+  const done  = document.querySelectorAll('#checklist li.done').length;
+  document.getElementById('checkCount').textContent = done + ' / ' + items.length + ' 完成';
+  document.getElementById('progressFill').style.width = (done / items.length * 100) + '%';
+}
+function resetChecklist() {
+  document.querySelectorAll('#checklist li').forEach(li => li.classList.remove('done'));
+  updateProgress();
+}
+function copyResume() {
+  const text = document.querySelector('.resume-block').innerText.replace('📋 复制','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => btn.textContent = '📋 复制', 2000);
+  });
+}
+window.addEventListener('scroll', () => {
+  document.getElementById('toTop').classList.toggle('show', window.scrollY > 300);
+});
+</script>
+</body>
+</html>
