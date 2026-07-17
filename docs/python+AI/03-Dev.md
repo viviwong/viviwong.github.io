@@ -57,7 +57,7 @@ deactivate
 ### 2. 权限解锁 (Win 用户必看)
 如果执行激活命令报错（如：在此系统上禁止运行脚本），请用管理员身份打开 PowerShell 执行：
 
-* **永久开启**：`Set-ExecutionPolicy -ExecutionPolicy Unrestricted`
+* **永久开启**：`Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser`
 * **临时开启**：`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
 
 ---
