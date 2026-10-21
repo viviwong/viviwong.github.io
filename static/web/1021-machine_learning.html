@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机器学习基础知识 · 小白图解教程</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230B1026'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%238B9CFF' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='13' fill='none' stroke='%233AD6C6' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23FF9F43'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* ============ 设计系统 ============ */
+:root{
+  --bg0:#070B1A;
+  --bg1:#0C1228;
+  --bg2:#111A3A;
+  --bg3:#182349;
+  --line:rgba(148,163,255,.16);
+  --line2:rgba(148,163,255,.30);
+  --txt:#E9EDFF;
+  --txt2:#A6B1DA;
+  --txt3:#6F7CAA;
+  --acc:#FF9F43;
+  --acc2:#3AD6C6;
+  --acc3:#8B9CFF;
+  --danger:#FF7B7B;
+  --ok:#3AD6C6;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg0);
+  color:var(--txt);
+  line-height:1.75;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(255,159,67,.35);color:#fff}
+img{max-width:100%;display:block}
+a{color:var(--acc2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ============ 顶部导航 ============ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;
+  background:rgba(7,11,26,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav .brand{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;font-size:15px;color:var(--txt);
+  white-space:nowrap;
+}
+.nav .brand svg{width:22px;height:22px;flex:none}
+.nav .links{
+  display:flex;gap:4px;overflow-x:auto;
+  scrollbar-width:none;margin-left:auto;
+}
+.nav .links::-webkit-scrollbar{display:none}
+.nav .links a{
+  flex:none;font-size:13px;color:var(--txt2);
+  padding:6px 10px;border-radius:8px;white-space:nowrap;
+}
+.nav .links a:hover{color:var(--txt);background:var(--bg2);text-decoration:none}
+.nav .links a.on{color:var(--acc);background:rgba(255,159,67,.12)}
+
+/* ============ Hero ============ */
+.hero{
+  position:relative;overflow:hidden;
+  padding:64px 20px 90px;
+  text-align:center;
+  background:
+    radial-gradient(1100px 520px at 50% -10%,rgba(139,156,255,.22),transparent 60%),
+    radial-gradient(900px 480px at 85% 30%,rgba(58,214,198,.10),transparent 55%),
+    radial-gradient(800px 460px at 12% 55%,rgba(255,159,67,.10),transparent 55%),
+    linear-gradient(180deg,#0B1129 0%,#070B1A 100%);
+}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero .inner{position:relative;z-index:2;max-width:1080px;margin:0 auto}
+.hero .eyebrow{
+  display:inline-block;font-size:13px;letter-spacing:.18em;color:var(--acc2);
+  border:1px solid var(--line2);border-radius:999px;padding:6px 16px;
+  margin-bottom:22px;background:rgba(58,214,198,.07);
+}
+.hero h1{
+  font-size:clamp(34px,7vw,58px);font-weight:900;line-height:1.22;
+  background:linear-gradient(120deg,#FFFFFF 30%,#B9C4FF 60%,#3AD6C6 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:18px;
+}
+.hero .sub{
+  font-size:clamp(15px,2.4vw,18px);color:var(--txt2);
+  max-width:640px;margin:0 auto 34px;
+}
+.hero .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:560px;margin:0 auto}
+.hero .stat{
+  background:var(--bg2);border:1px solid var(--line);border-radius:14px;
+  padding:12px 20px;min-width:130px;
+}
+.hero .stat b{display:block;font-size:26px;font-weight:900;color:var(--acc);font-family:var(--mono)}
+.hero .stat span{font-size:13px;color:var(--txt2)}
+
+/* 嵌套圆 SVG */
+.ringbox{position:relative;z-index:2;max-width:760px;margin:-10px auto 0}
+.ringbox svg{width:100%;height:auto;display:block}
+.ringbox .tip{
+  position:absolute;z-index:3;pointer-events:none;
+  background:var(--bg3);border:1px solid var(--line2);border-radius:12px;
+  padding:10px 14px;font-size:13px;color:var(--txt);
+  max-width:230px;opacity:0;transform:translateY(6px);
+  transition:opacity .25s,transform .25s;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+.ringbox .tip.show{opacity:1;transform:none}
+.ringbox .tip b{color:var(--acc)}
+.ringbox .tip .en{display:block;color:var(--txt3);font-family:var(--mono);font-size:11px;margin-top:2px}
+
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.035);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ring-anim{transform-origin:center;animation:breathe 4.5s ease-in-out infinite}
+.spin-dash{transform-origin:center;animation:spin 26s linear infinite}
+.spin-dash2{transform-origin:center;animation:spin 40s linear infinite reverse}
+
+.scroll-hint{
+  position:relative;z-index:2;margin-top:26px;font-size:12px;color:var(--txt3);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.scroll-hint::after{
+  content:"";width:14px;height:14px;border-right:2px solid var(--txt3);border-bottom:2px solid var(--txt3);
+  transform:rotate(45deg);animation:nd 1.6s ease-in-out infinite;
+}
+@keyframes nd{0%,100%{transform:rotate(45deg) translate(0,0)}50%{transform:rotate(45deg) translate(4px,4px)}}
+
+/* ============ 章节通用 ============ */
+main{max-width:1080px;margin:0 auto;padding:0 20px}
+section{padding:70px 0 20px}
+.chapter-head{margin-bottom:34px}
+.chapter-head .kicker{
+  font-family:var(--mono);font-size:13px;color:var(--acc3);letter-spacing:.12em;
+  display:flex;align-items:center;gap:12px;margin-bottom:10px;
+}
+.chapter-head .kicker::before{content:"";width:34px;height:2px;background:linear-gradient(90deg,var(--acc3),transparent)}
+.chapter-head h2{font-size:clamp(24px,4.4vw,36px);font-weight:900;line-height:1.3}
+.chapter-head p{color:var(--txt2);font-size:15px;margin-top:10px;max-width:760px}
+.lead{
+  font-size:16px;color:var(--txt);max-width:820px;
+  background:linear-gradient(180deg,rgba(139,156,255,.08),rgba(139,156,255,.02));
+  border:1px solid var(--line);border-left:3px solid var(--acc3);
+  border-radius:12px;padding:16px 20px;margin-bottom:30px;
+}
+
+/* 卡片网格 */
+.grid{display:grid;grid-template-columns:repeat(1,1fr);gap:14px}
+.card{
+  background:var(--bg1);border:1px solid var(--line);border-radius:16px;
+  padding:18px;transition:border-color .2s,transform .2s;
+}
+.card:hover{border-color:var(--line2)}
+.card .ct{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;margin-bottom:8px}
+.card .ct .n{
+  font-family:var(--mono);font-size:12px;color:var(--bg0);
+  background:var(--acc3);border-radius:7px;padding:2px 8px;flex:none;
+}
+.card p{color:var(--txt2);font-size:14.5px}
+.card p b{color:var(--txt)}
+.hl{color:var(--acc);font-weight:700}
+.hl2{color:var(--acc2);font-weight:700}
+
+/* 小节标题 */
+.subt{
+  display:flex;align-items:center;gap:10px;
+  font-size:19px;font-weight:800;margin:36px 0 16px;
+}
+.subt::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--acc);flex:none}
+.subt .en{font-family:var(--mono);font-size:12px;color:var(--txt3);font-weight:400}
+
+/* 概念强调框 */
+.notebox{
+  border:1px dashed var(--line2);border-radius:14px;padding:14px 18px;
+  font-size:14.5px;color:var(--txt2);background:rgba(255,159,67,.05);margin:14px 0;
+}
+.notebox b{color:var(--acc)}
+
+/* 定义块 */
+.def{
+  background:var(--bg1);border:1px solid var(--line);border-radius:16px;
+  padding:18px;margin:14px 0;position:relative;
+}
+.def::before{
+  content:"定义";position:absolute;top:-10px;left:16px;
+  font-size:11px;letter-spacing:.1em;color:var(--acc3);
+  background:var(--bg1);border:1px solid var(--line);border-radius:6px;padding:1px 8px;
+}
+.def .en{font-family:var(--mono);font-size:12px;color:var(--txt3);margin-bottom:6px;line-height:1.6}
+.def p{font-size:14.5px;color:var(--txt2)}
+.def p b{color:var(--txt)}
+
+/* 公式 */
+.fx{font-family:var(--mono);font-size:13.5px;color:var(--acc2);background:rgba(58,214,198,.08);
+  border:1px solid rgba(58,214,198,.18);border-radius:8px;padding:2px 8px;display:inline-block;
+  max-width:100%;overflow-wrap:anywhere;vertical-align:middle}
+
+/* 图片配图 */
+.fig{margin:20px 0;text-align:center}
+.fig img{border-radius:14px;border:1px solid var(--line);background:#fff}
+.fig .cap{font-size:12.5px;color:var(--txt3);margin-top:8px}
+
+/* ============ T/E/P 交互 ============ */
+.tep{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.tep button{
+  flex:1;min-width:150px;cursor:pointer;text-align:left;
+  background:var(--bg1);border:1px solid var(--line);border-radius:14px;
+  color:var(--txt);padding:14px 16px;font-family:var(--sans);font-size:14px;
+  transition:border-color .2s,background .2s,transform .2s;
+}
+.tep button:hover{border-color:var(--acc3);transform:translateY(-2px)}
+.tep button.on{border-color:var(--acc);background:rgba(255,159,67,.10)}
+.tep button .k{font-family:var(--mono);font-weight:600;color:var(--acc);font-size:15px}
+.tep button .t{display:block;font-size:13px;color:var(--txt2);margin-top:4px}
+.tep-desc{
+  min-height:64px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:14px;padding:14px 18px;font-size:14.5px;color:var(--txt2);
+}
+.tep-desc b{color:var(--acc)}
+
+/* ============ 三要素 ============ */
+.tri{
+  display:flex;flex-direction:column;align-items:stretch;gap:14px;margin:18px 0;
+}
+.tri .node{
+  cursor:pointer;background:var(--bg1);border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px;transition:border-color .2s,background .2s;
+}
+.tri .node.on{border-color:var(--acc);background:rgba(255,159,67,.08)}
+.tri .node h4{display:flex;align-items:center;gap:10px;font-size:16px}
+.tri .node h4 .en{font-family:var(--mono);font-size:11px;color:var(--txt3);font-weight:400}
+.tri .node .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.tri .node .more{font-size:13.5px;color:var(--txt2);margin-top:6px;display:none}
+.tri .node.on .more{display:block}
+.tri .flow{
+  text-align:center;font-family:var(--mono);font-size:12px;color:var(--txt3);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.tri .flow .arr{color:var(--acc);font-size:16px}
+
+/* ============ 时间轴 ============ */
+.timeline{
+  --date:84px;--axis:16px;--gap:10px;
+  display:grid;grid-template-columns:var(--date) var(--axis) 1fr;
+  gap:0 var(--gap);margin:22px 0;position:relative;
+}
+.timeline::before{
+  content:"";position:absolute;top:8px;bottom:8px;
+  left:calc(var(--date) + var(--gap) + var(--axis)/2);
+  width:2px;transform:translateX(-50%);
+  background:linear-gradient(180deg,var(--acc3),var(--acc2),var(--acc));
+}
+.tl-time{text-align:right;padding:10px 0;font-family:var(--mono);font-size:13px;color:var(--acc2);font-weight:600;line-height:1.4}
+.tl-axis{display:flex;justify-content:center}
+.tl-axis .dot{
+  width:12px;height:12px;border-radius:50%;background:var(--bg0);
+  border:3px solid var(--acc3);margin-top:13px;flex:none;box-sizing:border-box;
+}
+.tl-axis .dot.hot{border-color:var(--acc);background:var(--acc)}
+.tl-body{padding:6px 0 18px;cursor:pointer}
+.tl-body h5{font-size:15.5px;font-weight:700;color:var(--txt)}
+.tl-body .brief{font-size:13.5px;color:var(--txt2);margin-top:2px}
+.tl-body .detail{display:none;font-size:13.5px;color:var(--txt2);margin-top:6px;background:var(--bg2);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tl-body.open .detail{display:block}
+.tl-body .hint{font-size:11.5px;color:var(--txt3);margin-top:4px}
+
+/* ============ 核心技术 ============ */
+.tech4{display:grid;grid-template-columns:repeat(1,1fr);gap:14px;margin:18px 0}
+.tech{
+  cursor:pointer;background:var(--bg1);border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px;transition:border-color .2s,background .2s;
+}
+.tech.on{border-color:var(--acc3);background:var(--bg2)}
+.tech h4{display:flex;align-items:center;gap:8px;font-size:15.5px}
+.tech h4 .tag{font-family:var(--mono);font-size:11px;color:var(--txt3);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-left:auto;flex:none}
+.tech .svgmini{margin:10px auto 4px;display:block;width:100%;max-width:300px;height:auto}
+.tech .more{display:none;font-size:13.5px;color:var(--txt2);margin-top:8px}
+.tech .more b{color:var(--txt)}
+.tech.on .more{display:block}
+.tech .apps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tech .apps span{
+  font-size:12px;color:var(--txt2);background:rgba(139,156,255,.10);
+  border:1px solid var(--line);border-radius:999px;padding:2px 10px;
+}
+
+/* ============ 流程步骤条 ============ */
+.steps{display:grid;grid-template-columns:repeat(1,1fr);gap:12px;margin:20px 0}
+.step{
+  background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:14px 16px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.step.on{border-color:var(--acc2);background:rgba(58,214,198,.07)}
+.step .sh{display:flex;align-items:center;gap:10px}
+.step .no{font-family:var(--mono);font-weight:700;color:var(--acc2);font-size:14px}
+.step h5{font-size:15px}
+.step .en{font-family:var(--mono);font-size:11px;color:var(--txt3);margin-left:auto}
+.step .detail{display:none;font-size:13.5px;color:var(--txt2);margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+.step.on .detail{display:block}
+.step .detail b{color:var(--acc2)}
+.step .detail .job{display:inline-block;font-size:12px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:1px 8px;margin:3px 4px 0 0;color:var(--txt2)}
+
+/* ============ 名词卡 ============ */
+.terms{display:grid;grid-template-columns:repeat(1,1fr);gap:12px;margin:18px 0}
+.term{
+  background:var(--bg1);border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;cursor:pointer;transition:border-color .2s,background .2s;
+}
+.term.on{border-color:var(--acc2);background:rgba(58,214,198,.06)}
+.term h5{font-size:15px;display:flex;align-items:center;gap:8px}
+.term h5 .en{font-family:var(--mono);font-size:11px;color:var(--txt3);font-weight:400}
+.term .more{display:none;font-size:13.5px;color:var(--txt2);margin-top:6px}
+.term.on .more{display:block}
+.term .more b{color:var(--acc2)}
+
+/* ============ 表格 ============ */
+.tblwrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:14px;background:var(--bg1)}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13.5px}
+colgroup col:first-child{width:26%}
+table th{
+  text-align:left;padding:10px 12px;font-size:12.5px;color:var(--txt3);
+  font-weight:600;border-bottom:1px solid var(--line2);white-space:nowrap;
+}
+table td{padding:10px 12px;color:var(--txt2);border-bottom:1px solid var(--line);vertical-align:top}
+table tr:last-child td{border-bottom:none}
+table td b{color:var(--txt)}
+table .cn{font-family:var(--mono);font-size:12px;color:var(--acc3)}
+
+/* 西瓜案例按钮 */
+.melon-wrap{background:var(--bg1);border:1px solid var(--line);border-radius:16px;padding:18px;margin:18px 0}
+.melon-wrap .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.melon-wrap .feat{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:13.5px}
+.melon-wrap .feat b{color:var(--acc2)}
+.melon-wrap .q{color:var(--acc);font-family:var(--mono);font-weight:700;font-size:18px}
+button.act{
+  cursor:pointer;background:var(--acc);color:#1B1408;border:none;border-radius:10px;
+  font-weight:700;font-size:14px;padding:10px 22px;font-family:var(--sans);
+  transition:transform .15s,filter .15s;
+}
+button.act:hover{transform:translateY(-2px);filter:brightness(1.08)}
+button.act:active{transform:translateY(0)}
+.melon-result{
+  margin-top:12px;border-radius:12px;padding:14px 16px;font-size:14.5px;display:none;
+  border:1px solid var(--ok);background:rgba(58,214,198,.08);color:var(--txt);
+}
+.melon-result b{color:var(--ok)}
+
+/* ============ 算法分类 tab ============ */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.tabs button{
+  cursor:pointer;flex:1;min-width:120px;font-family:var(--sans);font-size:14px;font-weight:600;
+  background:var(--bg1);border:1px solid var(--line);border-radius:12px;color:var(--txt2);
+  padding:12px 14px;transition:all .2s;
+}
+.tabs button.on{background:var(--bg2);border-color:var(--acc);color:var(--txt)}
+.tabs button .en{display:block;font-family:var(--mono);font-size:10.5px;color:var(--txt3);font-weight:400;margin-top:2px}
+.pane{display:none}
+.pane.on{display:block;animation:fadein .4s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.algo-list{display:grid;grid-template-columns:repeat(1,1fr);gap:14px;margin:14px 0}
+.algo{
+  background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.algo.on{border-color:var(--acc3);background:var(--bg2)}
+.algo h5{font-size:15px;display:flex;align-items:center;gap:8px}
+.algo h5 .tag{font-family:var(--mono);font-size:11px;color:var(--acc3);margin-left:auto}
+.algo .mini{display:block;width:100%;max-width:320px;margin:10px auto;height:auto}
+.algo .more{display:none;font-size:13.5px;color:var(--txt2);margin-top:6px}
+.algo .more b{color:var(--acc3)}
+.algo.on .more{display:block}
+.algo .scene{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.algo .scene span{font-size:12px;color:var(--txt2);background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.25);border-radius:999px;padding:2px 10px}
+
+/* ============ 偏差方差滑块 ============ */
+.bv-wrap{background:var(--bg1);border:1px solid var(--line);border-radius:16px;padding:18px;margin:18px 0}
+.bv-wrap .ctrl{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.bv-wrap input[type=range]{flex:1;min-width:200px;accent-color:var(--acc);cursor:pointer;height:6px}
+.bv-wrap .cval{font-family:var(--mono);font-size:13px;color:var(--acc);min-width:86px;text-align:right}
+.bv-wrap .state{font-size:14.5px;font-weight:700;color:var(--txt2)}
+.bv-wrap .state b{color:var(--acc)}
+.bv-wrap .charts{display:grid;grid-template-columns:repeat(1,1fr);gap:14px}
+.bv-wrap .panel{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.bv-wrap .panel h6{font-size:13px;color:var(--txt3);font-weight:600;margin-bottom:4px}
+#bvChart{width:100%;height:260px}
+#fitChart{width:100%;height:260px;display:block}
+
+/* ============ 混淆矩阵 ============ */
+.cm{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:560px;margin:16px 0}
+.cm .cell{
+  background:var(--bg1);border:1px solid var(--line);border-radius:12px;
+  padding:14px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;
+}
+.cm .cell.on{border-color:var(--acc3);background:var(--bg2)}
+.cm .cell .v{font-family:var(--mono);font-weight:700;font-size:18px}
+.cm .cell .t{font-size:12px;color:var(--txt3);margin-top:2px}
+.cm .cell.tp .v{color:var(--ok)} .cm .cell.fn .v{color:var(--danger)}
+.cm .cell.fp .v{color:var(--danger)} .cm .cell.tn .v{color:var(--ok)}
+.cm-desc{min-height:56px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:14px;color:var(--txt2);max-width:560px}
+.cm-desc b{color:var(--acc3)}
+.cm-labels{max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;text-align:center;font-size:12px;color:var(--txt3)}
+
+/* ============ 评估方法 ============ */
+.eval-steps{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.eval-steps .es{
+  background:var(--bg1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+  font-size:13.5px;color:var(--txt2);
+}
+.eval-steps .es b{color:var(--acc3)}
+.cv-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:560px;margin:14px 0}
+.cv-grid .f{border-radius:8px;padding:12px 4px;text-align:center;font-size:12px;font-family:var(--mono)}
+.cv-grid .tr{background:rgba(139,156,255,.18);border:1px solid rgba(139,156,255,.35);color:var(--txt)}
+.cv-grid .te{background:rgba(255,159,67,.20);border:1px solid rgba(255,159,67,.45);color:var(--acc);font-weight:700}
+.cv-note{font-size:13.5px;color:var(--txt2);max-width:560px;margin-top:8px}
+.cv-note b{color:var(--acc)}
+
+/* ============ 小测验 ============ */
+.quiz-card{background:var(--bg1);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0}
+.quiz-card .qi{font-size:11.5px;color:var(--txt3);font-family:var(--mono)}
+.quiz-card h4{font-size:16.5px;margin:6px 0 14px;line-height:1.55}
+.quiz-card .opts{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
+.quiz-card .opt{
+  cursor:pointer;text-align:left;font-family:var(--sans);font-size:14px;
+  background:var(--bg2);border:1px solid var(--line);border-radius:12px;
+  color:var(--txt2);padding:12px 16px;transition:all .2s;
+}
+.quiz-card .opt:hover{border-color:var(--line2);color:var(--txt)}
+.quiz-card .opt.sel{border-color:var(--acc);background:rgba(255,159,67,.10);color:var(--txt)}
+.quiz-card .opt.right{border-color:var(--ok);background:rgba(58,214,198,.12);color:var(--txt)}
+.quiz-card .opt.wrong{border-color:var(--danger);background:rgba(255,123,123,.10);color:var(--txt)}
+.quiz-card .fb{display:none;margin-top:12px;border-radius:12px;padding:12px 16px;font-size:14px}
+.quiz-card .fb.ok{border:1px solid var(--ok);background:rgba(58,214,198,.08);color:var(--txt2)}
+.quiz-card .fb.no{border:1px solid var(--danger);background:rgba(255,123,123,.08);color:var(--txt2)}
+.quiz-card .fb b{color:var(--txt)}
+.quiz-score{margin:16px 0 6px;font-family:var(--mono);font-size:14px;color:var(--acc3)}
+
+/* ============ 页脚 ============ */
+footer{
+  margin-top:70px;border-top:1px solid var(--line);background:var(--bg1);
+  padding:40px 20px;color:var(--txt3);font-size:13px;
+}
+footer .inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(1,1fr);gap:20px}
+footer h5{color:var(--txt2);font-size:14px;margin-bottom:8px}
+footer a{display:inline-block;margin:2px 10px 2px 0;color:var(--txt3)}
+footer a:hover{color:var(--acc2)}
+footer .src{color:var(--txt2);line-height:1.8}
+
+/* 返回顶部 */
+#toTop{
+  position:fixed;right:18px;bottom:18px;z-index:60;
+  width:46px;height:46px;border-radius:50%;border:1px solid var(--line2);
+  background:var(--bg2);color:var(--txt);cursor:pointer;font-size:18px;
+  opacity:0;pointer-events:none;transition:opacity .25s;font-family:var(--mono);
+}
+#toTop.show{opacity:1;pointer-events:auto}
+#toTop:hover{background:var(--bg3);border-color:var(--acc3)}
+
+/* 进度条 */
+#progress{
+  position:fixed;top:0;left:0;height:3px;z-index:70;
+  background:linear-gradient(90deg,var(--acc3),var(--acc2),var(--acc));
+  width:0%;transition:width .1s linear;
+}
+
+/* ============ 响应式 ============ */
+@media (min-width:768px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .hero .stats{grid-template-columns:repeat(4,1fr);max-width:none}
+  .tech4{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(4,1fr)}
+  .algo-list{grid-template-columns:repeat(2,1fr)}
+  .terms{grid-template-columns:repeat(2,1fr)}
+  .tri{flex-direction:row;align-items:stretch}
+  .tri .flow{flex-direction:column;padding:0 4px}
+  .tri .flow .arr{transform:rotate(90deg)}
+  .quiz-card .opts{grid-template-columns:repeat(2,1fr)}
+  .bv-wrap .charts{grid-template-columns:1fr 1fr}
+  footer .inner{grid-template-columns:repeat(2,1fr)}
+}
+@media (min-width:1024px){
+  .tech4{grid-template-columns:repeat(4,1fr)}
+  .terms{grid-template-columns:repeat(2,1fr)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .ring-anim,.spin-dash,.spin-dash2,.scroll-hint::after{animation:none}
+  .hero canvas{display:none}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="nav">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="#8B9CFF" stroke-width="1.6"/><circle cx="12" cy="12" r="5.6" stroke="#3AD6C6" stroke-width="1.6"/><circle cx="12" cy="12" r="1.8" fill="#FF9F43"/></svg>
+    机器学习·小白图解
+  </div>
+  <nav class="links" aria-label="章节导航">
+    <a href="#ch1">1 是什么</a>
+    <a href="#ch2">2 基本名词</a>
+    <a href="#ch3">3 算法分类</a>
+    <a href="#ch4">4 评估与选择</a>
+    <a href="#quiz">小测验</a>
+  </nav>
+</header>
+
+<!-- ===== 视图：Hero ===== -->
+<section class="hero" id="hero">
+  <canvas id="netCanvas" aria-hidden="true"></canvas>
+  <div class="inner">
+    <span class="eyebrow">SHOWMEAI 图解系列 · 第 1 篇</span>
+    <h1>机器学习，<br>没你想的那么难</h1>
+    <p class="sub">从「人工智能」到「机器学习」再到「深度学习」——它们到底是什么关系？机器是怎么从数据里学会本领的？这篇文章用大白话和可以动手点的交互，带你一次看懂机器学习的地基。</p>
+    <div class="stats">
+      <div class="stat"><b>3</b><span>大学习方式</span></div>
+      <div class="stat"><b>3</b><span>个核心要素</span></div>
+      <div class="stat"><b>4</b><span>类核心技术</span></div>
+      <div class="stat"><b>4</b><span>步基本流程</span></div>
+    </div>
+  </div>
+
+  <div class="ringbox" id="ringbox">
+    <svg viewBox="0 0 800 520" role="img" aria-label="人工智能、机器学习、深度学习三层嵌套关系图">
+      <g class="ring-anim">
+        <circle cx="400" cy="260" r="235" fill="rgba(139,156,255,.05)" stroke="#8B9CFF" stroke-width="2.5" stroke-dasharray="14 8"/>
+      </g>
+      <g class="spin-dash">
+        <circle cx="400" cy="260" r="235" fill="none" stroke="#8B9CFF" stroke-width="1" stroke-dasharray="2 10" opacity=".6"/>
+      </g>
+      <g class="ring-anim">
+        <circle cx="400" cy="260" r="160" fill="rgba(58,214,198,.06)" stroke="#3AD6C6" stroke-width="2.5" stroke-dasharray="10 7"/>
+      </g>
+      <g class="spin-dash2">
+        <circle cx="400" cy="260" r="160" fill="none" stroke="#3AD6C6" stroke-width="1" stroke-dasharray="2 8" opacity=".6"/>
+      </g>
+      <circle cx="400" cy="260" r="92" fill="rgba(255,159,67,.09)" stroke="#FF9F43" stroke-width="2.5"/>
+      <circle cx="400" cy="260" r="92" fill="none" stroke="#FF9F43" stroke-width="1" stroke-dasharray="1 6" opacity=".5" class="spin-dash"/>
+      <circle cx="400" cy="260" r="8" fill="#FF9F43"/>
+      <circle cx="400" cy="260" r="26" fill="none" stroke="#FF9F43" stroke-width="1" opacity=".35"/>
+      <text x="400" y="62" text-anchor="middle" fill="#8B9CFF" font-size="17" font-weight="700" font-family="Noto Sans SC,sans-serif">人工智能 AI</text>
+      <text x="400" y="86" text-anchor="middle" fill="#6F7CAA" font-size="11" font-family="JetBrains Mono,monospace">ARTIFICIAL INTELLIGENCE</text>
+      <text x="400" y="156" text-anchor="middle" fill="#3AD6C6" font-size="14" font-weight="700" font-family="Noto Sans SC,sans-serif">机器学习 ML</text>
+      <text x="400" y="338" text-anchor="middle" fill="#FF9F43" font-size="14" font-weight="700" font-family="Noto Sans SC,sans-serif">深度学习 DL</text>
+      <text x="400" y="424" text-anchor="middle" fill="#6F7CAA" font-size="12" font-family="Noto Sans SC,sans-serif">1950s 兴起 · 1980s 蓬勃发展 · 2012 后爆发</text>
+    </svg>
+    <div class="tip" id="ringTip"></div>
+  </div>
+  <div class="scroll-hint">往下滚动，开始学习</div>
+</section>
+
+<main>
+<!-- ===== 视图：第一章 ===== -->
+<section id="ch1">
+  <div class="chapter-head">
+    <div class="kicker">CHAPTER 01</div>
+    <h2>机器学习是什么？</h2>
+    <p>先搞清楚三个「看起来很像」的词——人工智能、机器学习、深度学习。它们不是一回事，而是层层包含的关系。</p>
+  </div>
+
+  <p class="lead">一句话版：<b class="hl">机器学习 = 让计算机自己从数据里「学」出规律</b>，然后拿这个规律去预测新东西。它是人工智能的一个子集，也是实现人工智能最主要的途径。</p>
+
+  <div class="subt">三个关键词的关系 <span class="en">AI · ML · DL</span></div>
+  <div class="def">
+    <div class="en">Artificial Intelligence / Machine Learning / Deep Learning</div>
+    <p><b class="hl">人工智能（AI）</b>：研究如何让计算机<b>模拟、延伸和扩展人的智能</b>。它是个大筐，目标很多（认图、说话、下棋……）。上世纪 50 年代兴起，但当时数据和硬件都不行，发展很慢。</p>
+    <p><b class="hl2">机器学习（ML）</b>：AI 的一个子集——让计算机<b>从数据中自己学规律</b>。80 年代开始蓬勃发展，诞生了一大批基于数学统计的模型。</p>
+    <p><b class="hl">深度学习（DL）</b>：机器学习的一个子集，灵感来自人脑，由一层一层的<b>人工神经网络</b>组成。2012 年以后爆炸式增长——这就是你现在听到的 ChatGPT、AI 绘画背后的主力。</p>
+  </div>
+
+  <div class="notebox"><b>记住这个比喻：</b>AI 像「考大学」这个大目标，机器学习是「刷题提分」这个方法，深度学习是「刷题方法里最猛的那套题海战术」。</div>
+  <div class="fig"><img src="assets/ai-ml-dl-history.png" alt="人工智能、机器学习、深度学习发展关系图">
+    <div class="cap">AI、ML、DL 的诞生时间线（原图来自 ShowMeAI）——一层套一层，越靠内越新、越具体</div>
+  </div>
+
+  <div class="subt">权威定义：T、E、P <span class="en">Tom Mitchell, 1998</span></div>
+  <div class="def">
+    <div class="en">Well-posed Learning Problem (Tom Mitchell, 1998)</div>
+    <p>计算机程序从<b>经验 E</b> 中学习某个<b>任务 T</b> 和某些<b>绩效测量 P</b>，如果它在 T 上的表现（用 P 衡量）随经验 E 不断改善，那它就是在「学习」。</p>
+  </div>
+  <p>听起来有点绕？点下面三个按钮，看一个每天都会发生的例子——<b class="hl">垃圾邮件过滤</b>，T、E、P 立刻清楚：</p>
+  <div class="tep">
+    <button data-k="T" data-d="将邮件分类为垃圾邮件和非垃圾邮件（Task 任务：要做什么）。" class="on"><span class="k">T · Task</span><span class="t">任务：要做什么</span></button>
+    <button data-k="E" data-d="看着你把一封封邮件手动标记为垃圾邮件或正常邮件（Experience 经验：喂给机器的历史数据）。"><span class="k">E · Experience</span><span class="t">经验：拿什么学</span></button>
+    <button data-k="P" data-d="正确分类为垃圾邮件 / 非垃圾邮件的数量（Performance 绩效：学得好不好怎么量）。"><span class="k">P · Performance</span><span class="t">绩效：学得好不好</span></button>
+  </div>
+  <div class="tep-desc" id="tepDesc">T 任务：将邮件分类为垃圾邮件和非垃圾邮件</div>
+  <div class="fig"><img src="assets/spam-filter.png" alt="垃圾邮件过滤中的TEP对应关系图解">
+    <div class="cap">T / E / P 在垃圾邮件过滤中的对应关系（原图来自 ShowMeAI）——左边是机器学到的，右边是 T、E、P 分别指什么</div>
+  </div>
+
+  <div class="subt">机器学习三要素 <span class="en">数据 · 模型 · 算法</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:6px">任何机器学习项目，都绕不开这三样东西。点开每一块看细节：</p>
+  <div class="tri">
+    <div class="node" data-tri="0">
+      <h4><span class="dot" style="background:var(--acc2)"></span>数据 <span class="en">Data</span></h4>
+      <p style="font-size:13.5px;color:var(--txt2)">机器学习的基础燃料</p>
+      <div class="more">「数据驱动」指基于客观量化数据做决策，而不是「拍脑袋」。数据驱动形成一个闭环：<b>数据获取 → 数据分析 → 数据应用 → 数据反馈</b>，让系统自动调整、越用越准。</div>
+    </div>
+    <div class="flow"><span>数据</span><span class="arr">→</span><span>算法</span><span class="arr">→</span><span>模型</span></div>
+    <div class="node" data-tri="1">
+      <h4><span class="dot" style="background:var(--acc3)"></span>算法 <span class="en">Algorithm</span></h4>
+      <p style="font-size:13.5px;color:var(--txt2)">怎么从数据里学</p>
+      <div class="more">算法是「学习模型的具体计算方法」：在训练数据上，根据学习策略，从一堆候选模型中选出最优的那个。本质上通常是一个<b>最优化问题</b>——找到让误差最小的那组参数。</div>
+    </div>
+    <div class="node" data-tri="2">
+      <h4><span class="dot" style="background:var(--acc)"></span>模型 <span class="en">Model</span></h4>
+      <p style="font-size:13.5px;color:var(--txt2)">学到的规律本身</p>
+      <div class="more">模型 = 基于数据 X 做出决策 Y 的<b>假设函数 f(x)</b>，形态多种多样（计算型、规则型等）。学完的模型就是那个「答案机器」：丢给它新数据，它给出预测。</div>
+    </div>
+  </div>
+  <div class="fig"><img src="assets/three-elements.png" alt="数据、算法、模型三要素图">
+    <div class="cap">三要素关系：一堆数据（Data）喂给算法（Algorithm），学出一个模型（Model）——也就是那个 f(x)</div>
+  </div>
+
+  <div class="subt">机器学习发展历程 <span class="en">Timeline</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:4px">点击时间轴上的节点，展开每个时期发生了什么：</p>
+  <div class="timeline">
+    <div class="tl-time">19 世纪</div>
+    <div class="tl-axis"><span class="dot"></span></div>
+    <div class="tl-body"><h5>「智能机器」的幻想</h5><div class="brief">人们开始设想：机器有朝一日能像人一样聪明。</div>
+      <div class="detail">19 世纪起，人类就开始幻想「Intelligence Machines」——那时候还没有人工智能这个词，只有朴素的愿望。</div>
+      <div class="hint">＋ 点击展开</div></div>
+    <div class="tl-time">1956</div>
+    <div class="tl-axis"><span class="dot hot"></span></div>
+    <div class="tl-body"><h5>「人工智能」一词诞生</h5><div class="brief">达特茅斯会议上，AI 正式得名。</div>
+      <div class="detail">1956 年「人工智能」一词首次出现，用来探索一些问题的有效解决方案。但很快人们发现「智能」到底是什么都不好回答，AI 进入漫长的寒冬与摸索期。</div>
+      <div class="hint">＋ 点击展开</div></div>
+    <div class="tl-time">1960</div>
+    <div class="tl-axis"><span class="dot"></span></div>
+    <div class="tl-body"><h5>「神经网络」登场</h5><div class="brief">美国国防部用神经网络训练计算机模仿推理。</div>
+      <div class="detail">1960 年，美国国防部借助「神经网络」这一概念训练计算机模仿人类的推理过程——这是深度学习最早的远房亲戚。</div>
+      <div class="hint">＋ 点击展开</div></div>
+    <div class="tl-time">1980s</div>
+    <div class="tl-axis"><span class="dot"></span></div>
+    <div class="tl-body"><h5>机器学习开始蓬勃发展</h5><div class="brief">一大批数学统计模型诞生。</div>
+      <div class="detail">80 年代起，机器学习作为独立学科蓬勃发展，决策树、神经网络、支持向量机等经典模型相继出现。</div>
+      <div class="hint">＋ 点击展开</div></div>
+    <div class="tl-time">2010 前</div>
+    <div class="tl-axis"><span class="dot"></span></div>
+    <div class="tl-body"><h5>巨头改进搜索</h5><div class="brief">谷歌、微软把查询准确度提到新高度。</div>
+      <div class="detail">2010 年之前，谷歌、微软等科技巨头改进了机器学习算法，把搜索引擎的准确度提升到了新的高度。</div>
+      <div class="hint">＋ 点击展开</div></div>
+    <div class="tl-time">2012 后</div>
+    <div class="tl-axis"><span class="dot hot"></span></div>
+    <div class="tl-body"><h5>深度学习引爆 AI 浪潮</h5><div class="brief">数据量、算力、算法同时就位，AI 进入爆发期。</div>
+      <div class="detail">数据量暴增、先进算法出现、计算和存储能力提高，深度学习在 2012 年以后爆炸式增长，广泛应用到图像、语音、自然语言等几乎所有领域。</div>
+      <div class="hint">＋ 点击展开</div></div>
+  </div>
+
+  <div class="subt">机器学习核心技术 <span class="en">4 大任务</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:10px">机器学习能干的活，基本可以分成四类。点击卡片，看它的原理和身边的应用：</p>
+  <div class="tech4">
+    <div class="tech" data-tech="0">
+      <h4>分类 <span class="tag">Classification</span></h4>
+      <svg class="svgmini" viewBox="0 0 300 150" aria-hidden="true">
+        <line x1="20" y1="130" x2="280" y2="130" stroke="#6F7CAA" stroke-width="1.5"/>
+        <line x1="20" y1="130" x2="20" y2="20" stroke="#6F7CAA" stroke-width="1.5"/>
+        <path d="M20 110 C 90 40, 200 40, 280 78" stroke="#FF9F43" stroke-width="2.5" fill="none"/>
+        <circle cx="55" cy="98" r="6" fill="#3AD6C6"/><circle cx="92" cy="62" r="6" fill="#3AD6C6"/><circle cx="140" cy="52" r="6" fill="#3AD6C6"/>
+        <circle cx="70" cy="116" r="6" fill="#FF9F43"/><circle cx="150" cy="96" r="6" fill="#FF9F43"/><circle cx="230" cy="72" r="6" fill="#FF9F43"/>
+        <text x="150" y="147" text-anchor="middle" fill="#6F7CAA" font-size="10" font-family="JetBrains Mono,monospace">决策边界：把两类点分开</text>
+      </svg>
+      <div class="more">用<b>带类别的数据</b>训练模型，模型学出一条「决策边界」，把新样本精准分到某一类。<b>比如：</b>这封邮件是垃圾还是正常？这张图里是猫还是狗？</div>
+      <div class="apps"><span>构建用户画像</span><span>情感分析</span><span>用户行为预测</span><span>图像识别分类</span></div>
+    </div>
+    <div class="tech" data-tech="1">
+      <h4>聚类 <span class="tag">Clustering</span></h4>
+      <svg class="svgmini" viewBox="0 0 300 150" aria-hidden="true">
+        <line x1="20" y1="130" x2="280" y2="130" stroke="#6F7CAA" stroke-width="1.5"/>
+        <line x1="20" y1="130" x2="20" y2="20" stroke="#6F7CAA" stroke-width="1.5"/>
+        <circle cx="70" cy="76" r="5" fill="#3AD6C6"/><circle cx="92" cy="60" r="5" fill="#3AD6C6"/><circle cx="84" cy="88" r="5" fill="#3AD6C6"/><circle cx="105" cy="76" r="5" fill="#3AD6C6"/>
+        <circle cx="190" cy="66" r="5" fill="#FF9F43"/><circle cx="210" cy="52" r="5" fill="#FF9F43"/><circle cx="205" cy="80" r="5" fill="#FF9F43"/><circle cx="225" cy="70" r="5" fill="#FF9F43"/>
+        <ellipse cx="88" cy="76" rx="40" ry="26" fill="none" stroke="#3AD6C6" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <ellipse cx="208" cy="66" rx="40" ry="26" fill="none" stroke="#FF9F43" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <text x="150" y="147" text-anchor="middle" fill="#6F7CAA" font-size="10" font-family="JetBrains Mono,monospace">自动把相似的点聚成堆</text>
+      </svg>
+      <div class="more">从海量数据中<b>发现相似与差异</b>，按最大共同点聚成几堆——<b>事先没有标签</b>，全靠数据自己说话。<b>比如：</b>把用户按购物习惯自动分成几类人群。</div>
+      <div class="apps"><span>市场细分</span><span>模式识别</span><span>空间数据分析</span><span>图像处理与分析</span></div>
+    </div>
+    <div class="tech" data-tech="2">
+      <h4>异常检测 <span class="tag">Anomaly Detection</span></h4>
+      <svg class="svgmini" viewBox="0 0 300 150" aria-hidden="true">
+        <line x1="20" y1="130" x2="280" y2="130" stroke="#6F7CAA" stroke-width="1.5"/>
+        <line x1="20" y1="130" x2="20" y2="20" stroke="#6F7CAA" stroke-width="1.5"/>
+        <circle cx="60" cy="104" r="5" fill="#3AD6C6"/><circle cx="90" cy="92" r="5" fill="#3AD6C6"/><circle cx="120" cy="98" r="5" fill="#3AD6C6"/><circle cx="150" cy="90" r="5" fill="#3AD6C6"/><circle cx="180" cy="96" r="5" fill="#3AD6C6"/><circle cx="210" cy="86" r="5" fill="#3AD6C6"/>
+        <circle cx="235" cy="40" r="8" fill="#FF9F43"/>
+        <text x="235" y="28" text-anchor="middle" fill="#FF9F43" font-size="10" font-family="JetBrains Mono,monospace">离群点</text>
+        <text x="150" y="147" text-anchor="middle" fill="#6F7CAA" font-size="10" font-family="JetBrains Mono,monospace">揪出跟大家不一样的点</text>
+      </svg>
+      <div class="more">分析数据的分布规律，找出<b>和正常数据差异很大的「离群点」</b>。<b>比如：</b>一笔平时从没出现过的巨额交易——可能是盗刷！</div>
+      <div class="apps"><span>日常运行监控</span><span>风险识别</span><span>舞弊检测</span></div>
+    </div>
+    <div class="tech" data-tech="3">
+      <h4>回归 <span class="tag">Regression</span></h4>
+      <svg class="svgmini" viewBox="0 0 300 150" aria-hidden="true">
+        <line x1="20" y1="130" x2="280" y2="130" stroke="#6F7CAA" stroke-width="1.5"/>
+        <line x1="20" y1="130" x2="20" y2="20" stroke="#6F7CAA" stroke-width="1.5"/>
+        <circle cx="60" cy="110" r="5" fill="#3AD6C6"/><circle cx="100" cy="98" r="5" fill="#3AD6C6"/><circle cx="140" cy="88" r="5" fill="#3AD6C6"/><circle cx="180" cy="74" r="5" fill="#3AD6C6"/><circle cx="220" cy="62" r="5" fill="#3AD6C6"/><circle cx="260" cy="50" r="5" fill="#3AD6C6"/>
+        <path d="M40 118 L 280 46" stroke="#FF9F43" stroke-width="2.5"/>
+        <text x="150" y="147" text-anchor="middle" fill="#6F7CAA" font-size="10" font-family="JetBrains Mono,monospace">拟合一条趋势线，预测连续数值</text>
+      </svg>
+      <div class="more">根据已知数据训练，为模型<b>寻找最佳拟合参数</b>，然后预测新样本的<b>连续数值</b>。<b>比如：</b>明天这件商品卖多少钱？下个月流量有多大？</div>
+      <div class="apps"><span>趋势预测</span><span>价格预测</span><span>流量预测</span></div>
+    </div>
+  </div>
+
+  <div class="subt">机器学习基本流程 <span class="en">Workflow</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:10px">一次完整的机器学习项目，大致走这 4 步。点击每一步看里面包含什么：</p>
+  <div class="steps">
+    <div class="step" data-step="0">
+      <div class="sh"><span class="no">01</span><h5>数据预处理</h5><span class="en">Processing</span></div>
+      <div class="detail">输入：未处理的数据 + 标签 → 处理：<b>特征抽取与幅度缩放、特征选择、维度约减、采样</b> → 输出：测试集 + 训练集。<br><span class="job">特征抽取</span><span class="job">特征选择</span><span class="job">维度约减</span><span class="job">采样</span></div>
+    </div>
+    <div class="step" data-step="1">
+      <div class="sh"><span class="no">02</span><h5>模型学习</h5><span class="en">Learning</span></div>
+      <div class="detail">用训练集教模型：<b>模型选择、交叉验证、结果评估、超参选择</b>，不断调优直到模型「学会」。<br><span class="job">模型选择</span><span class="job">交叉验证</span><span class="job">结果评估</span><span class="job">超参选择</span></div>
+    </div>
+    <div class="step" data-step="2">
+      <div class="sh"><span class="no">03</span><h5>模型评估</h5><span class="en">Evaluation</span></div>
+      <div class="detail">在测试集上打分：<b>了解模型对没见过的数据表现如何</b>——准确率、误差这些指标就是在这里算出来的。</div>
+    </div>
+    <div class="step" data-step="3">
+      <div class="sh"><span class="no">04</span><h5>新样本预测</h5><span class="en">Prediction</span></div>
+      <div class="detail">模型毕业上岗：把<b>新的输入数据</b>丢给最终模型，输出预测标签 / 数值。</div>
+    </div>
+  </div>
+
+  <div class="subt">机器学习应用场景 <span class="en">Everywhere</span></div>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>智能医疗</div><p>智能假肢、外骨骼、医疗保健机器人、手术机器人、智能健康管理——帮医生诊断，帮病人康复。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>人脸识别</div><p>门禁、考勤、人脸防盗门、电子护照与身份证；还能用识别系统在网络上搜捕逃犯。</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>机器人控制</div><p>工业机器人、机械臂、多足机器人、扫地机器人、无人机——让机器看懂环境、自主行动。</p></div>
+    <div class="card"><div class="ct"><span class="n">4</span>更广阔的版图</div><p>数据挖掘、计算机视觉、自然语言处理、搜索引擎、医学诊断、信用卡欺诈检测、证券市场分析、DNA 测序、语音和手写识别……</p></div>
+  </div>
+</section>
+<!-- ===== 视图：第二章 ===== -->
+<section id="ch2">
+  <div class="chapter-head">
+    <div class="kicker">CHAPTER 02</div>
+    <h2>机器学习基本名词</h2>
+    <p>学机器学习，先认识几个天天挂在嘴边的词。这里用「西瓜」做例子——选瓜、看瓜、判断好瓜，全是最经典的教学案例。</p>
+  </div>
+
+  <div class="subt">三种学习方式 <span class="en">3 Types of Learning</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:10px">机器学习的训练数据「有没有人给答案」，决定了它属于哪一类。点击卡片看区别：</p>
+  <div class="terms">
+    <div class="term" data-term="0">
+      <h5>监督学习 <span class="en">Supervised Learning</span></h5>
+      <p style="font-size:13.5px;color:var(--txt2)">训练数据带标记（有答案）</p>
+      <div class="more">训练集里<b>每条数据都有人标好了答案</b>（标签）。机器照着标准答案学，之后遇到新数据就能自己给出答案。学习方式：<b>分类</b>（选类别）和<b>回归</b>（预测数值）。<br>类比：老师批改过的习题册。</div>
+    </div>
+    <div class="term" data-term="1">
+      <h5>无监督学习 <span class="en">Unsupervised Learning</span></h5>
+      <p style="font-size:13.5px;color:var(--txt2)">训练数据没有标记（没答案）</p>
+      <div class="more">训练集里<b>没有</b>任何人工标注的答案，机器要靠数据自身结构发现规律。学习方式：<b>聚类</b>（自动分组）和<b>降维</b>（压缩维度）。<br>类比：一堆散落的拼图，没人告诉你该拼成什么，全靠自己观察。</div>
+    </div>
+    <div class="term" data-term="2">
+      <h5>强化学习 <span class="en">Reinforcement Learning</span></h5>
+      <p style="font-size:13.5px;color:var(--txt2)">靠「延迟的、稀疏的」反馈自学</p>
+      <div class="more">没有标准答案，只有<b>做得好给奖励、做不好给惩罚</b>，而且反馈常常很「延迟」——走完一大步才知道对不对。机器边试边学，目标是让长期收益最大。<br>类比：训练小狗，做对了给零食，做错了不理它。</div>
+    </div>
+  </div>
+
+  <div class="subt">十来个高频名词 <span class="en">Vocabulary</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:10px">下面的词都在西瓜例子里出现。点击每个词看解释：</p>
+  <div class="terms">
+    <div class="term" data-term="3"><h5>示例 / 样本</h5><div class="more">数据集里的<b>一条数据</b>。比如「一个西瓜」就是一条样本，一条样本里有多个属性。</div></div>
+    <div class="term" data-term="4"><h5>属性 / 特征</h5><div class="more">描述样本的每个维度，比如西瓜的<b>「色泽」「根蒂」「敲声」</b>。机器学习里常叫「特征」。</div></div>
+    <div class="term" data-term="5"><h5>属性空间 / 样本空间 / 输入空间 X</h5><div class="more">由<b>全部属性张成的空间</b>。色泽、根蒂、敲声三个属性，就组成一个三维空间；每个西瓜是空间里的一个点。</div></div>
+    <div class="term" data-term="6"><h5>特征向量</h5><div class="more">样本空间里<b>每个点对应的一个坐标向量</b>，如（青绿，蜷缩，浊响）。</div></div>
+    <div class="term" data-term="7"><h5>标记</h5><div class="more">关于样本结果的信息。如（色泽=青绿，根蒂=蜷缩，敲声=浊响），好瓜——其中<b>「好瓜」就是标记</b>，也就是答案。</div></div>
+    <div class="term" data-term="8"><h5>分类</h5><div class="more">预测的是<b>离散值</b>（类别），如判断「好瓜 / 坏瓜」。要预测的是离散值的学习任务就叫分类。</div></div>
+    <div class="term" data-term="9"><h5>假设</h5><div class="more">学得的模型，对应了关于数据的某种<b>潜在规律</b>——「模型」其实就是一条假设。</div></div>
+    <div class="term" data-term="10"><h5>真相</h5><div class="more">潜在规律<b>本身</b>。假设是学到的近似，真相是真实存在的规律。</div></div>
+    <div class="term" data-term="11"><h5>学习过程</h5><div class="more">就是为了<b>找出或逼近真相</b>——从假设空间里选出一条最接近真相的假设。</div></div>
+    <div class="term" data-term="12"><h5>泛化能力</h5><div class="more">学得的模型<b>适用于新样本的能力</b>。一般来说训练样本越多，越有可能学到强泛化能力的模型。</div></div>
+  </div>
+
+  <div class="subt">实战演练：西瓜书案例 <span class="en">Interactive Demo</span></div>
+  <div class="melon-wrap">
+    <p style="font-size:14.5px;color:var(--txt2)">下面是一组「训练数据」——每个西瓜记录 3 个特征（色泽、根蒂、敲声）和 1 个标记（是不是好瓜）。机器用这些数据训练出一个模型。</p>
+    <div class="tblwrap">
+      <table>
+        <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup>
+        <thead><tr><th>色泽</th><th>根蒂</th><th>敲声</th><th>类别标记</th></tr></thead>
+        <tbody>
+          <tr><td>青绿</td><td>蜷缩</td><td>浊响</td><td><b>是（好瓜）</b></td></tr>
+          <tr><td>乌黑</td><td>蜷缩</td><td>浊响</td><td><b>是（好瓜）</b></td></tr>
+          <tr><td>青绿</td><td>硬挺</td><td>清脆</td><td>否</td></tr>
+          <tr><td>乌黑</td><td>稍蜷</td><td>沉闷</td><td>否</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14.5px;color:var(--txt2)">现在来了一个<b>新样本</b>——它的类别标记是未知的（用一个 ? 表示）。让模型来预测一下：</p>
+    <div class="row">
+      <span class="feat">色泽 = <b>浅白</b></span>
+      <span class="feat">根蒂 = <b>蜷缩</b></span>
+      <span class="feat">敲声 = <b>浊响</b></span>
+      <span class="q">类别 = ?</span>
+      <button class="act" id="melonBtn">让模型预测</button>
+    </div>
+    <div class="melon-result" id="melonResult">模型预测结果：<b>是 —— 好瓜！</b>（浅白、蜷缩、浊响的组合，和训练数据里「好瓜」的特征模式最接近）</div>
+  </div>
+</section>
+
+<!-- ===== 视图：第三章 ===== -->
+<section id="ch3">
+  <div class="chapter-head">
+    <div class="kicker">CHAPTER 03</div>
+    <h2>机器学习算法分类</h2>
+    <p>算法是机器学习的「方法库」。这一章先看算法解决哪些问题，再认识三大门类，最后逐个了解分类、回归、聚类、降维这四类经典任务。</p>
+  </div>
+
+  <div class="subt">算法依托的问题场景 <span class="en">4 Scenarios</span></div>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>聚类</div><p><b>发现与挖掘</b>数据分布的聚集特性——数据自己会扎堆。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>分类</div><p>从<b>若干个离散值</b>中做选择——这是哪个类别？</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>回归</div><p>预估<b>连续值结果</b>的算法——大概是多少？</p></div>
+    <div class="card"><div class="ct"><span class="n">4</span>强化学习</div><p><b>有延迟奖励</b>的场景，目标：<b>最大化长期受益</b>。</p></div>
+  </div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-top:6px">机器学习是一门多领域交叉学科，涉及概率论、统计学、逼近论、凸分析、计算复杂性理论等。它做的事可以概括为：<b class="hl">从数据中自动分析获得规律，并用规律对未知数据做预测</b>。</p>
+  <div class="fig"><img src="assets/problem-scene.png" alt="机器学习算法依托的问题场景图解">
+    <div class="cap">算法依托的四大问题场景：聚类、分类、回归、强化学习（原图来自 ShowMeAI）</div>
+  </div>
+
+  <div class="subt">三大门类 <span class="en">Supervised · Unsupervised · Reinforcement</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:6px">切换标签，看每种学习的定义和代表算法：</p>
+  <div class="tabs" id="mlTabs">
+    <button data-tab="0" class="on">监督学习<span class="en">Supervised Learning</span></button>
+    <button data-tab="1">无监督学习<span class="en">Unsupervised Learning</span></button>
+    <button data-tab="2">强化学习<span class="en">Reinforcement Learning</span></button>
+  </div>
+
+  <div class="pane on" data-pane="0">
+    <div class="notebox"><b>一句话：</b>从<b>带标签</b>的训练数据里学出一个函数 f，新数据来了直接预测结果。训练集同时包含输入（特征）和输出（目标），目标由<b>人标注</b>。</div>
+    <div class="algo-list">
+      <div class="algo" data-algo="0"><h5>分类预测 <span class="tag">Classification</span></h5>
+        <p style="font-size:13.5px;color:var(--txt2)">输出是离散类别</p>
+        <div class="more">典型代表：<b>KNN、逻辑回归、朴素贝叶斯、决策树、随机森林、GBDT、XGBoost、支持向量机（SVM）</b> 等。</div></div>
+      <div class="algo" data-algo="1"><h5>回归分析 <span class="tag">Regression</span></h5>
+        <p style="font-size:13.5px;color:var(--txt2)">输出是连续数值</p>
+        <div class="more">典型代表：<b>决策树、随机森林、GBDT、回归树、支持向量机（SVM）</b> 等。</div></div>
+    </div>
+  </div>
+  <div class="pane" data-pane="1">
+    <div class="notebox"><b>一句话：</b>训练数据<b>没有人工标注</b>的结果，让数据自己说话。常见算法：<b>生成对抗网络（GAN）、聚类</b>、<b>PCA 降维</b>等。</div>
+    <div class="algo-list">
+      <div class="algo" data-algo="2"><h5>聚类 <span class="tag">Clustering</span></h5>
+        <p style="font-size:13.5px;color:var(--txt2)">自动分组</p>
+        <div class="more">把相似样本聚成若干堆，常用于用户分群、社区发现、新闻聚合等。</div></div>
+      <div class="algo" data-algo="3"><h5>降维 <span class="tag">Dimensionality Reduction</span></h5>
+        <p style="font-size:13.5px;color:var(--txt2)">压缩数据维度</p>
+        <div class="more">用低维数据表达高维数据，代表算法：<b>PCA（主成分分析）</b>。</div></div>
+    </div>
+  </div>
+  <div class="pane" data-pane="2">
+    <div class="notebox"><b>一句话：</b>通过<b>观察</b>来学习怎么做动作——每个动作都会对环境产生影响，智能体根据环境反馈不断调整，追求<b>长期收益最大化</b>。</div>
+    <div class="algo-list">
+      <div class="algo" data-algo="4"><h5>Q-learning <span class="tag">Value-Based</span></h5>
+        <p style="font-size:13.5px;color:var(--txt2)">经典强化学习算法</p>
+        <div class="more">维护一张「状态-动作」价值表，学哪个状态下做哪个动作最划算。</div></div>
+      <div class="algo" data-algo="5"><h5>时间差学习 <span class="tag">TD Learning</span></h5>
+        <p style="font-size:13.5px;color:var(--txt2)">Temporal Difference</p>
+        <div class="more">边走边估：用「当前奖励 + 未来估计」更新判断，不需要等完整结局再学。</div></div>
+    </div>
+  </div>
+
+  <div class="subt">分类问题 <span class="en">Classification</span></div>
+  <p class="lead">根据数据样本上抽取出的特征，判定它属于<b class="hl">有限个类别中的哪一个</b>——这是监督学习里最重要的问题之一。</p>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>二分类问题</div><p>只有<b>两个类别</b>可选：垃圾邮件 / 正常邮件，褒 / 贬，好瓜 / 坏瓜。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>多类分类</div><p><b>多个类别</b>（Multiclass）：图像里是猫、狗、人，还是都不是？</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>多标签分类</div><p>给每个样本同时打上<b>一串目标标签</b>（Multilabel）：一篇文章既属于「科技」，又属于「财经」。</p></div>
+    <div class="card"><div class="ct"><span class="n">4</span>常见算法</div><p>KNN、逻辑回归、朴素贝叶斯、决策树、随机森林、GBDT、XGBoost、支持向量机（SVM）等。</p></div>
+  </div>
+  <div class="tblwrap">
+    <table>
+      <colgroup><col style="width:34%"><col style="width:26%"><col style="width:40%"></colgroup>
+      <thead><tr><th>应用场景</th><th>类型</th><th>结果类别</th></tr></thead>
+      <tbody>
+        <tr><td>垃圾邮件识别</td><td><span class="cn">二分类</span></td><td>垃圾邮件 / 正常邮件</td></tr>
+        <tr><td>图像内容识别</td><td><span class="cn">多分类</span></td><td>猫 / 狗 / 人 / 都不是</td></tr>
+        <tr><td>文本情感分析</td><td><span class="cn">二分类</span></td><td>褒 / 贬</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subt">回归问题 <span class="en">Regression</span></div>
+  <p class="lead">根据数据样本上抽取出的特征，<b class="hl">预测连续值结果</b>——不选类别，而是给一个具体数字。</p>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>电影票房</div><p>根据档期、阵容、宣发等特征，预测《水门桥》的<b>票房值</b>是多少。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>房价预估</div><p>根据面积、地段、楼层等特征，预测某城市一套房的<b>具体价格</b>。</p></div>
+  </div>
+
+  <div class="subt">聚类问题 <span class="en">Clustering</span></div>
+  <p class="lead">属于<b class="hl2">无监督学习</b>：根据数据样本上抽取出的特征，<b class="hl">挖掘数据的关联模式</b>——事先不知道有几类，让数据自己形成几堆。</p>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>相似用户挖掘</div><p>把行为习惯相似的用户自动归到一起，做社区发现、精准运营。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>新闻聚类</div><p>把内容相近的新闻自动聚合，形成话题分组。</p></div>
+  </div>
+
+  <div class="subt">降维问题 <span class="en">Dimensionality Reduction</span></div>
+  <p class="lead">属于<b class="hl2">无监督学习</b>：<b class="hl">对高维数据用低维数据进行表达</b>（数据映射）——把复杂数据压缩成更好处理的低维表示，同时尽量保留关键信息。</p>
+  <div class="notebox">为什么要降维？数据维度太高，计算慢、还容易「过拟合」。降维就像把一张复杂地图简化成地铁图——信息有取舍，但主干保留，更好用。代表算法：<b>PCA</b>。</div>
+</section>
+<!-- ===== 视图：第四章 ===== -->
+<section id="ch4">
+  <div class="chapter-head">
+    <div class="kicker">CHAPTER 04</div>
+    <h2>模型评估与选择</h2>
+    <p>模型学完不等于万事大吉——怎么判断它学得好不好？怎么防止它「背答案」？这一章是机器学习最核心的「质检环节」。</p>
+  </div>
+
+  <div class="subt">机器学习与数据拟合 <span class="en">Fitting</span></div>
+  <p class="lead">最典型的监督学习是分类与回归：<b class="hl">分类</b>学出一条「决策边界」区分数据；<b class="hl">回归</b>学出一条「曲线」拟合样本分布。</p>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>分类问题（监督学习）</div>
+      <svg viewBox="0 0 300 170" style="width:100%;height:auto;margin-top:8px" aria-hidden="true">
+        <line x1="30" y1="150" x2="290" y2="150" stroke="#6F7CAA" stroke-width="1.5"/><line x1="30" y1="150" x2="30" y2="25" stroke="#6F7CAA" stroke-width="1.5"/>
+        <path d="M30 128 C 110 50, 210 55, 290 85" stroke="#FF9F43" stroke-width="2.5" fill="none"/>
+        <circle cx="62" cy="112" r="6" fill="#3AD6C6"/><circle cx="100" cy="76" r="6" fill="#3AD6C6"/><circle cx="150" cy="62" r="6" fill="#3AD6C6"/><circle cx="196" cy="72" r="6" fill="#3AD6C6"/>
+        <circle cx="80" cy="130" r="6" fill="#FF9F43"/><circle cx="140" cy="108" r="6" fill="#FF9F43"/><circle cx="230" cy="78" r="6" fill="#FF9F43"/><circle cx="258" cy="62" r="6" fill="#FF9F43"/>
+      </svg>
+      <p>学出决策边界，把两类点隔开——新点落在哪边就属于哪类。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>回归问题（监督学习）</div>
+      <svg viewBox="0 0 300 170" style="width:100%;height:auto;margin-top:8px" aria-hidden="true">
+        <line x1="30" y1="150" x2="290" y2="150" stroke="#6F7CAA" stroke-width="1.5"/><line x1="30" y1="150" x2="30" y2="25" stroke="#6F7CAA" stroke-width="1.5"/>
+        <circle cx="62" cy="126" r="6" fill="#3AD6C6"/><circle cx="100" cy="112" r="6" fill="#3AD6C6"/><circle cx="138" cy="96" r="6" fill="#3AD6C6"/><circle cx="176" cy="82" r="6" fill="#3AD6C6"/><circle cx="214" cy="66" r="6" fill="#3AD6C6"/><circle cx="252" cy="50" r="6" fill="#3AD6C6"/>
+        <path d="M40 140 C 100 118, 180 90, 280 42" stroke="#FF9F43" stroke-width="2.5" fill="none"/>
+      </svg>
+      <p>学出拟合曲线，沿曲线预测新的连续数值（如房价、票房）。</p></div>
+  </div>
+
+  <div class="subt">训练集与测试集 <span class="en">Training Set &amp; Test Set</span></div>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>训练集 <span class="en" style="font-family:var(--mono);font-size:11px;color:var(--txt3)">Training Set</span></div><p>用来<b>训练模型</b>：让模型根据这些数据确定拟合曲线的参数。相当于平时的「习题册」。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>测试集 <span class="en" style="font-family:var(--mono);font-size:11px;color:var(--txt3)">Test Set</span></div><p>用来<b>检验模型</b>：考考训练好的模型，看它准不准。相当于「期末考卷」。</p></div>
+  </div>
+  <div class="notebox"><b>注意：</b>测试集并不能 100% 保证模型正确——它只说明「相似的数据用此模型会得到相似的结果」。如果模型把训练集的参数拟合得「太死」（<b>过拟合</b>），遇到新数据准确率可能就很差。</div>
+
+  <div class="subt">经验误差 <span class="en">Empirical Error</span></div>
+  <div class="def">
+    <div class="en">模型在训练集上的误差，称为「经验误差」</div>
+    <p><span class="fx">经验误差 = 1/m Σ L(h_w(x⁽ⁱ⁾), y⁽ⁱ⁾) = 1/m Σ (h_w(x⁽ⁱ⁾) − y⁽ⁱ⁾)²</span></p>
+    <p style="margin-top:8px">即：模型预测值 h_w(x) 与真实值 y 之间差了多少，在训练集上取平均。</p>
+  </div>
+  <div class="notebox"><b>关键认知：经验误差并不是越小越好！</b>我们希望模型在<b>没见过的新数据</b>上也有好表现，而不只是死记硬背训练集。</div>
+
+  <div class="subt">过拟合 <span class="en">Overfitting</span></div>
+  <p class="lead">模型在<b class="hl">训练集上表现很好</b>，但在<b class="hl2">交叉验证集 / 测试集上表现一般</b>——对未知样本的预测能力弱，<b class="hl">泛化能力差</b>。</p>
+  <div class="notebox"><b>通俗理解：</b>就像学生把习题册的答案背得滚瓜烂熟，但题目稍微一变就不会做了。经验误差很小，但模型曲线「抖动非常厉害」，无法平稳地在新数据上完成预估。</div>
+  <div class="subt" style="font-size:16px;margin-top:26px">如何防止过拟合？</div>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>正则化</div><p>在目标函数后面加一个<b>正则化项</b>（惩罚模型太复杂）。有 <b>L1 正则化</b>（参数绝对值之和）与 <b>L2 正则化</b>（参数平方和）两种常用形式。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>数据集扩增</div><p>拿到<b>更多符合要求的数据</b>（与已有数据独立同分布）：从源头采集更多数据、复制原数据加随机噪声、重采样、按分布参数生成新数据等。</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>Dropout</div><p>训练时随机「丢弃」一部分神经元，通过<b>修改神经网络结构</b>来防止网络死记硬背。</p></div>
+    <div class="card"><div class="ct"><span class="n">4</span>Early Stopping</div><p>训练时盯着验证集误差，一旦验证误差开始回升就<b>提前停止训练</b>，别让模型继续过拟合。</p></div>
+  </div>
+
+  <div class="subt">偏差 vs 方差 <span class="en">Bias · Variance · 亲手调一调</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:10px"><b class="hl">偏差（Bias）</b>：模型<b>拟合的偏离程度</b>——「平均模型」与「真实模型」的差距。简单模型通常<b>高偏差</b>。<br>
+  <b class="hl2">方差（Variance）</b>：模型的<b>平稳（简单）程度</b>——模型对数据变动敏不敏感。复杂模型通常<b>高方差</b>。</p>
+  <div class="bv-wrap">
+    <div class="ctrl">
+      <label for="bvSlider" style="font-size:13.5px;color:var(--txt2);white-space:nowrap">模型复杂度</label>
+      <input type="range" id="bvSlider" min="0" max="100" value="55" aria-label="模型复杂度滑块">
+      <span class="cval" id="bvVal">中</span>
+      <span class="state" id="bvState">状态：<b>刚刚好（最优）</b></span>
+    </div>
+    <p style="font-size:13px;color:var(--txt3);margin-bottom:10px">拖动滑块改变模型复杂度，观察拟合曲线与「偏差 / 方差 / 总误差」如何变化——总误差最低的点，就是最好的模型。</p>
+    <div class="charts">
+      <div class="panel">
+        <h6>数据拟合效果（黄线 = 真实规律，青色线 = 模型学到的曲线）</h6>
+        <svg id="fitChart" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      </div>
+      <div class="panel">
+        <h6>偏差 / 方差 / 总误差 随复杂度变化（拖动滑块实时联动）</h6>
+        <div id="bvChart"></div>
+      </div>
+    </div>
+  </div>
+  <div class="tblwrap" style="max-width:640px">
+    <table>
+      <colgroup><col style="width:26%"><col style="width:22%"><col style="width:22%"><col style="width:30%"></colgroup>
+      <thead><tr><th></th><th>偏差</th><th>方差</th><th>拟合状态</th></tr></thead>
+      <tbody>
+        <tr><td><b>简单模型</b></td><td>大</td><td>小</td><td>欠拟合（学得太少）</td></tr>
+        <tr><td><b>复杂模型</b></td><td>小</td><td>大</td><td>过拟合（背得太死）</td></tr>
+        <tr><td><b>最优模型</b></td><td>平衡</td><td>平衡</td><td>总误差最小</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subt">性能度量指标 <span class="en">Performance Metrics</span></div>
+  <p style="color:var(--txt2);font-size:14.5px">性能度量是衡量模型<b>泛化能力</b>的数值评价标准，反映任务需求。使用不同指标可能得出不同结论。</p>
+
+  <div class="subt" style="font-size:16px;margin-top:22px">（1）回归问题</div>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>MAE · 平均绝对误差</div><p>所有「预测值 − 真实值」绝对值取平均。<span class="fx">MAE = 1/n Σ |f_i − y_i|</span></p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>MAPE · 平均绝对百分误差</div><p>MAE 的改进版，把误差折算成相对真实值的<b>百分比</b>。</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>MSE · 均方误差</div><p>「预测值 − 真实值」<b>平方</b>后取平均，对大误差惩罚更狠。<span class="fx">MSE = 1/n Σ (f_i − y_i)²</span></p></div>
+    <div class="card"><div class="ct"><span class="n">4</span>RMSE · 均方根误差</div><p>均方误差再开方（也称标准误差），量纲回到原始单位。<span class="fx">RMSE = √MSE</span></p></div>
+    <div class="card"><div class="ct"><span class="n">5</span>R² · 决定系数</div><p>因变量的变异有多大比例被模型解释。越接近 1，模型对数据的解释越好。<span class="fx">R² = SSR / SST</span></p></div>
+  </div>
+
+  <div class="subt" style="font-size:16px;margin-top:22px">（2）分类问题</div>
+  <p style="color:var(--txt2);font-size:14.5px">分类问题常用指标：错误率、精确率（Accuracy）、查准率（Precision）、查全率（Recall）、F1、ROC 曲线、AUC 等。</p>
+  <div class="subt" style="font-size:15px;margin-top:18px">先认识混淆矩阵 <span class="en">Confusion Matrix · 点击格子看解释</span></div>
+  <div class="cm-labels"><span></span><span>预测的类别</span></div>
+  <div class="cm">
+    <div class="cell tp" data-cm="0"><div class="v">TP</div><div class="t">预测为正，实际也为正</div></div>
+    <div class="cell fn" data-cm="1"><div class="v">FN</div><div class="t">预测为负，实际为正</div></div>
+    <div class="cell fp" data-cm="2"><div class="v">FP</div><div class="t">预测为正，实际为负</div></div>
+    <div class="cell tn" data-cm="3"><div class="v">TN</div><div class="t">预测为负，实际也为负</div></div>
+  </div>
+  <div class="cm-desc" id="cmDesc">TP = 真正例：模型说「是垃圾邮件」，它确实是。FN = 假反例：模型放过了一封真正的垃圾邮件。</div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card"><div class="ct"><span class="n">1</span>错误率 / 精确率</div><p>错误率 = 分错样本数 ÷ 总数；<b>精确率 Accuracy</b> = 分对样本数 ÷ 总数（两者相加为 1）。<span class="fx">Accuracy = (TP+TN) / (TP+FN+FP+TN)</span></p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>查准率 Precision</div><p>检索返回的结果里，<b>真正正确的比例</b>。<span class="fx">Precision = TP / (TP+FP)</span>——「我说它是垃圾邮件，到底准不准？」</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>查全率 Recall</div><p>整个数据集里真正正的样本，<b>被找回来多少</b>。<span class="fx">Recall = TP / (TP+FN)</span>——「垃圾邮件一共 100 封，我逮住几封？」</p></div>
+    <div class="card"><div class="ct"><span class="n">4</span>F1 / Fβ</div><p>查准率与查全率的<b>调和平均</b>，综合两者。Fβ 可以调节对两者的偏好。<span class="fx">F1 = 2·P·R / (P+R)</span></p></div>
+  </div>
+  <div class="subt" style="font-size:15px;margin-top:18px">ROC 曲线 与 AUC</div>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>ROC 曲线</div><p>全称「受试者工作特性曲线」，体现模型在<b>不同阈值</b>下「真正例率 TPR」与「假正例率 FPR」的权衡。<span class="fx">TPR = TP/(TP+FN)</span> <span class="fx">FPR = FP/(FP+TN)</span><br>曲线越靠近左上角，分类器性能越好。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>AUC</div><p>ROC 曲线<b>下方的面积</b>，代表样本预测的<b>排序质量</b>。AUC 越大，越能保证曲线靠近左上角。<br><b>直觉理解：</b>高的 AUC 意味着——模型在尽可能多地识别异常用户的同时，对正常用户仍有较低的误判率，不会「宁可错杀一千」。</p></div>
+  </div>
+
+  <div class="subt">评估方法 <span class="en">Evaluation Methods</span></div>
+  <p style="color:var(--txt2);font-size:14.5px;margin-bottom:10px">我们没有「未知的样本」可用来考试，怎么办？关键是拿到可靠的<b>测试集</b>——测试集（评估用）必须与训练集（学习用）<b class="hl">互斥</b>。切换标签看三种主流方法：</p>
+  <div class="tabs" id="evalTabs">
+    <button data-tab="0" class="on">留出法<span class="en">Hold-out</span></button>
+    <button data-tab="1">交叉验证法<span class="en">Cross Validation</span></button>
+    <button data-tab="2">自助法<span class="en">Bootstrap</span></button>
+  </div>
+  <div class="pane on" data-pane="0">
+    <div class="eval-steps">
+      <div class="es"><b>划分原则：</b>把数据集 D 分成训练集 S 和测试集 T。一般不宜随机划分，可采用<b>分层抽样</b>，保证数据分布比例平衡。</div>
+      <div class="es"><b>多次重复：</b>一般多次重复「划分 → 训练 → 测试求误差」的步骤，最后取误差的<b>平均值</b>。</div>
+      <div class="es"><b>比例选择：</b>测试集不能太大也不能太小，常用做法是取 <b>1/5 ~ 1/3</b> 左右的数据用于评估，其余用于训练。</div>
+    </div>
+  </div>
+  <div class="pane" data-pane="1">
+    <div class="eval-steps">
+      <div class="es"><b>做法：</b>把数据分成 k 份，轮流拿其中 1 份当测试集、其余 k−1 份训练，重复 k 次，对 k 次结果<b>平均</b>——模型性能对数据划分不那么敏感，数据利用更充分，结果更稳定。</div>
+      <div class="es"><b>k 取多少？</b>数据量小的时候 k 设大一点；数据量大可以设小一点。<b>一般取 k = 10</b>。</div>
+      <div class="es"><b>特例「留一法」（LOO）：</b>当 k = m（样本总数）时，每次测试集只有一个样本，要进行 m 次训练和预测。</div>
+    </div>
+    <div class="cv-grid" id="cvGrid" aria-hidden="true"></div>
+    <p class="cv-note">上面是 k=10 时的示意：每一轮（1st~10th）都换一个橙色测试折，其余 9 个灰色训练折一起训练；最终误差 <b>E = 1/10 Σ Eᵢ</b>。</p>
+  </div>
+  <div class="pane" data-pane="2">
+    <div class="eval-steps">
+      <div class="es"><b>做法：</b>对 m 个样本进行 <b>m 次有放回采样</b>得到训练集（与原始集同规模），没被抽中的样本自然成为测试集。</div>
+      <div class="es"><b>特点：</b>有放回抽样会让训练集里出现<b>重复样本</b>，数据分布会略有改变，但对小样本特别友好。</div>
+      <div class="es"><b>数学小彩蛋：</b>当 m 很大时，约有 <b>36.8%（= 1/e ≈ 0.368）</b>的样本从未被抽到，这部分正好当测试集。<span class="fx">lim (1−1/m)ᵐ → 1/e ≈ 0.368</span></div>
+    </div>
+  </div>
+
+  <div class="subt">模型调优与选择准则 <span class="en">Model Selection</span></div>
+  <p class="lead">我们希望找到<b class="hl">表达能力好</b>且<b class="hl2">复杂度较低</b>的模型——表达力好，能学到训练数据里的规律；复杂度低，方差小、不容易过拟合、泛化更好。</p>
+  <div class="grid">
+    <div class="card"><div class="ct"><span class="n">1</span>验证集评估</div><p>把数据切为训练集 + 验证集；候选超参数在训练集上训练、在验证集上评估，挑表现最好的。</p></div>
+    <div class="card"><div class="ct"><span class="n">2</span>网格 / 随机搜索</div><p>用网格搜索或随机搜索产出候选超参数组，对每一组用<b>交叉验证</b>评估，选出效果最好的。</p></div>
+    <div class="card"><div class="ct"><span class="n">3</span>贝叶斯优化</div><p>基于贝叶斯优化的超参数调优，更聪明地选择下一组超参数去试。</p></div>
+  </div>
+  <div class="notebox"><b>欠拟合 · 刚刚好 · 过拟合：</b>模型太简单 → 学不到规律（欠拟合）；复杂度合适 → 既学到规律又泛化好（刚刚好）；太复杂 → 背下训练集（过拟合）。调优就是在三者之间找平衡点。</div>
+</section>
+<!-- ===== 视图：小测验 ===== -->
+<section id="quiz">
+  <div class="chapter-head">
+    <div class="kicker">CHECKPOINT</div>
+    <h2>小测验：你学会了吗？</h2>
+    <p>8 道题，每选完一题立刻看解析。全部答完看总分——答错的地方，回上面再看一眼对应章节。</p>
+  </div>
+  <div id="quizBox"></div>
+  <div class="quiz-score" id="quizScore"></div>
+</section>
+</main>
+
+<footer>
+  <div class="inner">
+    <div class="src">
+      <h5>内容来源</h5>
+      本文内容整理自 ShowMeAI 教程《图解机器学习 | 机器学习基础知识》（韩信子 @ ShowMeAI，2022-03-07）。<br>
+      原文地址：<a href="https://www.showmeai.tech/article-detail/185" target="_blank" rel="noopener">https://www.showmeai.tech/article-detail/185</a><br>
+      教程主页：<a href="https://www.showmeai.tech/tutorials/34" target="_blank" rel="noopener">https://www.showmeai.tech/tutorials/34</a><br>
+      配套视频（B站 双语字幕）：<a href="https://www.bilibili.com/video/BV1TT4y127Nf" target="_blank" rel="noopener">https://www.bilibili.com/video/BV1TT4y127Nf</a>
+    </div>
+    <div>
+      <h5>继续学习（ShowMeAI 图解机器学习系列）</h5>
+      <a href="https://www.showmeai.tech/article-detail/186" target="_blank" rel="noopener">模型评估方法与准则</a>
+      <a href="https://www.showmeai.tech/article-detail/187" target="_blank" rel="noopener">KNN 算法</a>
+      <a href="https://www.showmeai.tech/article-detail/188" target="_blank" rel="noopener">逻辑回归</a>
+      <a href="https://www.showmeai.tech/article-detail/189" target="_blank" rel="noopener">朴素贝叶斯</a>
+      <a href="https://www.showmeai.tech/article-detail/190" target="_blank" rel="noopener">决策树</a>
+      <a href="https://www.showmeai.tech/article-detail/191" target="_blank" rel="noopener">随机森林</a>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:24px;color:var(--txt3)">学习笔记 · 小白友好重制版 · 原图版权归 ShowMeAI 所有，仅用于个人学习</p>
+</footer>
+
+<button id="toTop" aria-label="返回顶部">↑</button>
+
+<script src="https://fastly.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ============ 通用工具 ============ */
+function $(s,c){return (c||document).querySelector(s)}
+function $$(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))}
+function singleToggle(items, cls, item){
+  items.forEach(function(x){ if(x!==item) x.classList.remove(cls); });
+  item.classList.toggle(cls);
+}
+
+/* ============ 进度条 / 导航高亮 / 返回顶部 ============ */
+var progress = $('#progress'), navLinks = $$('.nav .links a'), toTop = $('#toTop');
+function onScroll(){
+  var h = document.documentElement;
+  var max = h.scrollHeight - h.clientHeight;
+  progress.style.width = (max>0 ? (h.scrollTop/max*100) : 0) + '%';
+  toTop.classList.toggle('show', h.scrollTop > 600);
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+toTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+var secObs = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){
+      var id = en.target.id;
+      navLinks.forEach(function(a){
+        a.classList.toggle('on', a.getAttribute('href') === '#'+id);
+      });
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+['ch1','ch2','ch3','ch4','quiz'].forEach(function(id){ var el=document.getElementById(id); if(el) secObs.observe(el); });
+
+/* ============ Hero 粒子动画 ============ */
+(function(){
+  var canvas = $('#netCanvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H, parts = [], hero = canvas.parentElement;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced){ canvas.style.display='none'; return; }
+  function resize(){
+    W = canvas.width = hero.offsetWidth;
+    H = canvas.height = hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  var COLORS = ['#8B9CFF','#3AD6C6','#FF9F43','#B9C4FF'];
+  function spawn(){
+    if(parts.length > 70) return;
+    parts.push({
+      x: Math.random() < .5 ? -10 : W+10,
+      y: Math.random()*H,
+      vx: (Math.random()*1.2+.3) * (Math.random()<.5 ? 1 : -1),
+      vy: (Math.random()-.5)*.4,
+      r: Math.random()*2.4+1,
+      c: COLORS[Math.floor(Math.random()*COLORS.length)]
+    });
+  }
+  var visible = true;
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ visible = e.isIntersecting; }); }, {threshold:0});
+  io.observe(hero);
+  var cx = 0, cy = 0;
+  function tick(){
+    if(visible){
+      cx = W/2; cy = H/2;
+      ctx.clearRect(0,0,W,H);
+      for(var i=0;i<parts.length;i++){
+        var p = parts[i];
+        p.x += p.vx; p.y += p.vy;
+        var dx = cx-p.x, dy = cy-p.y, d2 = dx*dx+dy*dy;
+        if(d2 < 26000){ parts.splice(i,1); i--; continue; }
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle = p.c; ctx.globalAlpha = .55; ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      if(Math.random() < .55) spawn();
+    }
+    requestAnimationFrame(tick);
+  }
+  for(var k=0;k<46;k++) spawn();
+  tick();
+})();
+
+/* ============ T / E / P ============ */
+(function(){
+  var btns = $$('.tep button');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      singleToggle(btns, 'on', b);
+      $('#tepDesc').innerHTML = '<b>'+b.dataset.k+' · '+b.dataset.t+':</b> '+b.dataset.d;
+    });
+  });
+})();
+
+/* ============ 三要素 ============ */
+(function(){
+  var nodes = $$('.tri .node');
+  nodes.forEach(function(n){
+    n.addEventListener('click', function(){ singleToggle(nodes, 'on', n); });
+  });
+})();
+
+/* ============ 时间轴 ============ */
+(function(){
+  $$('.tl-body').forEach(function(b){
+    b.addEventListener('click', function(){
+      b.classList.toggle('open');
+      var hint = $('.hint', b);
+      if(hint) hint.textContent = b.classList.contains('open') ? '− 收起' : '＋ 点击展开';
+    });
+  });
+})();
+
+/* ============ 核心技术 / 流程 / 名词 ============ */
+(function(){
+  $$('.tech4 .tech').forEach(function(t){
+    t.addEventListener('click', function(){ singleToggle($$('.tech4 .tech'), 'on', t); });
+  });
+  $$('.steps .step').forEach(function(s){
+    s.addEventListener('click', function(){ singleToggle($$('.steps .step'), 'on', s); });
+  });
+  $$('.terms .term').forEach(function(t){
+    t.addEventListener('click', function(){ t.classList.toggle('on'); });
+  });
+})();
+
+/* ============ 算法分类 Tabs ============ */
+(function(){
+  var tabs = $$('#mlTabs button'), panes = $$('#ch3 .pane');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      panes.forEach(function(p){ p.classList.remove('on'); });
+      t.classList.add('on');
+      var pn = $('[data-pane="'+t.dataset.tab+'"]', $('#ch3'));
+      if(pn) pn.classList.add('on');
+    });
+  });
+  $$('#ch3 .algo').forEach(function(a){
+    a.addEventListener('click', function(){ a.classList.toggle('on'); });
+  });
+})();
+
+/* ============ 西瓜预测 ============ */
+(function(){
+  var btn = $('#melonBtn'), res = $('#melonResult');
+  btn.addEventListener('click', function(){ res.style.display='block'; });
+})();
+
+/* ============ 混淆矩阵 ============ */
+(function(){
+  var cells = $$('.cm .cell');
+  var descs = [
+    '<b>TP · 真正例</b>：预测为正（如「垃圾邮件」），实际也为正——逮对了一个坏人。',
+    '<b>FN · 假反例</b>：预测为负（放过了），实际为正——漏掉了一封垃圾邮件（最怕的类型）。',
+    '<b>FP · 假正例</b>：预测为正，实际为负——把正常邮件误判成垃圾邮件（误伤）。',
+    '<b>TN · 真反例</b>：预测为负，实际也为负——正常邮件安然无恙。'
+  ];
+  cells.forEach(function(c){
+    c.addEventListener('click', function(){
+      cells.forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on');
+      $('#cmDesc').innerHTML = descs[+c.dataset.cm];
+    });
+  });
+})();
+
+/* ============ 评估方法 Tabs + 交叉验证格子 ============ */
+(function(){
+  var tabs = $$('#evalTabs button'), panes = $$('#ch4 .pane');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      panes.forEach(function(p){ p.classList.remove('on'); });
+      t.classList.add('on');
+      var pn = $('[data-pane="'+t.dataset.tab+'"]', $('#ch4'));
+      if(pn) pn.classList.add('on');
+    });
+  });
+  var grid = $('#cvGrid');
+  if(grid){
+    var cur = 0;
+    for(var i=0;i<10;i++){
+      var d = document.createElement('div');
+      d.className = 'f ' + (i===cur?'te':'tr');
+      d.textContent = 'F'+(i+1);
+      d.addEventListener('click', function(){
+        var idx = this.textContent.slice(1)-1;
+        grid.querySelectorAll('.f').forEach(function(f, j){
+          f.className = 'f ' + (j===idx ? 'te' : 'tr');
+        });
+      });
+      grid.appendChild(d);
+    }
+  }
+})();
+
+/* ============ 偏差方差：SVG 拟合 + ECharts ============ */
+(function(){
+  var slider = $('#bvSlider'), fit = $('#fitChart'), valEl = $('#bvVal'), stEl = $('#bvState');
+  if(!slider || !fit) return;
+  var hasEcharts = (typeof echarts !== 'undefined');
+  var chart = null;
+  if(hasEcharts){
+    chart = echarts.init($('#bvChart'));
+    chart.setOption(buildEchartOption(55));
+  } else {
+    var ph = $('#bvChart');
+    ph.style.display='flex'; ph.style.alignItems='center'; ph.style.justifyContent='center';
+    ph.innerHTML = '<span style="font-size:13px;color:var(--txt3)">离线模式：图表库未加载，请联网后刷新页面查看误差曲线（滑块交互不受影响）</span>';
+  }
+  function buildEchartOption(t){
+    var xs = [], bias=[], vari=[], tot=[];
+    for(var v=0; v<=100; v+=2){
+      xs.push(v);
+      var b = 0.9*Math.pow(1-v/100, 1.3);
+      var vr = 0.08+0.92*Math.pow(v/100, 1.7);
+      bias.push(+b.toFixed(3)); vari.push(+vr.toFixed(3)); tot.push(+(b+vr).toFixed(3));
+    }
+    var idx = Math.round(t/2);
+    return {
+      animation:false,
+      grid:{left:40,right:18,top:28,bottom:26},
+      tooltip:{trigger:'axis', backgroundColor:'#182349', borderColor:'rgba(148,163,255,.3)', textStyle:{color:'#E9EDFF', fontSize:12}},
+      legend:{data:['偏差','方差','总误差'], top:0, textStyle:{color:'#A6B1DA', fontSize:11}, itemWidth:14, itemHeight:8},
+      xAxis:{type:'category', data:xs, axisLine:{lineStyle:{color:'rgba(148,163,255,.4)'}}, axisLabel:{color:'#6F7CAA', fontSize:10, interval:Math.floor(xs.length/6)}, name:'模型复杂度', nameTextStyle:{color:'#6F7CAA', fontSize:10}},
+      yAxis:{type:'value', max:1.15, axisLine:{show:false}, splitLine:{lineStyle:{color:'rgba(148,163,255,.12)'}}, axisLabel:{color:'#6F7CAA', fontSize:10}},
+      series:[
+        {name:'偏差', type:'line', data:bias, smooth:true, symbol:'none', lineStyle:{width:2, color:'#8B9CFF'}},
+        {name:'方差', type:'line', data:vari, smooth:true, symbol:'none', lineStyle:{width:2, color:'#3AD6C6'}},
+        {name:'总误差', type:'line', data:tot, smooth:true, symbol:'none', lineStyle:{width:2.5, color:'#FF9F43'}},
+        {name:'当前', type:'line', data:[], markLine:{silent:true, symbol:'none', lineStyle:{color:'#FF9F43', type:'dashed', width:1}, label:{show:false}, data:[{xAxis: idx}]}}
+      ]
+    };
+  }
+  function yPx(v){ return 210 - (v-2)*31.7; } // g 值域约 [2,8] → 映射 190px
+  function realY(xn){ return 3*Math.sin(0.9*xn+1)+5; }
+  function fitY(xn, t){
+    var s = t/100;
+    return 5 + (xn-5)*0.32*s
+           + 3*Math.sin(0.9*xn+1)*Math.pow(s,1.5)
+           + Math.pow(s,6)*1.15*Math.sin(7*xn+2.5);
+  }
+  function clamp(v,lo,hi){ return Math.min(hi, Math.max(lo, v)); }
+  function render(t){
+    var pts = [], real=[], fitd=[];
+    for(var i=0;i<=120;i++){
+      var x = 30 + i*260/120, xn = (x-30)/260*10;
+      real.push(x+','+yPx(realY(xn)));
+      var fy = clamp(fitY(xn,t), 2.2, 7.8);
+      fitd.push(x+','+yPx(fy));
+    }
+    var realPts = [];
+    for(var j=0;j<=9;j++){
+      var xp = 30 + j*260/9, xn2 = (xp-30)/260*10;
+      realPts.push(xp+','+yPx(clamp(realY(xn2)+ (Math.sin(xn2*13)*0.22+Math.cos(xn2*5)*0.18), 2.2, 7.8)));
+    }
+    var g = fit.getAttribute('viewBox').split(' ').map(Number);
+    var html =
+      '<rect x="10" y="10" width="300" height="220" fill="none"/>'+
+      '<line x1="30" y1="210" x2="290" y2="210" stroke="#6F7CAA" stroke-width="1.5"/>'+
+      '<line x1="30" y1="210" x2="30" y2="20" stroke="#6F7CAA" stroke-width="1.5"/>'+
+      '<polyline points="'+fitd.join(' ')+'" fill="none" stroke="#3AD6C6" stroke-width="2.5" stroke-linejoin="round" opacity="0.95"/>'+
+      '<polyline points="'+real.join(' ')+'" fill="none" stroke="#FF9F43" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" opacity="0.85"/>'+
+      '<g fill="#B9C4FF">'+realPts.map(function(p){var q=p.split(',');return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="3.4"/>';}).join('')+'</g>'+
+      '<text x="150" y="235" text-anchor="middle" fill="#6F7CAA" font-size="10" font-family="JetBrains Mono,monospace">特征 X（如面积）</text>'+
+      '<text x="12" y="34" text-anchor="start" fill="#6F7CAA" font-size="10" font-family="JetBrains Mono,monospace">输出 Y</text>';
+    fit.innerHTML = html;
+  }
+  function state(t){
+    if(t < 35){ return ['欠拟合（高偏差 · 低方差）','低']; }
+    if(t <= 75){ return ['刚刚好（偏差方差平衡，最优区）','中']; }
+    return ['过拟合（低偏差 · 高方差）','高'];
+  }
+  function update(t){
+    render(t);
+    var s = state(t);
+    valEl.textContent = s[1];
+    stEl.innerHTML = '状态：<b>'+s[0]+'</b>';
+    if(chart) chart.setOption(buildEchartOption(t));
+  }
+  slider.addEventListener('input', function(){ update(+slider.value); });
+  update(55);
+})();
+
+/* ============ 小测验 ============ */
+(function(){
+  var QUIZ = [
+    {q:'人工智能（AI）、机器学习（ML）、深度学习（DL）三者的关系是？',
+     opts:[
+       {t:'三者是并列关系', ok:false},
+       {t:'AI ⊃ ML ⊃ DL（层层包含）', ok:true},
+       {t:'ML 包含 AI 和 DL', ok:false},
+       {t:'DL 包含 AI 和 ML', ok:false}
+     ],
+     why:'AI 是最大的筐；机器学习是 AI 的子集；深度学习又是机器学习的子集。'},
+    {q:'在「垃圾邮件过滤」的例子中，「经验 E」指的是？',
+     opts:[
+       {t:'把邮件分对的个数', ok:false},
+       {t:'邮件分类任务本身', ok:false},
+       {t:'你手动把邮件标记为垃圾/正常的历史数据', ok:true},
+       {t:'计算机程序的运行速度', ok:false}
+     ],
+     why:'E（Experience）是喂给机器的历史数据——你标记过的邮件；T 是任务，P 是绩效。'},
+    {q:'机器学习的三要素是？',
+     opts:[
+       {t:'数据、模型、算法', ok:true},
+       {t:'CPU、内存、硬盘', ok:false},
+       {t:'输入、处理、输出', ok:false},
+       {t:'训练集、测试集、验证集', ok:false}
+     ],
+     why:'数据是燃料，算法是方法，模型是学到的规律 f(x)。'},
+    {q:'训练数据「没有人工标记」的学习方式属于？',
+     opts:[
+       {t:'监督学习', ok:false},
+       {t:'无监督学习', ok:true},
+       {t:'强化学习', ok:false},
+       {t:'深度学习', ok:false}
+     ],
+     why:'没有标签 = 无监督学习，代表任务：聚类、降维。'},
+    {q:'「模型在训练集上表现很好，但在测试集上表现差」是？',
+     opts:[
+       {t:'欠拟合', ok:false},
+       {t:'过拟合', ok:true},
+       {t:'正常现象', ok:false},
+       {t:'泛化能力强', ok:false}
+     ],
+     why:'死记硬背训练集、对新数据没泛化能力，就是过拟合。防过拟合：正则化、数据扩增、Dropout、Early Stopping。'},
+    {q:'简单模型通常具有的特点是？',
+     opts:[
+       {t:'高偏差、低方差', ok:true},
+       {t:'低偏差、高方差', ok:false},
+       {t:'高偏差、高方差', ok:false},
+       {t:'低偏差、低方差', ok:false}
+     ],
+     why:'简单模型平均后是一条直线，与真实规律差得远（高偏差），但对数据变动不敏感（低方差）。'},
+    {q:'下列哪一组指标属于「回归问题」的性能度量？',
+     opts:[
+       {t:'Precision 与 Recall', ok:false},
+       {t:'MAE、MSE、RMSE、R²', ok:true},
+       {t:'TP、FP、FN、TN', ok:false},
+       {t:'ROC 与 AUC', ok:false}
+     ],
+     why:'MAE/MSE/RMSE/R² 衡量预测连续值与真实值的差距；Precision、Recall、混淆矩阵、ROC/AUC 属于分类问题。'},
+    {q:'查全率（Recall）的计算公式是？',
+     opts:[
+       {t:'TP / (TP + FP)', ok:false},
+       {t:'TP / (TP + FN)', ok:true},
+       {t:'(TP + TN) / 总数', ok:false},
+       {t:'2PR / (P + R)', ok:false}
+     ],
+     why:'Recall = TP/(TP+FN)——真正正的样本被找回来多少。TP/(TP+FP) 是 Precision（查准率）。'}
+  ];
+  var box = $('#quizBox'), scoreEl = $('#quizScore');
+  var score = 0, done = 0;
+  QUIZ.forEach(function(item, qi){
+    var card = document.createElement('div');
+    card.className = 'quiz-card';
+    var optsHtml = item.opts.map(function(o, oi){
+      return '<button class="opt" data-oi="'+oi+'">'+o.t+'</button>';
+    }).join('');
+    card.innerHTML = '<div class="qi">Q'+(qi+1)+' / '+QUIZ.length+'</div><h4>'+item.q+'</h4><div class="opts">'+optsHtml+'</div><div class="fb"></div>';
+    var answered = false;
+    card.querySelectorAll('.opt').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(answered) return;
+        answered = true;
+        var oi = +btn.dataset.oi;
+        var isRight = item.opts[oi].ok;
+        btn.classList.add(isRight ? 'right' : 'wrong');
+        item.opts.forEach(function(o, idx){
+          if(o.ok){ var rb = card.querySelector('.opt[data-oi="'+idx+'"]'); rb.classList.add('right'); }
+        });
+        var fb = $('.fb', card);
+        fb.style.display = 'block';
+        fb.className = 'fb ' + (isRight ? 'ok' : 'no');
+        fb.innerHTML = (isRight ? '<b>回答正确！</b>' : '<b>答错了，别灰心。</b>') + item.why;
+        if(isRight) score++;
+        done++;
+        scoreEl.textContent = '已答 ' + done + ' / ' + QUIZ.length + ' · 当前得分 ' + score + ' / ' + QUIZ.length;
+        if(done === QUIZ.length){
+          scoreEl.textContent += ' — 完成！' + (score>=6 ? '已经很棒了，可以开始接触具体算法啦。' : '建议把上面没把握的章节再点开看一遍。');
+        }
+      });
+    });
+    box.appendChild(card);
+  });
+})();
+
+})();
+</script>
+</body>
+</html>
