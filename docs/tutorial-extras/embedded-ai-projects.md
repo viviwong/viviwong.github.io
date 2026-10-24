@@ -12,7 +12,7 @@ sidebar_position: 1
 
 基于 CAN 总线的锂电池微短路预警系统，了解端侧 AI 在电池安全监测中的应用。
 
-[查看项目介绍 →](/web/1021-BATTERY.html)
+[查看项目介绍 →](/web/1021-BATTERY)
 
 ## AI 入门知识
 
@@ -20,4 +20,4 @@ sidebar_position: 1
 
 面向初学者的机器学习图解资料，帮助你建立对机器学习基本概念的直观认识。
 
-[开始阅读 →](/web/1021-machine_learning.html)
+[开始阅读 →](/web/1021-machine_learning)
