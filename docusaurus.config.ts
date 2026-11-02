@@ -40,11 +40,7 @@ const config: Config = {
           showLastUpdateAuthor: true,  // 显示最后修改人
           showLastUpdateTime: true,    // 显示最后修改时间
         },
-        blog: {
-          showReadingTime: true,
-          // 博客也可以开启
-          showLastUpdateTime: true,
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
