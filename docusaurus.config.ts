@@ -50,6 +50,24 @@ const config: Config = {
 
   // 【修正点 1：把 plugins 移到正确层级】
   plugins: [
+    function trainingDemoAssets(context) {
+      const CopyPlugin = require('copy-webpack-plugin');
+      const path = require('node:path');
+      return {
+        name: 'training-demo-assets',
+        configureWebpack(_config, isServer) {
+          if (isServer) return {};
+          return {
+            plugins: [new CopyPlugin({
+              patterns: ['trashCan/index.html', 'trashCan/style.css', 'trashCan/app.js', 'gestureAccess/index.html'].map((file) => ({
+                from: path.join(context.siteDir, 'training', file),
+                to: 'training/' + file,
+              })),
+            })],
+          };
+        },
+      };
+    },
     [
       '@docusaurus/plugin-content-docs',
       {

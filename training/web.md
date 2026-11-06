@@ -26,8 +26,11 @@ sidebar_position: 1
 
 ## 嵌入式AI实训
 
+
 * <a href="/web/201-STM32智慧垃圾桶教学文档.html" target="_blank">21-STM32智慧垃圾桶教学文档</a>
 * <a href="/web/202-K230智慧门禁.html" target="_blank">22-K230智慧门禁</a>
+* <a href="/training/trashCan/index.html" target="_blank">23-智慧垃圾桶</a>
+* <a href="/training/gestureAccess/index.html" target="_blank" rel="noopener">24-手势识别</a>
 
 
 
